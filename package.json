@@ -1,0 +1,14 @@
+{
+  "name": "poker",
+  "version": "1.0.0",
+  "description": "Multi-player poker app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jeff Mason",
+  "license": "ISC",
+  "dependencies": {
+    "jasmine": "^3.6.4"
+  }
+}
