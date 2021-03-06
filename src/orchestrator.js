@@ -41,7 +41,9 @@ function deal(numCards, deck, players){
     for (var i = 0; i < numCards; i++){
         players.forEach(p => {
             if (p.handState == 'IN'){
-                p.hand.push(deck.take());
+                var c = deck.take();
+                p.hand.push(c);
+                console.log(p.name, "was given", c);
             }
         })
     };
