@@ -6,13 +6,15 @@ function Player(id, name) {
       var _bet = null;
       var _gameState = 'ACTIVE';
       var _handState = 'IN';
-      var _position = null;
-      var _dealer = false;
+      var _button = false;
+      var _tablePosition = null;
       var _smallBlind = false;
       var _bigBlind = false;
-
       return Object.freeze({
-
+            get id(){
+                  return _id;
+            },
+            
             get name(){
                   return _name;
             },
@@ -51,20 +53,19 @@ function Player(id, name) {
                   _handState = value;
                   return this;
             },
-            get position(){
-                  return _position;
+            get tablePosition(){
+                  return _tablePosition;
             },
-
-            set position(value){
-                  _position = position;
+            set tablePosition(value){
+                  _tablePosition = value;
                   return this;
             },
-            get dealer(){
-                  return _dealer;
+            get button(){
+                  return _button;
             },
 
-            set dealer(value){
-                  _dealer = value;
+            set button(value){
+                  _button = value;
                   return this;
             },
             get smallBlind(){

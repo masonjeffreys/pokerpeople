@@ -1,5 +1,3 @@
-const STAGES = ['preflop', 'flop', 'turn', 'river']
-
 function Table(id) {
     var _id = id;
     var _round = null;
@@ -12,6 +10,13 @@ function Table(id) {
     var _smallBlind = null;
     var _sidePots = [];
     return Object.freeze({
+        get dealerPosition(){
+            return _dealerPosition;
+        },
+        set dealerPosition(value){
+            _dealerPosition = value;
+            return this;
+        }
         // get tablePlayers(){
         //     return _tablePlayers;
         // },

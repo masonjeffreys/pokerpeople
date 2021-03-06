@@ -1,4 +1,6 @@
 // set of methods used to update the dumb state objects of deck, table, player
+const STAGES = ['preflop', 'flop', 'turn', 'river']
+
 const Table = require('./table');
 const Player = require('./player');
 const Deck = require('./deck');
@@ -11,50 +13,94 @@ var player3 = Player(3, "Jimmy Dean");
 
 var table = Table(1);
 var deck = Deck(1);
+var handPlayers = [];
+var activeTablePosition = null;
 
 function startGame(table, deck, players, startingChips, smallBlindAmount){
-    players.forEach(p => {
-        p.chips = startingChips;
-        console.log("Player added: ", p.name, " with ", p.chips, " chips.");
+    players.forEach(function(player, index){
+        player.chips = startingChips;
+        player.tablePosition = index + 1;
     });
     table.smallBlind = smallBlindAmount;
     table.bigBlind = 2 * smallBlindAmount;
-    table.position = 1;
     table.round = 1;
     table.dealerPosition = 1;
     deck.init().shuffle();
-    deck.listCards();
 };
 
-function setHandPlayers(players){
-    players.forEach(p => {
-        if (p.gameState == 'ACTIVE' && p.chips >= 50){
-            p.handState = 'IN';
-            console.log("Player: ", p.name, " is IN with ", p.chips, " chips.");
+function setHandPlayers(players, table){
+    players.forEach(function(player, index) {
+        if (player.gameState == 'ACTIVE' && player.chips >= 50){
+            player.handState = 'IN';
+            handPlayers.push(player)
         } else {
-            p.handState = 'OUT';
+            player.handState = 'OUT';
         }
+        console.log("at this point, ", player.tablePosition)
     });
 }
 
-function deal(numCards, deck, players){
-    for (var i = 0; i < numCards; i++){
-        players.forEach(p => {
-            if (p.handState == 'IN'){
-                var c = deck.take();
-                p.hand.push(c);
-                console.log(p.name, "was given", c);
-            }
-        })
-    };
+function getNextHandPlayerIndex(previousTablePosition, handPlayers){
+    var i = handPlayers.findIndex(obj => obj.tablePosition >= previousTablePosition + 1);
+    if (i == -1){
+        return 0;
+    } else {
+        return i;
+    }
+}
+
+function getCurrentPlayerIndex(tablePosition, handPlayers){
+    var i = handPlayers.findIndex(obj => obj.tablePosition >= tablePosition);
+    if (i == -1){
+        return 0;
+    } else {
+        return i;
+    }
+}
+
+function setDealer(table, handPlayers){
+    var i = getCurrentPlayerIndex(table.dealerPosition, handPlayers);
+    handPlayers[i].button = true;
+}
+
+function deal(numCards, deck, table, handPlayers){
+    // person after dealer gets first card
+    activeTablePosition = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
+    console.log("again, dealer position is ", table.dealerPosition);
+    console.log("First table position to receive card is ", activeTablePosition);
+    console.log("first card receiver is", handPlayers[activeTablePosition].name);
+    //then perform dealing
+    // for (var i = 0; i < numCards; i++){
+    //     handPlayers.forEach(function(player, index){
+    //         if (player.handState == 'IN'){
+    //             console.log(index);
+    //             var card = deck.take();
+    //             player.hand.push(card);
+    //             console.log(player.name, "was given", card);
+    //         }
+    //     })
+    // };
+}
+
+function preFlopBetRound(){
+    //find active person pass small blind and big blind
+    //offer options to active person call, fold, raise (not check here)
+    //update pot and player based on action
+    //evaluate next action
+        //declare winner
+        //advance to next player
+        //close bet round and flop
+    console.log("Implement betting round logic");
 }
 
 
 
 var players = [player1, player2, player3];
 startGame(table, deck, players, 100, 5);
-setHandPlayers(players);
-deal(2, deck, players);
+setHandPlayers(players, table);
+setDealer(table, handPlayers);
+deal(2, deck, table, handPlayers);
+preFlopBetRound();
 
 // deal: ,
 // burn: function(numCards){
