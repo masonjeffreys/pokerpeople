@@ -124,12 +124,14 @@ function preFlopBetRound(table, handPlayers){
             
             if (action == 'bet'){
                 amount = parseInt(reader.question("Bet amount?"));
+                player.makeBet(amount);
                 bettingRound.addAction(player, "bet", amount);
                 table.pot = table.pot + amount;
             }
 
             if (action == 'call'){
                 var callAmount = bettingRound.getCallAmount(player);
+                player.makeBet(callAmount);
                 bettingRound.addAction(player, "call", callAmount);
                 table.pot = table.pot + callAmount;
             }
@@ -147,10 +149,9 @@ function preFlopBetRound(table, handPlayers){
     
     //update pot and player based on action
     //evaluate next action
-        //declare winner
-        //advance to next player
-        //close bet round and flop
-    console.log("Still to finish implement betting round logic");
+        //declare winner or
+        //advance to next player or
+        //close bet round and flop or
 }
 
 startGame(table, deck, players, 100, 5);

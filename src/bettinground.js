@@ -13,38 +13,36 @@ function BettingRound(handPlayers, table){
         // Betting will stop if all but 1 player folds
         if (_activePlayers == 1){
             console.log("Betting is over since only 1 player is left!");
-            _isDone = true;
-            return _isDone;
+            return true;
         } else{
             // return true if betting should be done
             // According to poker rules, the betting is done if the player has stopped at the same amount
             // as the person to his/her left that is still in the game.
             var playerIndex = handPlayers.findIndex(obj => obj.id == player.id);
             
-            //get player to the left that hasn't folded by looping through array backwards
+            //get player to the left that hasn't folded by advancing through array
             var leftPlayerIndex = null;
-            var i = playerIndex - 1;
+            var i = playerIndex + 1;
 
             while (true){
-                console.log("i is ", i);
-                if (i == -1){
-                    //Start again at end if we go low
-                    i = handPlayers.length - 1;
+                if (i >= handPlayers.length){
+                    //Start again at end if we go high
+                    i = 0;
                 }
                 if (handPlayers[i].handState == 'IN'){
                     leftPlayerIndex = i;
                     break;
                 }
-                i = i - 1;
+                i = i + 1;
             }
     
             leftPlayer = handPlayers[leftPlayerIndex];
             
-            if (leftPlayer.bet == player.bet) {
-                console.log("You bet", player.bet);
-                console.log("Left player ", leftPlayer.name, " has matched current player bet", leftPlayer.bet);
-                _isDone = true;
-                return _isDone;
+            if (leftPlayer.bet === player.bet) {
+                console.log(`${leftPlayer.name} has matched ${player.name}'s bet of ${player.bet}`);
+                return true;
+            } else {
+                return false;
             }
         }
  

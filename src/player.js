@@ -85,14 +85,17 @@ function Player(id, name) {
                   _bigBlind = value;
                   return this;
             },
-
             get bet(){
                   return _bet;
             },
+            set bet(value){
+                  _bet = value;
+                  return _bet;
+            },
             makeBet: function(value){
-                  console.log("betting ", value);
                   _bet = _bet + value;
                   _chips = _chips - value;
+                  return this;
             }
       });
 }
