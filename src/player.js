@@ -10,6 +10,7 @@ function Player(id, name) {
       var _tablePosition = null;
       var _smallBlind = false;
       var _bigBlind = false;
+
       return Object.freeze({
             get id(){
                   return _id;
@@ -88,11 +89,12 @@ function Player(id, name) {
             get bet(){
                   return _bet;
             },
-
-            set bet(value){
+            bet: function(value){
+                  console.log("betting ", value);
+                  _chips = _chips - value;
                   _bet = value;
                   return this;
-            },
+            }
       });
 }
 

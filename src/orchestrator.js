@@ -93,32 +93,41 @@ function preFlopBetRound(table, handPlayers){
     var stopBetting = false;
     var adjustedIndex = activeHandPlayersIndex;
     var bettingRound = BettingRound(handPlayers, table, activeHandPlayersIndex)
+
     // add small blind
-    console.log("Blinds are", table.smallBlind, table.bigBlind)
     var smallBlindIndex = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
-    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", table.smallBlind)
+    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", table.smallBlind);
+    handPlayers[smallBlindIndex].bet(table.smallBlind);
+
     // add big blind
     var bigBlindIndex = getNextHandPlayerIndex(table.dealerPosition + 1, handPlayers);
     bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", table.smallBlind * 2)
     bettingRound.currentBet = table.smallBlind * 2;
-    bettingRound.listActions();
+    handPlayers[bigBlindIndex].bet(table.bigBlind);
 
     while (true){
+        bettingRound.listActions();
         // Ask player for action
         player = handPlayers[adjustedIndex];
         if (player.handState == 'IN'){
             // Prompt player based on options
-            act = console.log(handPlayers[adjustedIndex].name, "Call, raise, or fold?")
+            var actionOpts = bettingRound.getOptions(player)
             // Get action from player
-            var action = reader.question("Action?")
+            var action = reader.question(actionOpts)
             var amount = null;
+
             if (action == 'bet'){
-                amount = reader.question("Bet amount?")
-                hP.chips = hP.chips - amount;
+                amount = reader.question("Bet amount?");
+                bettingRound.addAction(player, "bet", amount);
+            }
+
+            if (action == 'call'){
+                bettingRound.addAction(player, 'call');
             }
             
             // Eval if action shoud stop
             if (action == 'fold'){
+                bettingRound.addAction(player, 'fold', 0);
                 stopBetting = true;
             }
             else {
