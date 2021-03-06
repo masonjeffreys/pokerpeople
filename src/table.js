@@ -10,6 +10,9 @@ function Table(id) {
     var _smallBlind = null;
     var _sidePots = [];
     return Object.freeze({
+        get id(){
+            return _id;
+        },
         get dealerPosition(){
             return _dealerPosition;
         },

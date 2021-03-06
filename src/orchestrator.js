@@ -4,12 +4,11 @@ const STAGES = ['preflop', 'flop', 'turn', 'river']
 const Table = require('./table');
 const Player = require('./player');
 const Deck = require('./deck');
+const BettingRound = require('./bettingRound');
 
 const reader = require("readline-sync");
 
-var player1 = Player(1, "Jon Snow");
-var player2 = Player(2, "James Taylor");
-var player3 = Player(3, "Jimmy Dean");
+var players = [Player(1, "Jon Snow"), Player(2, "James Taylor"), Player(3, "Jimmy Dean"), Player(4, "Jeff Mason")];
 
 var table = Table(1);
 var deck = Deck(1);
@@ -36,7 +35,6 @@ function setHandPlayers(players, table){
         } else {
             player.handState = 'OUT';
         }
-        console.log("at this point, ", player.tablePosition)
     });
 }
 
@@ -58,16 +56,13 @@ function getCurrentPlayerIndex(tablePosition, handPlayers){
     }
 }
 
-function cyclePlayersStartingAtIndex(players, startPosition, fn){
-    for( var i=0; i < players.length; i++) {
-        var pointer = (i + startPosition) % players.length;
-        fn(players[pointer]);
-    }
-}
-
-function setDealer(table, handPlayers){
+function setDealerAndBlinds(table, handPlayers){
     var i = getCurrentPlayerIndex(table.dealerPosition, handPlayers);
     handPlayers[i].button = true;
+    var j = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
+    handPlayers[j].smallBlind = true;
+    var k = getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
+    handPlayers[k].bigBlind = true;
 }
 
 function deal(numCards, deck, table, handPlayers){
@@ -79,30 +74,32 @@ function deal(numCards, deck, table, handPlayers){
             var card = deck.take();
             var player = handPlayers[pointer];
             player.hand.push(card);
-            console.log("dealt ", card, " to ", player.name)
         }
     }
 }
 
-function preFlopBetRound(){
+function preFlopBetRound(table, handPlayers){
     //find active person pass small blind and big blind
+    activeHandPlayersIndex = getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
     //offer options to active person call, fold, raise (not check here)
+    var bettingRound = BettingRound(handPlayers, table, activeHandPlayersIndex);
+    while (bettingRound.next == true){
+        console.log("offer to another player");
+    }
+    console.log(handPlayers[activeHandPlayersIndex].name, "Call, raise, or fold?")
     //update pot and player based on action
     //evaluate next action
         //declare winner
         //advance to next player
         //close bet round and flop
-    console.log("Implement betting round logic");
+    console.log("Still to finish implement betting round logic");
 }
 
-
-
-var players = [player1, player2, player3];
 startGame(table, deck, players, 100, 5);
 setHandPlayers(players, table);
-setDealer(table, handPlayers);
+setDealerAndBlinds(table, handPlayers);
 deal(2, deck, table, handPlayers);
-preFlopBetRound();
+preFlopBetRound(table, handPlayers);
 
 // deal: ,
 // burn: function(numCards){
