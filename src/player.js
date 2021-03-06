@@ -89,11 +89,10 @@ function Player(id, name) {
             get bet(){
                   return _bet;
             },
-            bet: function(value){
+            makeBet: function(value){
                   console.log("betting ", value);
+                  _bet = _bet + value;
                   _chips = _chips - value;
-                  _bet = value;
-                  return this;
             }
       });
 }

@@ -8,7 +8,7 @@ const BettingRound = require('./bettingRound');
 
 const reader = require("readline-sync");
 
-var players = [Player(1, "Jon Snow"), Player(2, "James Taylor"), Player(3, "Jimmy Dean"), Player(4, "Jeff Mason")];
+var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")];
 
 var table = Table(1);
 var deck = Deck(1);
@@ -19,11 +19,13 @@ function startGame(table, deck, players, startingChips, smallBlindAmount){
     players.forEach(function(player, index){
         player.chips = startingChips;
         player.tablePosition = index + 1;
+        player.bet = 0;
     });
     table.smallBlind = smallBlindAmount;
     table.bigBlind = 2 * smallBlindAmount;
     table.round = 1;
     table.dealerPosition = 1;
+    table.pot = 0;
     deck.init().shuffle();
 };
 
@@ -97,43 +99,44 @@ function preFlopBetRound(table, handPlayers){
     // add small blind
     var smallBlindIndex = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
     bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", table.smallBlind);
-    handPlayers[smallBlindIndex].bet(table.smallBlind);
+    handPlayers[smallBlindIndex].makeBet(table.smallBlind);
+    table.pot = table.pot + table.smallBlind;
 
     // add big blind
     var bigBlindIndex = getNextHandPlayerIndex(table.dealerPosition + 1, handPlayers);
     bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", table.smallBlind * 2)
     bettingRound.currentBet = table.smallBlind * 2;
-    handPlayers[bigBlindIndex].bet(table.bigBlind);
+    handPlayers[bigBlindIndex].makeBet(table.bigBlind);
+    table.pot = table.pot + table.bigBlind;
 
     while (true){
-        bettingRound.listActions();
         // Ask player for action
         player = handPlayers[adjustedIndex];
         if (player.handState == 'IN'){
+            // Remind player of current hand table state
+            console.log(`Player up: ${player.name}`);
+            console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
             // Prompt player based on options
             var actionOpts = bettingRound.getOptions(player)
             // Get action from player
-            var action = reader.question(actionOpts)
+            var action = reader.question(actionOpts + "\n");
             var amount = null;
-
+            
             if (action == 'bet'){
-                amount = reader.question("Bet amount?");
+                amount = parseInt(reader.question("Bet amount?"));
                 bettingRound.addAction(player, "bet", amount);
+                table.pot = table.pot + amount;
             }
 
             if (action == 'call'){
-                bettingRound.addAction(player, 'call');
-            }
-            
-            // Eval if action shoud stop
-            if (action == 'fold'){
-                bettingRound.addAction(player, 'fold', 0);
-                stopBetting = true;
-            }
-            else {
-                amount = 0;
+                var callAmount = bettingRound.getCallAmount(player);
+                bettingRound.addAction(player, "call", callAmount);
+                table.pot = table.pot + callAmount;
             }
         }
+
+        // Eval if action shoud stop
+        stopBetting = bettingRound.isDone;
         if (stopBetting === true){
             console.log("This street is over!");
             break;

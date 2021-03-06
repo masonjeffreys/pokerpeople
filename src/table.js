@@ -33,6 +33,13 @@ function Table(id) {
         set bigBlind(value){
             _bigBlind = value;
             return this;
+        },
+        get pot(){
+            return _pot;
+        },
+        set pot(value){
+            _pot = value;
+            return _pot;
         }
         // get tablePlayers(){
         //     return _tablePlayers;

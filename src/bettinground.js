@@ -2,20 +2,58 @@
 
 function BettingRound(handPlayers, table){
     var _handPlayers = handPlayers;
+    var _activePlayers = handPlayers.length;
     var _currentBet = 0;
     var _table = table;
     var _actions = [];
     var _i = 0;
+    var _isDone = false;
 
-    function evalNextAction(){
-        console.log('return complete if betting round is done')
+    function evalForStop(player){
+        // Betting will stop if all but 1 player folds
+        if (_activePlayers == 1){
+            console.log("Betting is over since only 1 player is left!");
+            _isDone = true;
+            return _isDone;
+        } else{
+            // return true if betting should be done
+            // According to poker rules, the betting is done if the player has stopped at the same amount
+            // as the person to his/her left that is still in the game.
+            var playerIndex = handPlayers.findIndex(obj => obj.id == player.id);
+            
+            //get player to the left that hasn't folded by looping through array backwards
+            var leftPlayerIndex = null;
+            var i = playerIndex - 1;
+
+            while (true){
+                console.log("i is ", i);
+                if (i == -1){
+                    //Start again at end if we go low
+                    i = handPlayers.length - 1;
+                }
+                if (handPlayers[i].handState == 'IN'){
+                    leftPlayerIndex = i;
+                    break;
+                }
+                i = i - 1;
+            }
+    
+            leftPlayer = handPlayers[leftPlayerIndex];
+            
+            if (leftPlayer.bet == player.bet) {
+                console.log("You bet", player.bet);
+                console.log("Left player ", leftPlayer.name, " has matched current player bet", leftPlayer.bet);
+                _isDone = true;
+                return _isDone;
+            }
+        }
+ 
     }
 
     function playerTotalBet(player){
         var playerSum = 0;
-        var playerId = player.id;
         _actions.forEach(a =>{
-            if (a.player.id == playerId) {
+            if (a.player.id == player.id) {
                 playerSum = playerSum + a.amount;
             }
         })
@@ -27,27 +65,28 @@ function BettingRound(handPlayers, table){
             console.log(_actions);
         },
         getCallAmount: function(player){
-            return _currentBet - playerTotalBet;
+            return (_currentBet - playerTotalBet(player));
+        },
+        get isDone(){
+            return _isDone;
         },
         addAction: function(player, action, amount){
             // Add some validation here
+            var logItem = {player: player, action: action, amount: amount}
             if (action == 'bet'){
-                _currentBet = _currentBet + parseInt(amount);
-                console.log("new current bet is ", _currentBet);
+                _currentBet = _currentBet + amount;
             }
             if (action == 'call'){
-                amount = _currentBet - playerTotalBet(player);
-                console.log("current bet is: ", _currentBet, "playerMax is", playerTotalBet(player));
+                // Nothing to do here
             }
             if (action == 'fold'){
-                amount = 0;
-                console.log("player ", player.name, " is OUT")
+                logItem.amount = 0;
+                console.log("player ", player.name, " FOLDED")
             }
-            _actions.push(
-                {player: player,
-                action: action,
-                amount: amount}
-            );
+            console.log("Action is: ", logItem.player.name, logItem.action, logItem.amount);
+            _actions.push(logItem);
+            _isDone = evalForStop(player);
+            return amount;
         },
         get currentBet(){
             return _currentBet;
@@ -58,7 +97,8 @@ function BettingRound(handPlayers, table){
         },
         getOptions: function(player){
             var actionOpts = [];
-            var callAmount = _currentBet - playerTotalBet(player);
+            var callAmount = this.getCallAmount(player);
+            actionOpts.push(`Bet up to ${player.chips}`);
             if ( callAmount > 0 ){
                 actionOpts.push(`${callAmount} to call`);
             }
