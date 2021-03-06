@@ -14,7 +14,6 @@ var deck = Deck(1);
 
 function startGame(table, deck, players, startingChips, smallBlindAmount){
     players.forEach(p => {
-        table.addPlayer(p);
         p.chips = startingChips;
         console.log("Player added: ", p.name, " with ", p.chips, " chips.");
     });
@@ -27,22 +26,35 @@ function startGame(table, deck, players, startingChips, smallBlindAmount){
     deck.listCards();
 };
 
+function setHandPlayers(players){
+    players.forEach(p => {
+        if (p.gameState == 'ACTIVE' && p.chips >= 50){
+            p.handState = 'IN';
+            console.log("Player: ", p.name, " is IN with ", p.chips, " chips.");
+        } else {
+            p.handState = 'OUT';
+        }
+    });
+}
+
+function deal(numCards, deck, players){
+    for (var i = 0; i < numCards; i++){
+        players.forEach(p => {
+            if (p.handState == 'IN'){
+                p.hand.push(deck.take());
+            }
+        })
+    };
+}
+
+
+
 var players = [player1, player2, player3];
 startGame(table, deck, players, 100, 5);
+setHandPlayers(players);
+deal(2, deck, players);
 
-// deal: function(numCards){
-//     this.players.forEach(p => {
-//         if (p.gameState == 'ACTIVE'){
-//             this.handPlayers.push(p);
-//         }
-//     })
-//     for (var i = 0; i < numCards; i++){
-//         this.handPlayers.forEach(p => {
-//             var c = this.deck.take();
-//             p.hand.push(c);
-//         })
-//     };
-// },
+// deal: ,
 // burn: function(numCards){
 //     for (var i = 0; i < numCards; i++){
 //         this.burnedCards.push(this.deck.take());
