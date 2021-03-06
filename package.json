@@ -9,6 +9,7 @@
   "author": "Jeff Mason",
   "license": "ISC",
   "dependencies": {
-    "jasmine": "^3.6.4"
+    "jasmine": "^3.6.4",
+    "readline-sync": "^1.4.10"
   }
 }
