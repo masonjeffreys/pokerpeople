@@ -78,15 +78,61 @@ function deal(numCards, deck, table, handPlayers){
     }
 }
 
+function bettingRoundOptions(){
+
+}
+
 function preFlopBetRound(table, handPlayers){
-    //find active person pass small blind and big blind
+    //find active person (first person after small blind and big blind)
     activeHandPlayersIndex = getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
+    console.log("Active starter should be", handPlayers[activeHandPlayersIndex].name, "index ", activeHandPlayersIndex)
     //offer options to active person call, fold, raise (not check here)
-    var bettingRound = BettingRound(handPlayers, table, activeHandPlayersIndex);
-    while (bettingRound.next == true){
-        console.log("offer to another player");
+    //var bettingRound = BettingRound(handPlayers, table, activeHandPlayersIndex);
+
+    //Infinite loop through people until betting is closed, then break
+    var stopBetting = false;
+    var adjustedIndex = activeHandPlayersIndex;
+    var bettingRound = BettingRound(handPlayers, table, activeHandPlayersIndex)
+    // add small blind
+    console.log("Blinds are", table.smallBlind, table.bigBlind)
+    var smallBlindIndex = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
+    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", table.smallBlind)
+    // add big blind
+    var bigBlindIndex = getNextHandPlayerIndex(table.dealerPosition + 1, handPlayers);
+    bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", table.smallBlind * 2)
+    bettingRound.currentBet = table.smallBlind * 2;
+    bettingRound.listActions();
+
+    while (true){
+        // Ask player for action
+        player = handPlayers[adjustedIndex];
+        if (player.handState == 'IN'){
+            // Prompt player based on options
+            act = console.log(handPlayers[adjustedIndex].name, "Call, raise, or fold?")
+            // Get action from player
+            var action = reader.question("Action?")
+            var amount = null;
+            if (action == 'bet'){
+                amount = reader.question("Bet amount?")
+                hP.chips = hP.chips - amount;
+            }
+            
+            // Eval if action shoud stop
+            if (action == 'fold'){
+                stopBetting = true;
+            }
+            else {
+                amount = 0;
+            }
+        }
+        if (stopBetting === true){
+            console.log("This street is over!");
+            break;
+        }
+        // Move to next player
+        adjustedIndex = (1 + adjustedIndex) % handPlayers.length
     }
-    console.log(handPlayers[activeHandPlayersIndex].name, "Call, raise, or fold?")
+    
     //update pot and player based on action
     //evaluate next action
         //declare winner

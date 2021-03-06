@@ -19,6 +19,20 @@ function Table(id) {
         set dealerPosition(value){
             _dealerPosition = value;
             return this;
+        },
+        get smallBlind(){
+            return _smallBlind;
+        },
+        set smallBlind(value){
+            _smallBlind = value;
+            return this;
+        },
+        get bigBlind(){
+            return _bigBlind;
+        },
+        set bigBlind(value){
+            _bigBlind = value;
+            return this;
         }
         // get tablePlayers(){
         //     return _tablePlayers;

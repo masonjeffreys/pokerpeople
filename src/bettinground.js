@@ -1,10 +1,10 @@
 // Holds state and Logic for managing state for a round betting
 
-function BettingRound(handPlayers, table, handPlayersStartingIndex){
+function BettingRound(handPlayers, table){
     var _handPlayers = handPlayers;
+    var _currentBet = 0;
     var _table = table;
     var _actions = [];
-    var _handPlayersStartingIndex = handPlayersStartingIndex;
     var _i = 0;
 
     function evalNextAction(){
@@ -12,13 +12,23 @@ function BettingRound(handPlayers, table, handPlayersStartingIndex){
     }
 
     return Object.freeze({
+        listActions: function(){
+            console.log(_actions);
+        },
         addAction: function(player, action, value){
+            // Add some validation here
             _actions.push(
                 {player: player,
                 action: action,
                 value: value}
             );
-            evalNextAction(_actions);
+        },
+        get currentBet(){
+            return _currentBet;
+        },
+        set currentBet(value){
+            _currentBet = value;
+            return this;
         },
         next: function(){
             if (_i == 1){
