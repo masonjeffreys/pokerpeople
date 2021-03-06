@@ -58,6 +58,13 @@ function getCurrentPlayerIndex(tablePosition, handPlayers){
     }
 }
 
+function cyclePlayersStartingAtIndex(players, startPosition, fn){
+    for( var i=0; i < players.length; i++) {
+        var pointer = (i + startPosition) % players.length;
+        fn(players[pointer]);
+    }
+}
+
 function setDealer(table, handPlayers){
     var i = getCurrentPlayerIndex(table.dealerPosition, handPlayers);
     handPlayers[i].button = true;
@@ -65,21 +72,16 @@ function setDealer(table, handPlayers){
 
 function deal(numCards, deck, table, handPlayers){
     // person after dealer gets first card
-    activeTablePosition = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
-    console.log("again, dealer position is ", table.dealerPosition);
-    console.log("First table position to receive card is ", activeTablePosition);
-    console.log("first card receiver is", handPlayers[activeTablePosition].name);
-    //then perform dealing
-    // for (var i = 0; i < numCards; i++){
-    //     handPlayers.forEach(function(player, index){
-    //         if (player.handState == 'IN'){
-    //             console.log(index);
-    //             var card = deck.take();
-    //             player.hand.push(card);
-    //             console.log(player.name, "was given", card);
-    //         }
-    //     })
-    // };
+    activeHandPlayersIndex = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
+    for (var i = 0; i < numCards; i++){
+        for( var j=0; j < handPlayers.length; j++) {
+            var pointer = (j + activeHandPlayersIndex) % handPlayers.length;
+            var card = deck.take();
+            var player = handPlayers[pointer];
+            player.hand.push(card);
+            console.log("dealt ", card, " to ", player.name)
+        }
+    }
 }
 
 function preFlopBetRound(){
