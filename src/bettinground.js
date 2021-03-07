@@ -1,20 +1,25 @@
 // Holds state and Logic for managing state for a round betting
 
-function BettingRound(handPlayers, table){
+function BettingRound(handPlayers, table, activeHandPlayersIndex){
     var _handPlayers = handPlayers;
-    var _activePlayers = handPlayers.length;
+    var _activeHandPlayersIndex = activeHandPlayersIndex;
+    var _activePlayersCount = handPlayers.length;
     var _currentBet = 0;
     var _table = table;
     var _actions = [];
     var _i = 0;
     var _isDone = false;
+    var _endState = null;
 
-    function evalForStop(player){
+    function evalForStop(player, action){
         // Betting will stop if all but 1 player folds
-        if (_activePlayers == 1){
+        console.log("eval for stop ", _activePlayersCount, "players", "action", action);
+        if (action == 'fold' && _activePlayersCount == 1){
             console.log("Betting is over since only 1 player is left!");
-            return true;
-        } else{
+            _endState = 'single player';
+            _isDone = true;
+        }
+        if (action == 'check' || action == 'call') {
             // return true if betting should be done
             // According to poker rules, the betting is done if the player has stopped at the same amount
             // as the person to his/her left that is still in the game.
@@ -38,11 +43,11 @@ function BettingRound(handPlayers, table){
     
             leftPlayer = handPlayers[leftPlayerIndex];
             
-            if (leftPlayer.bet === player.bet) {
+            if (leftPlayer.bet == player.bet) {
                 console.log(`${leftPlayer.name} has matched ${player.name}'s bet of ${player.bet}`);
-                return true;
+                _isDone = true;
             } else {
-                return false;
+                _isDone = false;
             }
         }
  
@@ -65,25 +70,48 @@ function BettingRound(handPlayers, table){
         getCallAmount: function(player){
             return (_currentBet - playerTotalBet(player));
         },
+        get activeHandPlayersIndex(){
+            return _activeHandPlayersIndex;
+        },
+        set activeHandPlayersIndex(value){
+            _activeHandPlayersIndex = value;
+            return _activeHandPlayersIndex;
+        },
         get isDone(){
             return _isDone;
         },
+        get handPlayers(){
+            return _handPlayers;
+        },
+        get table(){
+            return _table;
+        },
+        get activePlayersCount(){
+            return _activePlayersCount;
+        },
         addAction: function(player, action, amount){
             // Add some validation here
-            var logItem = {player: player, action: action, amount: amount}
+            var logItem = {player: player, action: action, amount: amount};
+
             if (action == 'bet'){
-                _currentBet = _currentBet + amount;
+                _currentBet = playerTotalBet(player) + amount;
             }
             if (action == 'call'){
-                // Nothing to do here
+                // Nothing to do here except check for stop since a call has to stop betting
             }
             if (action == 'fold'){
                 logItem.amount = 0;
-                console.log("player ", player.name, " FOLDED")
+                player.handState = 'FOLD';
+                _activePlayersCount = _activePlayersCount - 1;
             }
+
+            if (action == 'check'){
+                logItem.amount = 0;
+            }
+            
             console.log("Action is: ", logItem.player.name, logItem.action, logItem.amount);
             _actions.push(logItem);
-            _isDone = evalForStop(player);
+            evalForStop(player, action);
             return amount;
         },
         get currentBet(){
