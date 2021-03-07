@@ -1,7 +1,7 @@
-const CLUBS = "C";
-const HEARTS = "H";
-const DIAMONDS = "D";
-const SPADES = "S";
+const CLUBS = "c";
+const HEARTS = "h";
+const DIAMONDS = "d";
+const SPADES = "s";
 
 const SUITS = [CLUBS, HEARTS, DIAMONDS, SPADES];
 
@@ -19,7 +19,7 @@ function Deck(id) {
             SUITS.forEach((suit) => {
                 for (var i=0; i<13; i++){
                     // Index starts at 0. Card values start at 2.
-                    _cards.push({value: i + 2, name: CARD_NAMES[i], suit: suit})
+                    _cards.push(CARD_NAMES[i] + suit)
                 }
             })
             return this;

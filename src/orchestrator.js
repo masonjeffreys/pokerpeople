@@ -6,6 +6,10 @@ const Player = require('./player');
 const Deck = require('./deck');
 const BettingRound = require('./bettingRound');
 
+// Using a MIT license poker solver
+// https://github.com/goldfire/pokersolver
+var Hand = require('pokersolver').Hand;
+
 const reader = require("readline-sync");
 var streetIndex = 0;
 var street = STAGES[0];
@@ -119,6 +123,7 @@ function executeBetRound(bettingRound, startPosition){
             console.log('\n');
             console.log(`Player up: ${player.name}`);
             console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
+            console.log(`Hand: ${player.hand}`);
             // Prompt player based on options
             console.log('\n');
             var actionOpts = bettingRound.getOptions(player)

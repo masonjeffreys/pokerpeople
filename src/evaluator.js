@@ -1,25 +1,30 @@
-var evaluator = {
-    getBestHand: function getBestHand(cards){
-        var hand = getRoyalFlush(cards)
-        if (!hand) {
-            hand = getStraightFlush(cards)
-        }
-        /// many more options
-        return hand
-    },
-    
-    getHighCard: function getHighCard(cards){
-        var idx = -1;
-        for (var i = 0; i < cards.length; i++){
-            if(cards[i].value > idx){
-                idx = i;
-            }
-        }
-        return {value: HIGH_CARD, cards: [cards[idx]]};
-    }
-}
+// function getRoyalFlush(
 
-module.exports = evaluator;
+// function rank(activePlayers, commonCards){
+//     var _handEachPlayer = [];
+//     var _cards = [];
+
+//     function getBestHand(cards){
+//         var hand = getRoyalFlush(cards)
+//         if (!hand) {
+//             hand = getStraightFlush(cards)
+//         }
+//         /// many more options
+//         return hand
+//     }
+    
+//     function getHighCard(cards){
+//         var idx = -1;
+//         for (var i = 0; i < cards.length; i++){
+//             if(cards[i].value > idx){
+//                 idx = i;
+//             }
+//         }
+//         return {value: HIGH_CARD, cards: [cards[idx]]};
+//     }
+// }
+
+// module.exports = rank;
 
 
 

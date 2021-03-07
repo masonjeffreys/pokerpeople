@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "jasmine": "^3.6.4",
+    "pokersolver": "^2.1.4",
     "readline-sync": "^1.4.10"
   }
 }
