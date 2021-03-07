@@ -96,6 +96,10 @@ function Player(id, name) {
                   _bet = _bet + value;
                   _chips = _chips - value;
                   return this;
+            },
+            wins: function(value){
+                  _chips = _chips + value;
+                  return this;
             }
       });
 }

@@ -19,20 +19,31 @@ var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Play
 var table = Table(1);
 var deck = Deck(1);
 var handPlayers = [];
+var round = 0;
 
 function startGame(table, deck, players, startingChips, smallBlindAmount){
+    // first round only, seat players and add chips.
+    table.dealerPosition = 1;
     players.forEach(function(player, index){
         player.chips = startingChips;
         player.tablePosition = index + 1;
+    }); 
+    // start each round the same way, increment delaer position
+    startRound(table, deck, players, smallBlindAmount)
+};
+
+function startRound(table, deck, players, smallBlindAmount){
+    // Every round, reset bets, pots, blinds, dealer position, shuffle deck
+    round = round + 1;
+    players.forEach(function(player, index){
         player.bet = 0;
-    });
+    })
     table.smallBlind = smallBlindAmount;
     table.bigBlind = 2 * smallBlindAmount;
-    table.round = 1;
-    table.dealerPosition = 1;
+    table.dealerPosition = table.dealerPosition + 1;
     table.pot = 0;
     deck.init().shuffle();
-};
+}
 
 function setHandPlayers(players, table){
     players.forEach(function(player, index) {
@@ -227,5 +238,25 @@ executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handP
 nextStreet = closeRound(bettingRound);
 
 if (nextStreet == 'showdown'){
-    console.log("Time to declare a winner!");
+    var handsByPlayer = [];
+    var solutions = [];
+    handPlayers.forEach(p => {
+        if (p.handState == 'IN'){
+            handsByPlayer.push({player: p, hand: p.hand.concat(table.commonCards)})
+        }
+    })
+    
+    handsByPlayer.forEach(function(h, i){
+        var solution = Hand.solve(h.hand);
+        solution.index = i;
+        solutions.push(solution);
+    })
+    var winningHand = Hand.winners(solutions);
+    console.log("winning hand is: ", winningHand);
+    var winningPlayerIndex = winningHand[0].index;
+    var winningPlayer = handsByPlayer[winningPlayerIndex].player
+    console.log("winner is ", winningPlayer.name);
+    console.log("with hand ", winningHand[0].descr);
+    winningPlayer.wins(table.pot);
+    table.pot = 0;
 }
