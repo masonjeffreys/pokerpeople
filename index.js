@@ -21,6 +21,17 @@ const init = async () => {
     await server.register(Vision);
     await server.register(Inert);
 
+    server.route({
+        method: 'GET',
+        path: '/{param*}',
+        handler: {                                     // [3]
+        directory: {                                 // [3]
+            path: Path.join(__dirname, 'public'),      // [3]
+            listing: true                              // [3]
+        }                                            // [3]
+        }                                              // [3]
+    });
+
     server.views({
         engines: {
             html: require('handlebars')
@@ -34,8 +45,8 @@ const init = async () => {
         path: '/index',
         handler: (req, h) => {
             return h.view('index', {
-                title: 'Using handlebars in Hapi',
-                message: 'Tutorial'
+                title: 'Poker Pig',
+                message: 'Bring home the bacon for charity'
             });
         }
     });

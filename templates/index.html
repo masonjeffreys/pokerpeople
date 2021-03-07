@@ -7,19 +7,25 @@
           content="ie=edge">
     <title>Document</title>
     <style>
-        body {background-color: powderblue;}
-        h1   {color: blue;}
-        p    {color: red;}
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: powderblue;
+            background-image: url('http://localhost:3000/img/porky.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;}
+        h1   {color: rgb(47, 47, 48);}
+        h2    {color: rgb(138, 128, 128);}
     </style>
 </head>
 
 <body>
     <div class="entry">
         <h1>{{title}}</h1>
+        <h2>{{message}}</h2>
         <button type="button" onclick="newGame()">New Game</button>
-        <div class="body">
-            {{message}}
-        </div>
     </div>
     <main id="main">
         <button type="button" onclick="check()">Check</button>
