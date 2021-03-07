@@ -116,9 +116,11 @@ function executeBetRound(bettingRound, startPosition){
         player = bettingRound.handPlayers[adjustedIndex];
         if (player.handState == 'IN'){
             // Remind player of current hand table state
+            console.log('\n');
             console.log(`Player up: ${player.name}`);
             console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
             // Prompt player based on options
+            console.log('\n');
             var actionOpts = bettingRound.getOptions(player)
             // Get action from player
             var action = reader.question(actionOpts + "\n");

@@ -14,7 +14,6 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
     function evalForStop(player, action){
         // set _isDone to true if betting should be done
         // Betting will stop if all but 1 player folds
-        console.log("eval for stop ", _activePlayersCount, "players", "action", action);
         if (action == 'fold' && _activePlayersCount == 1){
             console.log("Betting is over since only 1 player is left!");
             _endState = 'single player';
