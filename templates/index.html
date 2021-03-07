@@ -6,14 +6,58 @@
     <meta http-equiv="X-UA-Compatible"
           content="ie=edge">
     <title>Document</title>
+    <style>
+        body {background-color: powderblue;}
+        h1   {color: blue;}
+        p    {color: red;}
+    </style>
 </head>
 
 <body>
     <div class="entry">
         <h1>{{title}}</h1>
+        <button type="button" onclick="newGame()">New Game</button>
         <div class="body">
             {{message}}
         </div>
     </div>
+    <main id="main">
+        <button type="button" onclick="check()">Check</button>
+        <button type="button" onclick="call()">Call</button>
+        <button type="button" onclick="bet()">Bet</button>
+        <button type="button" onclick="fold()">Fold</button>
+        <ul id="list">
+            
+        </ul>
+    </main>
+    <script>
+        function fetchAndUpdate(endpoint){
+            var responseData;
+            var ul = document.getElementById("list");
+            fetch('http://localhost:3000/api/' + endpoint)
+            .then(response => response.json())
+            .then(data => responseData = data)
+            .then(() => {
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(responseData.data));
+                ul.appendChild(li);
+            });
+        }
+        function newGame() {
+            fetchAndUpdate('new');
+        }
+        function check() {
+            fetchAndUpdate('check');
+        }
+        function bet() {
+            fetchAndUpdate('bet');
+        }
+        function call() {
+            fetchAndUpdate('call');
+        }
+        function fold() {
+            fetchAndUpdate('fold');
+        }
+    </script>
 </body>
 </html>
