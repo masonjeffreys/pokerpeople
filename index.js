@@ -12,13 +12,24 @@ const init = async () => {
     });
 
     await server.register(Vision);
-    
+
     server.views({
         engines: {
             html: require('handlebars')
         },
         relativeTo: __dirname,
         path: 'templates'
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/index',
+        handler: (req, h) => {
+            return h.view('index', {
+                title: 'Using handlebars in Hapi',
+                message: 'Tutorial'
+            });
+        }
     });
 
     server.route({
