@@ -1,5 +1,5 @@
 // set of methods used to update the dumb state objects of deck, table, player
-const STAGES = ['preflop', 'flop', 'turn', 'river']
+const STAGES = ['preflop', 'flop', 'turn', 'river', 'showdown']
 
 const Table = require('./table');
 const Player = require('./player');
@@ -42,7 +42,7 @@ function setHandPlayers(players, table){
 }
 
 function getNextHandPlayerIndex(previousTablePosition, handPlayers){
-    var i = handPlayers.findIndex(obj => obj.tablePosition >= previousTablePosition + 1);
+    var i = handPlayers.findIndex(obj => obj.tablePosition >= previousTablePosition + 1 && obj.handState == 'IN');
     if (i == -1){
         return 0;
     } else {
@@ -51,7 +51,7 @@ function getNextHandPlayerIndex(previousTablePosition, handPlayers){
 }
 
 function getCurrentPlayerIndex(tablePosition, handPlayers){
-    var i = handPlayers.findIndex(obj => obj.tablePosition >= tablePosition);
+    var i = handPlayers.findIndex(obj => obj.tablePosition >= tablePosition && obj.handState == 'IN');
     if (i == -1){
         return 0;
     } else {
@@ -93,22 +93,23 @@ function preFlopSetup(table, handPlayers){
     handPlayers[smallBlindIndex].makeBet(table.smallBlind);
     bettingRound.currentBet = table.smallBlind;
     table.pot = table.pot + table.smallBlind;
-    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", table.smallBlind);
+    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", street, table.smallBlind);
 
     // add big blind. I think I need callbacks here to do these in the right order
     handPlayers[bigBlindIndex].makeBet(table.bigBlind);
-    bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", table.smallBlind * 2)
+    bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", street, table.smallBlind * 2)
     bettingRound.currentBet = table.smallBlind * 2;
     table.pot = table.pot + table.bigBlind;
 
     return bettingRound;
 }
 
-function executeBetRound(bettingRound){
+function executeBetRound(bettingRound, startPosition){
 
     //Infinite loop through people until betting is closed, then break
     var stopBetting = false;
-    var adjustedIndex = bettingRound.activeHandPlayersIndex;
+    var adjustedIndex = startPosition;
+    bettingRound.activeHandPlayersIndex = startPosition;
 
     while (true){
         // Ask player for action
@@ -126,18 +127,22 @@ function executeBetRound(bettingRound){
             if (action == 'bet'){
                 amount = parseInt(reader.question("Bet amount?"));
                 player.makeBet(amount);
-                bettingRound.addAction(player, "bet", amount);
+                bettingRound.addAction(player, "bet", street, amount);
                 bettingRound.table.pot = bettingRound.table.pot + amount;
             }
 
+            if (action == 'check'){
+                bettingRound.addAction(player, "check", street, 0);
+            }
+
             if (action == 'fold'){
-                bettingRound.addAction(player, "fold");
+                bettingRound.addAction(player, "fold", street);
             }
 
             if (action == 'call'){
                 var callAmount = bettingRound.getCallAmount(player);
                 player.makeBet(callAmount);
-                bettingRound.addAction(player, "call", callAmount);
+                bettingRound.addAction(player, "call", street, callAmount);
                 bettingRound.table.pot = bettingRound.table.pot + callAmount;
             }
         }
@@ -148,13 +153,9 @@ function executeBetRound(bettingRound){
             console.log("This street is over!");
             break;
         }
-        // Move to next player
+        // Move to next player (check earlier in function prevents players that are out from responding)
         adjustedIndex = (1 + adjustedIndex) % bettingRound.handPlayers.length
     }
-    
-        //declare winner or
-        //advance to next player or
-        //close bet round and flop or
 }
 
 function closeRound(bettingRound){
@@ -163,6 +164,21 @@ function closeRound(bettingRound){
         var winner = bettingRound.handPlayers.find(p => p.handState == 'IN');
         console.log("Winner: ", winner.name);
     }
+    if (bettingRound.activePlayersCount > 1){
+        streetIndex = streetIndex + 1;
+        street = STAGES[streetIndex];
+        console.log("Next stage: ", STAGES[streetIndex]);
+        bettingRound.street = STAGES[streetIndex];
+        return STAGES[streetIndex];
+    }
+}
+
+function resetBets(table, handPlayers){
+    bettingRound.currentBet = 0;
+    bettingRound.isDone = false;
+    handPlayers.forEach(p => {
+        p.bet = 0;
+    })
 }
 
 startGame(table, deck, players, 100, 5);
@@ -170,80 +186,39 @@ setHandPlayers(players, table);
 setDealerAndBlinds(table, handPlayers);
 deal(2, deck, table, handPlayers);
 var bettingRound = preFlopSetup(table, handPlayers);
-executeBetRound(bettingRound);
-closeRound(bettingRound);
+// Start Pre-flow with the person AFTER the big blind.
+executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
+var nextStreet = closeRound(bettingRound);
 
+if (nextStreet == 'flop'){
+    table.addBurnedCard(deck.take());
+    table.addCommonCard(deck.take());
+    table.addCommonCard(deck.take());
+    table.addCommonCard(deck.take());
+}
 
-// deal: ,
-// burn: function(numCards){
-//     for (var i = 0; i < numCards; i++){
-//         this.burnedCards.push(this.deck.take());
-//         console.log("burning a card");
-//     }
-// },
-// turn: function(numCards){
-//     for (var i = 0; i < numCards; i++){
-//         this.commonCards.push(this.deck.take());
-//         console.log("adding a card to common");
-//     }
-// },
-// bettingRound: function(){
-//     var actions = [];
-//     while (actions.length == 0){
-//         this.handPlayers.forEach(hP => {
-//             if (hP.handState == 'IN'){
-//                 var action = reader.question("Action?")
-//                 var amount = null;
-//                 if (action == 'bet'){
-//                     amount = reader.question("Bet amount?")
-//                     hP.chips = hP.chips - amount;
-//                 } else {
-//                     amount = 0;
-//                 }
-                
-//                 actions.push({player: hP, action: action, amount: amount})
-//             }
-//         })
-//     }
-// },
-// advance: function(){
-//     this.position = this.position + 1;
-//     if (this.position > this.players.length) {
-//         this.position = 1;
-//     }
-//     console.log('next player is ', this.players.position);
-// },
-// ,
-// newRound: function(){
-//     this.dealerPosition = this.dealerPosition + 1;
-//     if (this.dealerPosition > this.players.length - 1){
-//         this.dealerPosition = 1;
-//     }
-//     console.log('new dealer is ', players[this.dealerPosition - 1].name);
-//     this.deck = deck.init().shuffle().cards;
-//     console.log('cards are shuffled');
-// }
+// On all new rounds, reset table bet, active player bets, and start with person after the dealer
+resetBets(table, handPlayers);
+executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+nextStreet = closeRound(bettingRound);
 
-// function roundOfPoker(){
-//     //Preflop
-//     table.deal(2);
-//     table.bettingRound();
+if (nextStreet == 'turn'){
+    table.addBurnedCard(deck.take());
+    table.addCommonCard(deck.take());
+}
 
-//     //Flop
-//     table.burn(1);
-//     table.turn(3);
-//     table.bettingRound();
+resetBets(table, handPlayers);
+executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+nextStreet = closeRound(bettingRound);
 
-//     //Turn
-//     table.burn(1);
-//     table.turn(1);
-//     table.bettingRound();
+if (nextStreet == 'river'){
+    table.addBurnedCard(deck.take());
+    table.addCommonCard(deck.take());
+}
+resetBets(table, handPlayers);
+executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+nextStreet = closeRound(bettingRound);
 
-//     //River
-//     table.burn(1);
-//     table.turn(1);
-//     table.bettingRound();
-
-//     //EndRound
-//     console.log(table);
-// }
+if (nextStreet == 'showdown'){
+    console.log("Time to declare a winner!");
+}

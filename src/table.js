@@ -40,22 +40,23 @@ function Table(id) {
         set pot(value){
             _pot = value;
             return _pot;
+        },
+        get burnedCards(){
+            return _burnedCards;
+        },
+        addBurnedCard: function(card){
+            console.log("burning ", card);
+            _burnedCards.push(card);
+            return this;
+        },
+        get commonCards(){
+            return _commonCards;
+        },
+        addCommonCard: function(card){
+            console.log("adding common ", card);
+            _commonCards.push(card);
+            return this;
         }
-        // get tablePlayers(){
-        //     return _tablePlayers;
-        // },
-        // addTablePlayer(player){
-        //     _tablePlayers.push(player);
-        // },
-        // get handPlayers(){
-        //     return _handPlayers;
-        // },
-        // clearHandPlayers(){
-        //     _handPlayers = [];
-        // },
-        // addHandPlayer(player){
-        //     _handPlayers.push(player);
-        // }
     })
 }
 

@@ -9,9 +9,10 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
     var _actions = [];
     var _i = 0;
     var _isDone = false;
-    var _endState = null;
+    var _street = 'preflop';
 
     function evalForStop(player, action){
+        // set _isDone to true if betting should be done
         // Betting will stop if all but 1 player folds
         console.log("eval for stop ", _activePlayersCount, "players", "action", action);
         if (action == 'fold' && _activePlayersCount == 1){
@@ -19,10 +20,24 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
             _endState = 'single player';
             _isDone = true;
         }
-        if (action == 'check' || action == 'call') {
-            // return true if betting should be done
+        if (action == 'check'){
             // According to poker rules, the betting is done if the player has stopped at the same amount
             // as the person to his/her left that is still in the game.
+            // However, this only applies if everyone has has a chance to action.
+            // Otherwise the first check after each common card would end the round.
+
+            // Here we check to see if all active players have logged an action for this street
+            var allActivePlayersHavePlayed = true;
+            handPlayers.forEach(p => {
+                if (p.handState == 'IN'){
+                   if (_actions.findIndex(a => a.player.id == p.id && a.street == _street) == -1){
+                       allActivePlayersHavePlayed = false;
+                   }
+                }
+            })
+            _isDone = allActivePlayersHavePlayed;
+        }
+        if (action == 'call') {
             var playerIndex = handPlayers.findIndex(obj => obj.id == player.id);
             
             //get player to the left that hasn't folded by advancing through array
@@ -56,7 +71,7 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
     function playerTotalBet(player){
         var playerSum = 0;
         _actions.forEach(a =>{
-            if (a.player.id == player.id) {
+            if (a.player.id == player.id && a.street == _street) {
                 playerSum = playerSum + a.amount;
             }
         })
@@ -80,6 +95,10 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
         get isDone(){
             return _isDone;
         },
+        set isDone(value){
+            _isDone = value;
+            return _isDone;
+        },
         get handPlayers(){
             return _handPlayers;
         },
@@ -89,9 +108,9 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
         get activePlayersCount(){
             return _activePlayersCount;
         },
-        addAction: function(player, action, amount){
+        addAction: function(player, action, street, amount){
             // Add some validation here
-            var logItem = {player: player, action: action, amount: amount};
+            var logItem = {player: player, action: action, street: street, amount: amount};
 
             if (action == 'bet'){
                 _currentBet = playerTotalBet(player) + amount;
@@ -109,7 +128,7 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
                 logItem.amount = 0;
             }
             
-            console.log("Action is: ", logItem.player.name, logItem.action, logItem.amount);
+            console.log("Action is: ", logItem.player.name, logItem.action, logItem.street, logItem.amount);
             _actions.push(logItem);
             evalForStop(player, action);
             return amount;
@@ -121,9 +140,16 @@ function BettingRound(handPlayers, table, activeHandPlayersIndex){
             _currentBet = value;
             return this;
         },
-        getOptions: function(player){
+        get street(){
+            return _street;
+        },
+        set street(value){
+            _street = value;
+            return _street;
+        },
+        getOptions: function(player, street){
             var actionOpts = [];
-            var callAmount = this.getCallAmount(player);
+            var callAmount = this.getCallAmount(player, street);
             actionOpts.push(`Bet up to ${player.chips}`);
             if ( callAmount > 0 ){
                 actionOpts.push(`${callAmount} to call`);
