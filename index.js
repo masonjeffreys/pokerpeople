@@ -22,17 +22,6 @@ const init = async () => {
     await server.register(Vision);
     await server.register(Inert);
 
-    server.route({
-        method: 'GET',
-        path: '/{param*}',
-        handler: {                                     // [3]
-        directory: {                                 // [3]
-            path: Path.join(__dirname, 'public'),      // [3]
-            listing: true                              // [3]
-        }                                            // [3]
-        }                                              // [3]
-    });
-
     server.views({
         engines: {
             html: require('handlebars')
@@ -43,9 +32,9 @@ const init = async () => {
 
     server.route({
         method: 'GET',
-        path: '/index',
+        path: '/',
         handler: (req, h) => {
-            return h.view('index', {
+            return h.view('home', {
                 title: 'Poker Pig',
                 message: 'Bring home the bacon for charity'
             });
@@ -54,20 +43,9 @@ const init = async () => {
 
     server.route({
         method: 'GET',
-        path: '/',
-        handler: (request, h) => {
-
-            return {status: "success", data: 'Hello World!'};
-        }
-    });
-
-    server.route({
-        method: 'GET',
         path: '/api/new',
-        handler: GameController.list
+        handler: GameController.play
     });
-
-    
 
     server.route({
         method: 'GET',
@@ -99,6 +77,17 @@ const init = async () => {
         handler: (request, h) => {
             return {status: "success", data: 'check'}
         }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/{param*}',
+        handler: {                                     // [3]
+            directory: {                                 // [3]
+                path: Path.join(__dirname, 'public'),      // [3]
+                listing: true                              // [3]
+            }
+        }                                          // [3]                                           // [3]
     });
 
     // server.route({

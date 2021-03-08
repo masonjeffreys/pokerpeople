@@ -3,16 +3,14 @@ var Game =  require('../orchestrator');
 /**
  * List Dogs
  */
-exports.list = (req, h) => {
-  return Dog.find({}).exec().then((dog) => {
-
-    return { dogs: dog };
-
-  }).catch((err) => {
-
-    return { err: err };
-
-  });
+exports.play = (req, h) => {
+    Game.playGame();
+    return {status: 'success', data: 'what up'};
+  //return Dog.find({}).exec().then((dog) => {
+//     return { dogs: dog };
+//   }).catch((err) => {
+//     return { err: err };
+//   });
 }
 
 /**

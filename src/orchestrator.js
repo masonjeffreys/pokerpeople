@@ -10,7 +10,7 @@ const BettingRound = require('./bettingRound');
 // https://github.com/goldfire/pokersolver
 var Hand = require('pokersolver').Hand;
 
-const reader = require("readline-sync");
+// const reader = require("readline-sync");
 var streetIndex = 0;
 var street = STAGES[0];
 
@@ -139,11 +139,12 @@ function executeBetRound(bettingRound, startPosition){
             console.log('\n');
             var actionOpts = bettingRound.getOptions(player)
             // Get action from player
-            var action = reader.question(actionOpts + "\n");
+            //var action = reader.question(actionOpts + "\n");
+            var action = "bet";
             var amount = null;
             
             if (action == 'bet'){
-                amount = parseInt(reader.question("Bet amount?"));
+                amount = parseInt(20);
                 player.makeBet(amount);
                 bettingRound.addAction(player, "bet", street, amount);
                 bettingRound.table.pot = bettingRound.table.pot + amount;
@@ -199,64 +200,66 @@ function resetBets(table, handPlayers){
     })
 }
 
-startGame(table, deck, players, 100, 5);
-setHandPlayers(players, table);
-setDealerAndBlinds(table, handPlayers);
-deal(2, deck, table, handPlayers);
-var bettingRound = preFlopSetup(table, handPlayers);
-// Start Pre-flow with the person AFTER the big blind.
-executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
-var nextStreet = closeRound(bettingRound);
+module.exports.playGame = function playGame(){
+    startGame(table, deck, players, 100, 5);
+    setHandPlayers(players, table);
+    setDealerAndBlinds(table, handPlayers);
+    deal(2, deck, table, handPlayers);
+    var bettingRound = preFlopSetup(table, handPlayers);
+    // Start Pre-flow with the person AFTER the big blind.
+    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
+    var nextStreet = closeRound(bettingRound);
 
-if (nextStreet == 'flop'){
-    table.addBurnedCard(deck.take());
-    table.addCommonCard(deck.take());
-    table.addCommonCard(deck.take());
-    table.addCommonCard(deck.take());
-}
+    if (nextStreet == 'flop'){
+        table.addBurnedCard(deck.take());
+        table.addCommonCard(deck.take());
+        table.addCommonCard(deck.take());
+        table.addCommonCard(deck.take());
+    }
 
-// On all new rounds, reset table bet, active player bets, and start with person after the dealer
-resetBets(table, handPlayers);
-executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-nextStreet = closeRound(bettingRound);
+    // On all new rounds, reset table bet, active player bets, and start with person after the dealer
+    resetBets(table, handPlayers);
+    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+    nextStreet = closeRound(bettingRound);
 
-if (nextStreet == 'turn'){
-    table.addBurnedCard(deck.take());
-    table.addCommonCard(deck.take());
-}
+    if (nextStreet == 'turn'){
+        table.addBurnedCard(deck.take());
+        table.addCommonCard(deck.take());
+    }
 
-resetBets(table, handPlayers);
-executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-nextStreet = closeRound(bettingRound);
+    resetBets(table, handPlayers);
+    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+    nextStreet = closeRound(bettingRound);
 
-if (nextStreet == 'river'){
-    table.addBurnedCard(deck.take());
-    table.addCommonCard(deck.take());
-}
-resetBets(table, handPlayers);
-executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-nextStreet = closeRound(bettingRound);
+    if (nextStreet == 'river'){
+        table.addBurnedCard(deck.take());
+        table.addCommonCard(deck.take());
+    }
+    resetBets(table, handPlayers);
+    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+    nextStreet = closeRound(bettingRound);
 
-if (nextStreet == 'showdown'){
-    var handsByPlayer = [];
-    var solutions = [];
-    handPlayers.forEach(p => {
-        if (p.handState == 'IN'){
-            handsByPlayer.push({player: p, hand: p.hand.concat(table.commonCards)})
-        }
-    })
-    
-    handsByPlayer.forEach(function(h, i){
-        var solution = Hand.solve(h.hand);
-        solution.index = i;
-        solutions.push(solution);
-    })
-    var winningHand = Hand.winners(solutions);
-    console.log("winning hand is: ", winningHand);
-    var winningPlayerIndex = winningHand[0].index;
-    var winningPlayer = handsByPlayer[winningPlayerIndex].player
-    console.log("winner is ", winningPlayer.name);
-    console.log("with hand ", winningHand[0].descr);
-    winningPlayer.wins(table.pot);
-    table.pot = 0;
+    if (nextStreet == 'showdown'){
+        var handsByPlayer = [];
+        var solutions = [];
+        handPlayers.forEach(p => {
+            if (p.handState == 'IN'){
+                handsByPlayer.push({player: p, hand: p.hand.concat(table.commonCards)})
+            }
+        })
+        
+        handsByPlayer.forEach(function(h, i){
+            var solution = Hand.solve(h.hand);
+            solution.index = i;
+            solutions.push(solution);
+        })
+        var winningHand = Hand.winners(solutions);
+        console.log("winning hand is: ", winningHand);
+        var winningPlayerIndex = winningHand[0].index;
+        var winningPlayer = handsByPlayer[winningPlayerIndex].player
+        console.log("winner is ", winningPlayer.name);
+        console.log("with hand ", winningHand[0].descr);
+        winningPlayer.wins(table.pot);
+        table.pot = 0;
+    }
 }
