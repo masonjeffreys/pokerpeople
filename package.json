@@ -15,10 +15,10 @@
     "@hapi/joi": "^17.1.1",
     "@hapi/vision": "^6.0.1",
     "handlebars": "^4.7.7",
-    "pokersolver": "^2.1.4",
-    "readline-sync": "^1.4.10"
+    "pokersolver": "^2.1.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "readline-sync": "^1.4.10"
   }
 }

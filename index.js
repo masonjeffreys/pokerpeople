@@ -5,6 +5,7 @@ const Joi = require('@hapi/joi');
 const Vision = require('@hapi/vision');
 const Inert = require('@hapi/inert');
 const Path = require('path');
+const GameController =  require('./src/controllers/game');
 
 const init = async () => {
 
@@ -63,9 +64,7 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/api/new',
-        handler: (request, h) => {
-            return {status: "success", data: "New Game"}
-        }
+        handler: GameController.list
     });
 
     
