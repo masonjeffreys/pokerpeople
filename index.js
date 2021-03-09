@@ -44,7 +44,7 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/api/new',
-        handler: GameController.play
+        handler: GameController.start
     });
 
     server.route({

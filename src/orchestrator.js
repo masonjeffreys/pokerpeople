@@ -1,5 +1,5 @@
 // set of methods used to update the dumb state objects of deck, table, player
-const STAGES = ['preflop', 'flop', 'turn', 'river', 'showdown']
+const STAGES = ['preflop', 'flop', 'turn', 'river', 'showdown', 'complete']
 
 const Table = require('./table');
 const Player = require('./player');
@@ -20,19 +20,23 @@ var table = Table(1);
 var deck = Deck(1);
 var handPlayers = [];
 var round = 0;
+var nextPlayer = {};
+var nextOptions = {};
 
-function startGame(table, deck, players, startingChips, smallBlindAmount){
+function startGame(){
     // first round only, seat players and add chips.
+    var startingChips = 100;
+    var smallBlindAmount = 5;
     table.dealerPosition = 1;
     players.forEach(function(player, index){
         player.chips = startingChips;
         player.tablePosition = index + 1;
     }); 
     // start each round the same way, increment delaer position
-    startRound(table, deck, players, smallBlindAmount)
+    newHand(table, deck, players, smallBlindAmount)
 };
 
-function startRound(table, deck, players, smallBlindAmount){
+function newHand(table, deck, players, smallBlindAmount){
     // Every round, reset bets, pots, blinds, dealer position, shuffle deck
     round = round + 1;
     players.forEach(function(player, index){
@@ -43,6 +47,20 @@ function startRound(table, deck, players, smallBlindAmount){
     table.dealerPosition = table.dealerPosition + 1;
     table.pot = 0;
     deck.init().shuffle();
+
+    setHandPlayers(players, table);
+    setDealerAndBlinds(table, handPlayers);
+    deal(2, deck, table, handPlayers);
+    var bettingRound = preFlopSetup(table, handPlayers);
+    playHand(table, handPlayers, bettingRound)
+}
+
+function playHand(table, handPlayers, bettingRound){
+    // On all new rounds, reset table bet, active player bets, and start with person after the dealer
+    // return next round name
+    resetBets(table, handPlayers);
+    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
+    return closeRound(bettingRound);
 }
 
 function setHandPlayers(players, table){
@@ -119,61 +137,71 @@ function preFlopSetup(table, handPlayers){
     return bettingRound;
 }
 
-function executeBetRound(bettingRound, startPosition){
+function promptPlayer(player, actionOpts){
+    // Time to find out what the player wants to do
+    // This was using readline-sync in Dev environment
+    console.log("Player", player.name);
+    console.log(actionOpts);
+    return `Player ${player.name} is up`;
+}
 
+function receiveAction(action, amount = 0){
+    amount = parseInt(amount);
+    // Handle player's desired action
+    if (action == 'bet'){
+        player.makeBet(amount);
+        bettingRound.addAction(player, "bet", street, amount);
+        bettingRound.table.pot = bettingRound.table.pot + amount;
+    }
+
+    if (action == 'check'){
+        bettingRound.addAction(player, "check", street, amount);
+    }
+
+    if (action == 'fold'){
+        bettingRound.addAction(player, "fold", street);
+    }
+
+    if (action == 'call'){
+        var callAmount = bettingRound.getCallAmount(player);
+        player.makeBet(callAmount);
+        bettingRound.addAction(player, "call", street, callAmount);
+        bettingRound.table.pot = bettingRound.table.pot + callAmount;
+    }
+    else {
+        throw 'Invalid player action!'
+    }
+    // Eval if action shoud stop
+    stopBetting = bettingRound.isDone;
+    if (stopBetting === true){
+        console.log("This street is over!");
+        return false;
+    } else {
+        // Move to next player (check earlier in function prevents players that are out from responding)
+        adjustedIndex = (1 + adjustedIndex) % bettingRound.handPlayers.length
+        promptPlayer(handPlayers[adjustedIndex]);
+    }
+
+}
+
+function executeBetRound(bettingRound, startPosition){
     //Infinite loop through people until betting is closed, then break
     var stopBetting = false;
     var adjustedIndex = startPosition;
+    var action = null;
+    var amount = null;
     bettingRound.activeHandPlayersIndex = startPosition;
 
-    while (true){
-        // Ask player for action
-        player = bettingRound.handPlayers[adjustedIndex];
-        if (player.handState == 'IN'){
-            // Remind player of current hand table state
-            console.log('\n');
-            console.log(`Player up: ${player.name}`);
-            console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
-            console.log(`Hand: ${player.hand}`);
-            // Prompt player based on options
-            console.log('\n');
-            var actionOpts = bettingRound.getOptions(player)
-            // Get action from player
-            //var action = reader.question(actionOpts + "\n");
-            var action = "bet";
-            var amount = null;
-            
-            if (action == 'bet'){
-                amount = parseInt(20);
-                player.makeBet(amount);
-                bettingRound.addAction(player, "bet", street, amount);
-                bettingRound.table.pot = bettingRound.table.pot + amount;
-            }
-
-            if (action == 'check'){
-                bettingRound.addAction(player, "check", street, 0);
-            }
-
-            if (action == 'fold'){
-                bettingRound.addAction(player, "fold", street);
-            }
-
-            if (action == 'call'){
-                var callAmount = bettingRound.getCallAmount(player);
-                player.makeBet(callAmount);
-                bettingRound.addAction(player, "call", street, callAmount);
-                bettingRound.table.pot = bettingRound.table.pot + callAmount;
-            }
-        }
-
-        // Eval if action shoud stop
-        stopBetting = bettingRound.isDone;
-        if (stopBetting === true){
-            console.log("This street is over!");
-            break;
-        }
-        // Move to next player (check earlier in function prevents players that are out from responding)
-        adjustedIndex = (1 + adjustedIndex) % bettingRound.handPlayers.length
+    // Ask player for action
+    player = bettingRound.handPlayers[adjustedIndex];
+    if (player.handState == 'IN'){
+        // Remind player of current hand table state
+        console.log('\n');
+        console.log(`Player up: ${player.name}`);
+        console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
+        console.log(`Hand: ${player.hand}`);
+        var actionOpts = bettingRound.getOptions(player)
+        promptPlayer(player, actionOpts);
     }
 }
 
@@ -182,8 +210,9 @@ function closeRound(bettingRound){
         // Winning player, others folded
         var winner = bettingRound.handPlayers.find(p => p.handState == 'IN');
         console.log("Winner: ", winner.name);
+        return false;
     }
-    if (bettingRound.activePlayersCount > 1){
+    else {
         streetIndex = streetIndex + 1;
         street = STAGES[streetIndex];
         console.log("Next stage: ", STAGES[streetIndex]);
@@ -200,66 +229,54 @@ function resetBets(table, handPlayers){
     })
 }
 
-module.exports.playGame = function playGame(){
-    startGame(table, deck, players, 100, 5);
-    setHandPlayers(players, table);
-    setDealerAndBlinds(table, handPlayers);
-    deal(2, deck, table, handPlayers);
-    var bettingRound = preFlopSetup(table, handPlayers);
-    // Start Pre-flow with the person AFTER the big blind.
-    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
-    var nextStreet = closeRound(bettingRound);
-
-    if (nextStreet == 'flop'){
-        table.addBurnedCard(deck.take());
-        table.addCommonCard(deck.take());
-        table.addCommonCard(deck.take());
-        table.addCommonCard(deck.take());
+function advanceStreet(){
+ 
+    while (street != 'complete'){
+        switch(street){
+            case 'preflop':
+                // Start Pre-flow with the person AFTER the big blind.
+                executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
+                closeRound(bettingRound);
+            case 'flop':
+                table.addBurnedCard(deck.take());
+                table.addCommonCard(deck.take());
+                table.addCommonCard(deck.take());
+                table.addCommonCard(deck.take());
+                nextRound(table, handPlayers, bettingRound);
+            case 'turn':
+                table.addBurnedCard(deck.take());
+                table.addCommonCard(deck.take());
+                nextRound(table, handPlayers, bettingRound);
+            case 'river':
+                table.addBurnedCard(deck.take());
+                table.addCommonCard(deck.take());
+            case 'showdown':
+                street = 'complete';
+                var handsByPlayer = [];
+                var solutions = [];
+                handPlayers.forEach(p => {
+                    if (p.handState == 'IN'){
+                        handsByPlayer.push({player: p, hand: p.hand.concat(table.commonCards)})
+                    }
+                })
+                
+                handsByPlayer.forEach(function(h, i){
+                    var solution = Hand.solve(h.hand);
+                    solution.index = i;
+                    solutions.push(solution);
+                })
+                var winningHand = Hand.winners(solutions);
+                console.log("winning hand is: ", winningHand);
+                var winningPlayerIndex = winningHand[0].index;
+                var winningPlayer = handsByPlayer[winningPlayerIndex].player
+                console.log("winner is ", winningPlayer.name);
+                console.log("with hand ", winningHand[0].descr);
+                winningPlayer.wins(table.pot);
+                table.pot = 0;
+        }
     }
 
-    // On all new rounds, reset table bet, active player bets, and start with person after the dealer
-    resetBets(table, handPlayers);
-    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-    nextStreet = closeRound(bettingRound);
-
-    if (nextStreet == 'turn'){
-        table.addBurnedCard(deck.take());
-        table.addCommonCard(deck.take());
-    }
-
-    resetBets(table, handPlayers);
-    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-    nextStreet = closeRound(bettingRound);
-
-    if (nextStreet == 'river'){
-        table.addBurnedCard(deck.take());
-        table.addCommonCard(deck.take());
-    }
-    resetBets(table, handPlayers);
-    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-    nextStreet = closeRound(bettingRound);
-
-    if (nextStreet == 'showdown'){
-        var handsByPlayer = [];
-        var solutions = [];
-        handPlayers.forEach(p => {
-            if (p.handState == 'IN'){
-                handsByPlayer.push({player: p, hand: p.hand.concat(table.commonCards)})
-            }
-        })
-        
-        handsByPlayer.forEach(function(h, i){
-            var solution = Hand.solve(h.hand);
-            solution.index = i;
-            solutions.push(solution);
-        })
-        var winningHand = Hand.winners(solutions);
-        console.log("winning hand is: ", winningHand);
-        var winningPlayerIndex = winningHand[0].index;
-        var winningPlayer = handsByPlayer[winningPlayerIndex].player
-        console.log("winner is ", winningPlayer.name);
-        console.log("with hand ", winningHand[0].descr);
-        winningPlayer.wins(table.pot);
-        table.pot = 0;
-    }
+    return 'done';
 }
+
+module.exports.startGame = startGame;

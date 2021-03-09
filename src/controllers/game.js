@@ -3,15 +3,9 @@ var Game =  require('../orchestrator');
 /**
  * List Dogs
  */
-exports.play = (req, h) => {
-    Game.playGame();
-    return {status: 'success', data: 'what up'};
-  //return Dog.find({}).exec().then((dog) => {
-//     return { dogs: dog };
-//   }).catch((err) => {
-//     return { err: err };
-//   });
-}
+exports.start = (req, h) => {
+        return {status: 'success', data: Game.startGame()};
+    };
 
 /**
  * Get Dog by ID
