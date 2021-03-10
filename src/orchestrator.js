@@ -1,10 +1,13 @@
-// set of methods used to update the dumb state objects of deck, table, player
+// Orchestrator is a set of methods used to control flow of the game
+// and update the dumb state objects of deck, table, player
+
 const STAGES = ['preflop', 'flop', 'turn', 'river', 'showdown', 'complete']
 
 const Table = require('./table');
 const Player = require('./player');
 const Deck = require('./deck');
 const BettingRound = require('./bettingRound');
+const Utils = require('./utils');
 
 // Using a MIT license poker solver
 // https://github.com/goldfire/pokersolver
@@ -19,91 +22,89 @@ var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Play
 var table = Table(1);
 var deck = Deck(1);
 var handPlayers = [];
-var round = 0;
-var nextPlayer = {};
-var nextOptions = {};
+var handCounter = 0;
+var startingChips = 100;
+var smallBlindAmount = 5;
+var bettingRound = null;
+var minChips = 50;
 
 function startGame(){
-    // first round only, seat players and add chips.
-    var startingChips = 100;
-    var smallBlindAmount = 5;
-    table.dealerPosition = 1;
+    // Very first hand only of a new game with a new set of players.
+    handCounter = 0;
+
+    // Seat players from position 1..n, add starting chips for each player.
     players.forEach(function(player, index){
         player.chips = startingChips;
         player.tablePosition = index + 1;
     }); 
-    // start each round the same way, increment delaer position
+
+    // Dealer position starts with the first player
+    table.dealerPosition = 1;
+
+    // Now that the table is set up, we start a new hand!
+    // We will start next rounds the same way, but increment
+    // Dealer position each time
     newHand(table, deck, players, smallBlindAmount)
 };
 
 function newHand(table, deck, players, smallBlindAmount){
-    // Every round, reset bets, pots, blinds, dealer position, shuffle deck
-    round = round + 1;
+    // Every hand (which we track for curiosity):
+    // reset player bets.
+    // Set dealer position, blind amounts, and reset pot to 0
+    handCounter = handCounter + 1;
+    
     players.forEach(function(player, index){
         player.bet = 0;
     })
+
+    table.dealerPosition = table.dealerPosition + 1;
     table.smallBlind = smallBlindAmount;
     table.bigBlind = 2 * smallBlindAmount;
-    table.dealerPosition = table.dealerPosition + 1;
     table.pot = 0;
+
+    // Grab a new deck, shuffle, and deal
+    // HandPlayers are any players that are 'ACTIVE'. Allows people to sit out a round if desired
+    handPlayers = Utils.setHandPlayers(players, minChips);
     deck.init().shuffle();
-
-    setHandPlayers(players, table);
-    setDealerAndBlinds(table, handPlayers);
     deal(2, deck, table, handPlayers);
-    var bettingRound = preFlopSetup(table, handPlayers);
-    playHand(table, handPlayers, bettingRound)
+
+    // Initialize a Betting Round. Still deciding if this object makes sense
+    bettingRound = BettingRound(table, handPlayers, table.dealerPosition);
+
+    // BetTheBlinds
+    makeBlindBets(table, bettingRound)
+
+    // PlayTheHand - now we need input from players!
+    executePlayerAsk(table, handPlayers, bettingRound.activeHandPlayersIndex)
 }
 
-function playHand(table, handPlayers, bettingRound){
-    // On all new rounds, reset table bet, active player bets, and start with person after the dealer
-    // return next round name
-    resetBets(table, handPlayers);
-    executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition, handPlayers));
-    return closeRound(bettingRound);
-}
+function makeBlindBets(table, bettingRound){
+    var smallBlindIndex = Utils.getNextHandPlayerIndex(table.dealerPosition, handPlayers);
+    var bigBlindIndex = Utils.getNextHandPlayerIndex(table.dealerPosition + 1, handPlayers);
+    var underGunIndex = Utils.getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
 
-function setHandPlayers(players, table){
-    players.forEach(function(player, index) {
-        if (player.gameState == 'ACTIVE' && player.chips >= 50){
-            player.handState = 'IN';
-            handPlayers.push(player)
-        } else {
-            player.handState = 'OUT';
-        }
-    });
-}
+    // Bet the small blind.
+    // Player makes bet first..then table is adjusted...then action logged
+    handPlayers[smallBlindIndex].makeBet(table.smallBlind);
+    bettingRound.currentBet = table.smallBlind;
+    table.pot = table.pot + table.smallBlind;
+    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", street, table.smallBlind);
 
-function getNextHandPlayerIndex(previousTablePosition, handPlayers){
-    var i = handPlayers.findIndex(obj => obj.tablePosition >= previousTablePosition + 1 && obj.handState == 'IN');
-    if (i == -1){
-        return 0;
-    } else {
-        return i;
-    }
-}
+    // Bet the big blind
+    handPlayers[bigBlindIndex].makeBet(table.bigBlind);
+    bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", street, table.smallBlind * 2)
+    bettingRound.currentBet = table.smallBlind * 2;
+    table.pot = table.pot + table.bigBlind;
 
-function getCurrentPlayerIndex(tablePosition, handPlayers){
-    var i = handPlayers.findIndex(obj => obj.tablePosition >= tablePosition && obj.handState == 'IN');
-    if (i == -1){
-        return 0;
-    } else {
-        return i;
-    }
-}
+    // Advance betting round one more time to get to active player
+    bettingRound.activeHandPlayersIndex = underGunIndex
 
-function setDealerAndBlinds(table, handPlayers){
-    var i = getCurrentPlayerIndex(table.dealerPosition, handPlayers);
-    handPlayers[i].button = true;
-    var j = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
-    handPlayers[j].smallBlind = true;
-    var k = getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
-    handPlayers[k].bigBlind = true;
+    return bettingRound;
 }
 
 function deal(numCards, deck, table, handPlayers){
     // person after dealer gets first card
-    activeHandPlayersIndex = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
+    activeHandPlayersIndex = Utils.getNextHandPlayerIndex(table.dealerPosition, handPlayers);
     for (var i = 0; i < numCards; i++){
         for( var j=0; j < handPlayers.length; j++) {
             var pointer = (j + activeHandPlayersIndex) % handPlayers.length;
@@ -112,29 +113,6 @@ function deal(numCards, deck, table, handPlayers){
             player.hand.push(card);
         }
     }
-}
-
-function preFlopSetup(table, handPlayers){
-    var smallBlindIndex = getNextHandPlayerIndex(table.dealerPosition, handPlayers);
-    var bigBlindIndex = getNextHandPlayerIndex(table.dealerPosition + 1, handPlayers);
-    var activeHandPlayersIndex = getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
-
-    bettingRound = BettingRound(handPlayers, table, activeHandPlayersIndex);
-
-    // add small blind. Player makes bet first..then table is adjusted...then action logged
-    var smallBlindPlayer = handPlayers[smallBlindIndex];
-    handPlayers[smallBlindIndex].makeBet(table.smallBlind);
-    bettingRound.currentBet = table.smallBlind;
-    table.pot = table.pot + table.smallBlind;
-    bettingRound.addAction(handPlayers[smallBlindIndex], "smallBlind", street, table.smallBlind);
-
-    // add big blind. I think I need callbacks here to do these in the right order
-    handPlayers[bigBlindIndex].makeBet(table.bigBlind);
-    bettingRound.addAction(handPlayers[bigBlindIndex], "bigBlind", street, table.smallBlind * 2)
-    bettingRound.currentBet = table.smallBlind * 2;
-    table.pot = table.pot + table.bigBlind;
-
-    return bettingRound;
 }
 
 function promptPlayer(player, actionOpts){
@@ -178,37 +156,28 @@ function receiveAction(action, amount = 0){
         return false;
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
-        adjustedIndex = (1 + adjustedIndex) % bettingRound.handPlayers.length
+        adjustedIndex = (1 + adjustedIndex) % handPlayers.length
         promptPlayer(handPlayers[adjustedIndex]);
     }
 
 }
 
-function executeBetRound(bettingRound, startPosition){
-    //Infinite loop through people until betting is closed, then break
-    var stopBetting = false;
-    var adjustedIndex = startPosition;
-    var action = null;
-    var amount = null;
-    bettingRound.activeHandPlayersIndex = startPosition;
-
+function executePlayerAsk(bettingRound, handPlayers, playerHandIndex){
     // Ask player for action
-    player = bettingRound.handPlayers[adjustedIndex];
-    if (player.handState == 'IN'){
-        // Remind player of current hand table state
-        console.log('\n');
-        console.log(`Player up: ${player.name}`);
-        console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
-        console.log(`Hand: ${player.hand}`);
-        var actionOpts = bettingRound.getOptions(player)
-        promptPlayer(player, actionOpts);
-    }
+    player = handPlayers[playerHandIndex];
+    // Remind player of current hand table state
+    console.log('\n');
+    console.log(`Player up: ${player.name}`);
+    console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
+    console.log(`Hand: ${player.hand}`);
+    var actionOpts = bettingRound.getOptions(player)
+    promptPlayer(player, actionOpts);
 }
 
 function closeRound(bettingRound){
     if (bettingRound.activePlayersCount == 1){
         // Winning player, others folded
-        var winner = bettingRound.handPlayers.find(p => p.handState == 'IN');
+        var winner = handPlayers.find(p => p.handState == 'IN');
         console.log("Winner: ", winner.name);
         return false;
     }
@@ -221,21 +190,13 @@ function closeRound(bettingRound){
     }
 }
 
-function resetBets(table, handPlayers){
-    bettingRound.currentBet = 0;
-    bettingRound.isDone = false;
-    handPlayers.forEach(p => {
-        p.bet = 0;
-    })
-}
-
 function advanceStreet(){
  
     while (street != 'complete'){
         switch(street){
             case 'preflop':
                 // Start Pre-flow with the person AFTER the big blind.
-                executeBetRound(bettingRound, getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
+                executeBetRound(bettingRound, Utils.getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers));
                 closeRound(bettingRound);
             case 'flop':
                 table.addBurnedCard(deck.take());
