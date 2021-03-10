@@ -45,7 +45,11 @@ function startGame(){
     // Now that the table is set up, we start a new hand!
     // We will start next rounds the same way, but increment
     // Dealer position each time
-    newHand(table, deck, players, smallBlindAmount)
+    
+    var ret = newHand(table, deck, players, smallBlindAmount)
+    // console.log("new hand is:");
+    // console.log(ret);
+    return ret
 };
 
 function newHand(table, deck, players, smallBlindAmount){
@@ -76,7 +80,12 @@ function newHand(table, deck, players, smallBlindAmount){
     makeBlindBets(table, bettingRound)
 
     // PlayTheHand - now we need input from players!
-    executePlayerAsk(bettingRound, handPlayers, bettingRound.activeHandPlayersIndex)
+     
+
+    var ret = executePlayerAsk(bettingRound, handPlayers, bettingRound.activeHandPlayersIndex)
+    // console.log("execute player ask:");
+    // console.log(ret);
+    return ret;
 }
 
 function makeBlindBets(table, bettingRound){
@@ -120,9 +129,11 @@ function deal(numCards, deck, table, handPlayers){
 function promptPlayer(player, actionOpts){
     // Time to find out what the player wants to do
     // This was using readline-sync in Dev environment
-    console.log("Player", player.name);
-    console.log(actionOpts);
-    return `Player ${player.name} is up`;
+    var ret = {
+        player: player,
+        options: actionOpts
+    }
+    return ret;
 }
 
 function receiveAction(action, amount = 0){
@@ -173,7 +184,10 @@ function executePlayerAsk(bettingRound, handPlayers, playerHandIndex){
     console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
     console.log(`Hand: ${player.hand}`);
     var actionOpts = bettingRound.getOptions(player, street)
-    promptPlayer(player, actionOpts);
+    console.log("prompt player is")
+    ret = promptPlayer(player, actionOpts);
+    console.log(ret)
+    return ret;
 }
 
 function closeRound(bettingRound){

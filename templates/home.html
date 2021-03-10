@@ -45,7 +45,7 @@
             .then(data => responseData = data)
             .then(() => {
                 var li = document.createElement("li");
-                li.appendChild(document.createTextNode(responseData.data));
+                li.appendChild(document.createTextNode(JSON.stringify(responseData.data)));
                 ul.appendChild(li);
             });
         }
