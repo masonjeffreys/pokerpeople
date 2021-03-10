@@ -80,8 +80,6 @@ function newHand(table, deck, players, smallBlindAmount){
     makeBlindBets(table, bettingRound)
 
     // PlayTheHand - now we need input from players!
-     
-
     var ret = executePlayerAsk(bettingRound, handPlayers, bettingRound.activeHandPlayersIndex)
     // console.log("execute player ask:");
     // console.log(ret);
@@ -137,7 +135,11 @@ function promptPlayer(player, actionOpts){
 }
 
 function receiveAction(action, amount = 0){
+    console.log("index is", handPlayers[0].name)
     amount = parseInt(amount);
+    // Get current player
+    player = handPlayers[bettingRound.activeHandPlayersIndex]
+
     // Handle player's desired action
     if (action == 'bet'){
         player.makeBet(amount);
@@ -257,3 +259,4 @@ function advanceStreet(){
 }
 
 module.exports.startGame = startGame;
+module.exports.receiveAction = receiveAction;

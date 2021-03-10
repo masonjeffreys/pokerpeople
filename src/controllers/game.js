@@ -1,11 +1,23 @@
 var Game =  require('../orchestrator');
 
 /**
- * List Dogs
+ * Poker Endpoints
  */
 exports.start = (req, h) => {
-        return {status: 'success', data: Game.startGame()};
-    };
+  return {status: 'success', data: Game.startGame()};
+};
+
+exports.bet = (req, h) => {
+    return {status: 'success', data: Game.receiveAction('bet', req.query.amount)};
+};
+
+exports.check = (req, h) => {
+  return {status: 'success', data: Game.receiveAction('check')};
+};
+
+exports.fold = (req, h) => {
+  return {status: 'success', data: Game.receiveAction('fold')};
+};
 
 /**
  * Get Dog by ID

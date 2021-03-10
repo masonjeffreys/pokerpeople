@@ -58,25 +58,19 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/api/bet',
-        handler: (request, h) => {
-            return {status: "success", data: `betting ${request.query.amount}`}
-        }
+        handler: GameController.bet
     });
 
     server.route({
         method: 'GET',
         path: '/api/fold',
-        handler: (request, h) => {
-            return {status: "success", data: 'folding'}
-        }
+        handler: GameController.fold
     });
 
     server.route({
         method: 'GET',
         path: '/api/check',
-        handler: (request, h) => {
-            return {status: "success", data: 'check'}
-        }
+        handler: GameController.check
     });
 
     server.route({
