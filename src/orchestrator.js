@@ -27,6 +27,7 @@ var startingChips = 100;
 var smallBlindAmount = 5;
 var bettingRound = null;
 var minChips = 50;
+var startingDealerPosition = 0 ; //we'll increment this on each deal. First deal will be 0
 
 function startGame(){
     // Very first hand only of a new game with a new set of players.
@@ -39,7 +40,7 @@ function startGame(){
     }); 
 
     // Dealer position starts with the first player
-    table.dealerPosition = 1;
+    table.dealerPosition = startingDealerPosition;
 
     // Now that the table is set up, we start a new hand!
     // We will start next rounds the same way, but increment
@@ -75,10 +76,11 @@ function newHand(table, deck, players, smallBlindAmount){
     makeBlindBets(table, bettingRound)
 
     // PlayTheHand - now we need input from players!
-    executePlayerAsk(table, handPlayers, bettingRound.activeHandPlayersIndex)
+    executePlayerAsk(bettingRound, handPlayers, bettingRound.activeHandPlayersIndex)
 }
 
 function makeBlindBets(table, bettingRound){
+    // 
     var smallBlindIndex = Utils.getNextHandPlayerIndex(table.dealerPosition, handPlayers);
     var bigBlindIndex = Utils.getNextHandPlayerIndex(table.dealerPosition + 1, handPlayers);
     var underGunIndex = Utils.getNextHandPlayerIndex(table.dealerPosition + 2, handPlayers);
@@ -170,7 +172,7 @@ function executePlayerAsk(bettingRound, handPlayers, playerHandIndex){
     console.log(`Player up: ${player.name}`);
     console.log(`Pot: ${table.pot}`, `Bet: ${bettingRound.currentBet}`, `You're in ${player.bet}`);
     console.log(`Hand: ${player.hand}`);
-    var actionOpts = bettingRound.getOptions(player)
+    var actionOpts = bettingRound.getOptions(player, street)
     promptPlayer(player, actionOpts);
 }
 
