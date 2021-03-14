@@ -21,11 +21,14 @@ var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Play
 
 var table = Table(1);
 var deck = Deck(1);
-var handPlayers = [];
+
+// Currently have global scope - will manage state differently in next round of refactor
+global.handPlayers = [];
+global.bettingRound = null;
+
 var handCounter = 0;
 var startingChips = 100;
 var smallBlindAmount = 5;
-var bettingRound = null;
 var minChips = 50;
 var startingDealerPosition = 0 ; //we'll increment this on each deal. First deal will be 0
 
@@ -69,12 +72,12 @@ function newHand(table, deck, players, smallBlindAmount){
 
     // Grab a new deck, shuffle, and deal
     // HandPlayers are any players that are 'ACTIVE'. Allows people to sit out a round if desired
-    handPlayers = Utils.setHandPlayers(players, minChips);
+    global.handPlayers = Utils.setHandPlayers(players, minChips);
     deck.init().shuffle();
     deal(2, deck, table, handPlayers);
 
     // Initialize a Betting Round. Still deciding if this object makes sense
-    bettingRound = BettingRound(table, handPlayers, table.dealerPosition);
+    global.bettingRound = BettingRound(handPlayers, table, table.dealerPosition);
 
     // BetTheBlinds
     makeBlindBets(table, bettingRound)
@@ -135,35 +138,34 @@ function promptPlayer(player, actionOpts){
 }
 
 function receiveAction(action, amount = 0){
-    console.log("index is", handPlayers[0].name)
+    console.log("index is", bettingRound.activeHandPlayersIndex)
     amount = parseInt(amount);
     // Get current player
     player = handPlayers[bettingRound.activeHandPlayersIndex]
 
     // Handle player's desired action
-    if (action == 'bet'){
-        player.makeBet(amount);
-        bettingRound.addAction(player, "bet", street, amount);
-        bettingRound.table.pot = bettingRound.table.pot + amount;
+    switch (action){
+        case "bet":
+            player.makeBet(amount);
+            bettingRound.addAction(player, "bet", street, amount);
+            bettingRound.table.pot = bettingRound.table.pot + amount;
+            break
+        case "check":
+            bettingRound.addAction(player, "check", street, amount);
+            break
+        case "fold":
+            bettingRound.addAction(player, "fold", street);
+            break
+        case "call":
+            var callAmount = bettingRound.getCallAmount(player);
+            player.makeBet(callAmount);
+            bettingRound.addAction(player, "call", street, callAmount);
+            bettingRound.table.pot = bettingRound.table.pot + callAmount;
+            break
+        default:
+            throw new Error(`Invalid player action: ${action}, ${amount}`)
     }
-
-    if (action == 'check'){
-        bettingRound.addAction(player, "check", street, amount);
-    }
-
-    if (action == 'fold'){
-        bettingRound.addAction(player, "fold", street);
-    }
-
-    if (action == 'call'){
-        var callAmount = bettingRound.getCallAmount(player);
-        player.makeBet(callAmount);
-        bettingRound.addAction(player, "call", street, callAmount);
-        bettingRound.table.pot = bettingRound.table.pot + callAmount;
-    }
-    else {
-        throw 'Invalid player action!'
-    }
+    
     // Eval if action shoud stop
     stopBetting = bettingRound.isDone;
     if (stopBetting === true){
@@ -171,8 +173,8 @@ function receiveAction(action, amount = 0){
         return false;
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
-        adjustedIndex = (1 + adjustedIndex) % handPlayers.length
-        promptPlayer(handPlayers[adjustedIndex]);
+        bettingRound.activeHandPlayersIndex = (1 + bettingRound.activeHandPlayersIndex) % handPlayers.length;
+        return executePlayerAsk(bettingRound, handPlayers, bettingRound.activeHandPlayersIndex);
     }
 
 }
