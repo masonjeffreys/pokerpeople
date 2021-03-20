@@ -4,7 +4,7 @@
   "description": "Multi-player poker app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "lab -v **/*.test.js",
     "start": "./node_modules/nodemon/bin/nodemon.js index.js"
   },
   "author": "Jeff Mason",
@@ -18,6 +18,8 @@
     "pokersolver": "^2.1.4"
   },
   "devDependencies": {
+    "@hapi/code": "^8.0.3",
+    "@hapi/lab": "^24.1.1",
     "nodemon": "^2.0.7",
     "readline-sync": "^1.4.10"
   },
@@ -26,7 +28,8 @@
       "spec/*",
       ".gitignore",
       "node_modules/**/node_modules",
-      ".git"],
+      ".git"
+    ],
     "watch": [
       "src/",
       "public/",
