@@ -50,9 +50,7 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/api/call',
-        handler: (request, h) => {
-            return {status: "success", data: 'calling bet'}
-        }
+        handler: GameController.call
     });
 
     server.route({
