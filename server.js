@@ -22,7 +22,7 @@ exports.init = async () => {
     await server.register(Vision);
     await server.register(Inert);
 
-    await server.initialize();
+    
 
     server.views({
         engines: {
@@ -83,6 +83,8 @@ exports.init = async () => {
             }
         }                                          // [3]                                           // [3]
     });
+
+    await server.initialize();
 
     return server;
     
