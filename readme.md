@@ -8,6 +8,7 @@ Pull down master
 delete node_modules)
 npm install
 
-npm run test
+npm run test // runs all tests
+npm run test ./test/example.test.js // runs only a certain file
 
 npm run start

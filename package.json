@@ -4,7 +4,7 @@
   "description": "Multi-player poker app",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/@hapi/lab/bin/lab -v **/*.test.js",
+    "test": "./node_modules/@hapi/lab/bin/lab -v",
     "start": "./node_modules/nodemon/bin/nodemon.js index.js"
   },
   "author": "Jeff Mason",

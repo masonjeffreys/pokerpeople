@@ -5,7 +5,6 @@
 const Code = require('@hapi/code'); // Load Lab (test runner that is produced by Hapi people)
 const Lab = require('@hapi/lab'); // Load Lab (test runner that is produced by Hapi people)
 
-
 const { init } = require('../server'); // If the app is required, this is required to start the server
 const { expect } = Code; // Use this instead of Assert
 const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // Defines several constants that are useful for test followup, and notation
@@ -41,3 +40,28 @@ describe('GET /', () => {
         expect(res.statusCode).to.equal(200);
     })
 })
+
+// Old example of user creation
+// Lab.test("creating valid user", function(done) {
+//     var options = {
+//         method: "PUT",
+//         url: "/users/testuser",
+//         payload: {
+//             full_name: "Test User",
+//             age: 19,
+//             image: "dhown783hhdwinx.png"
+//         }
+//     };
+ 
+//     server.inject(options, function(response) {
+//         var result = response.result,
+//         payload = options.payload;
+ 
+//         Lab.expect(response.statusCode).to.equal(200);   Lab.expect(result.full_name).to.equal(payload.full_name);
+//         Lab.expect(result.age).to.equal(payload.age);
+//         Lab.expect(result.image).to.equal(payload.image);
+//         Lab.expect(result.count).to.equal(0);
+ 
+//         done();
+//     });
+// });
