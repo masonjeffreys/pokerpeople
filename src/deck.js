@@ -15,6 +15,9 @@ function Deck(id) {
         listCards: function(){
             console.log(_cards);
         },
+        cardCount: function(){
+            return _cards.length;
+        },
         init: function init(){
             SUITS.forEach((suit) => {
                 for (var i=0; i<13; i++){
