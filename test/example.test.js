@@ -7,7 +7,7 @@ const Lab = require('@hapi/lab'); // Load Lab (test runner that is produced by H
 
 const { init } = require('../server'); // If the app is required, this is required to start the server
 const { expect } = Code; // Use this instead of Assert
-const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // Defines several constants that are useful for test followup, and notation
+const { afterEach, beforeEach, describe, it, beforeAll } = exports.lab = Lab.script(); // Defines several constants that are useful for test followup, and notation
 
 // Every test case should have at least one assertion
 
@@ -16,20 +16,25 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // D
 // 2 - callback function
 
 // Basic unit test example
-it('returns true when 1 + 1 equals 2', () => {
-    expect(1 + 1).to.equal(2);
-});
+// it('returns true when 1 + 1 equals 2', () => {
+//     expect(1 + 1).to.equal(2);
+// });
 
 // Basic server page call test example
 describe('GET /', () => {
+
     let server;
-    
+
     beforeEach(async () => {
+        console.log("about to initialize server");
+        console.log("server is ", server);
         server = await init();
+        console.log("initializating server");
     });
 
     afterEach(async () => {
         await server.stop();
+        console.log("server stopped");
     });
 
     it('responds with 200', async () => {
@@ -38,8 +43,42 @@ describe('GET /', () => {
             url: '/'
         });
         expect(res.statusCode).to.equal(200);
-    })
+    });
+
+    it('can add player', async () => {
+        const res = await server.inject({
+            method: 'post',
+            url: '/addPlayer',
+            payload: {
+                name: "Jeff"
+            }
+        })
+        expect(res.statusCode).to.equal(200);
+    });
 })
+
+// Basic server page call test example
+// describe('POST /addPlayer', () => {
+
+//     beforeEach(async () => {
+//         server = await init();
+//     });
+
+//     afterEach(async () => {
+//         await server.stop();
+//     });
+
+//     // it('can add player', async () => {
+//     //     const res = await server.inject({
+//     //         method: 'post',
+//     //         url: '/addPlayer',
+//     //         payload: {
+//     //             name: "Jeff"
+//     //         }
+//     //     })
+//     //     expect(res.statusCode).to.equal(200);
+//     // });
+// })
 
 // Old example of user creation
 // Lab.test("creating valid user", function(done) {

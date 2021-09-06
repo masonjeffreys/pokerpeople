@@ -7,22 +7,62 @@ const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
 
-const server = Hapi.server({
-    port: 3000,
-    host: 'localhost',
-    routes: {
-        files: {
-            relativeTo: Path.join(__dirname, 'public')
+
+
+
+
+
+
+
+// server.route({
+//     method: 'GET',
+//     path: '/account/{username}',
+//     handler: (request, h) => {
+//         var accountMock = {};
+//         if (request.params.username == "jeff"){
+//             accountMock = {
+//                 username: "jeff",
+//                 password: "1234",
+//                 website: "https://jeffmason.me"
+//             }
+//         }
+//         return accountMock;
+//     }
+// });
+
+// server.route({
+//     method: "POST",
+//     path: "/account",
+//     options: {
+//         validate: {
+//             payload: Joi.object({
+//                 firstname: Joi.string().required(),
+//                 lastname: Joi.string().required(),
+//                 timestamp: Joi.any().forbidden().default((new Date).getTime())
+//             })
+//         }
+//     },
+//     handler: (request, h) => {
+//         return request.payload
+//     }
+// });
+
+
+exports.init = async function () {
+
+    const server = Hapi.server({
+        port: 3000,
+        host: 'localhost',
+        routes: {
+            files: {
+                relativeTo: Path.join(__dirname, 'public')
+            }
         }
-    }
-});
+    });
 
-exports.init = async () => {
-
+    await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
-
-    
 
     server.views({
         engines: {
@@ -31,7 +71,7 @@ exports.init = async () => {
         relativeTo: __dirname,
         path: 'templates'
     });
-
+    
     server.route({
         method: 'GET',
         path: '/',
@@ -40,6 +80,21 @@ exports.init = async () => {
                 title: 'Poker Pig',
                 message: 'Bring home the bacon for charity'
             });
+        }
+    });
+    
+    server.route({
+        method: 'POST',
+        path: '/api/addPlayer',
+        handler: GameController.addPlayer,
+        options: {
+            validate: {
+                payload: Joi.object({
+                    firstname: Joi.string().required(),
+                    lastname: Joi.string().required(),
+                    timestamp: Joi.any().forbidden().default((new Date).getTime())
+                })
+            }
         }
     });
     
@@ -72,56 +127,28 @@ exports.init = async () => {
         path: '/api/check',
         handler: GameController.check
     });
-    
+
     server.route({
+        // Route for getting random picture
+        // using the directory handler requires Inert to be registered
         method: 'GET',
         path: '/{param*}',
-        handler: {                                     // [3]
-            directory: {                                 // [3]
-                path: Path.join(__dirname, 'public'),      // [3]
-                listing: true                              // [3]
+        handler: {
+            directory: {
+                path: Path.join(__dirname, 'public'),
+                listing: true
             }
-        }                                          // [3]                                           // [3]
+        }
     });
 
-    await server.initialize();
-
     return server;
-    
-
-    // server.route({
-    //     method: 'GET',
-    //     path: '/account/{username}',
-    //     handler: (request, h) => {
-    //         var accountMock = {};
-    //         if (request.params.username == "jeff"){
-    //             accountMock = {
-    //                 username: "jeff",
-    //                 password: "1234",
-    //                 website: "https://jeffmason.me"
-    //             }
-    //         }
-    //         return accountMock;
-    //     }
-    // });
-
-    // server.route({
-    //     method: "POST",
-    //     path: "/account",
-    //     options: {
-    //         validate: {
-    //             payload: Joi.object({
-    //                 firstname: Joi.string().required(),
-    //                 lastname: Joi.string().required(),
-    //                 timestamp: Joi.any().forbidden().default((new Date).getTime())
-    //             })
-    //         }
-    //     },
-    //     handler: (request, h) => {
-    //         return request.payload
-    //     }
-    // });
 };
+
+exports.start = async function () {
+    await server.start();
+    console.log('Server running on %s', server.info.uri);
+    return server;
+}
 
 
 // Error Handling
@@ -129,9 +156,3 @@ process.on('unhandledRejection', (err) => {
     console.log(err);
     process.exit(1);
 });
-
-exports.start = async () => {
-    await server.start();
-    console.log('Server running on %s', server.info.uri);
-    return server;
-}

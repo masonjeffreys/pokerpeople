@@ -32,6 +32,16 @@ var smallBlindAmount = 5;
 var minChips = 50;
 var startingDealerPosition = 0 ; //we'll increment this on each deal. First deal will be 0
 
+function addPlayer(gameId, playerId){
+    getGame(gameId).then(game => {
+        getPlayer(playerId).then(player => {
+            console.log("Player is ", player);
+            game.players.push = player;
+        })
+    })
+    return game
+}
+
 function startGame(){
     // Very first hand only of a new game with a new set of players.
     handCounter = 0;
