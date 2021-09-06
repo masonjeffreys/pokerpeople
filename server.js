@@ -77,14 +77,13 @@ exports.init = async function () {
     
     server.route({
         method: 'POST',
-        path: '/api/addPlayer',
-        handler: GameController.addPlayer,
+        path: '/api/createPlayer',
+        handler: GameController.createPlayer,
         options: {
             validate: {
                 payload: Joi.object({
                     firstname: Joi.string().required(),
-                    lastname: Joi.string().required(),
-                    timestamp: Joi.any().forbidden().default((new Date).getTime())
+                    lastname: Joi.string().required()
                 })
             }
         }

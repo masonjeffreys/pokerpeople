@@ -32,6 +32,10 @@ var smallBlindAmount = 5;
 var minChips = 50;
 var startingDealerPosition = 0 ; //we'll increment this on each deal. First deal will be 0
 
+function createPlayer(firstname, lastname){
+    return {playerId: 1, firstname: firstname, lastname: lastname};
+}
+
 function addPlayer(gameId, playerId){
     getGame(gameId).then(game => {
         getPlayer(playerId).then(player => {
@@ -266,4 +270,5 @@ function advanceStreet(bettingRound){
 }
 
 module.exports.startGame = startGame;
+module.exports.createPlayer = createPlayer;
 module.exports.receiveAction = receiveAction;
