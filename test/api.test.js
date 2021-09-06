@@ -34,8 +34,8 @@ const { afterEach, beforeEach, describe, it, beforeAll } = exports.lab = Lab.scr
 // result - the raw handler response (e.g. when not a stream or a view) before it is serialized for transmission. If not available, the value is set to payload. Useful for inspection and reuse of the internal objects returned (instead of parsing the response string).
 // request - the request object.
 
-// Basic API calls
-describe('POST /api/addPlayer', () => {
+// Player API calls
+describe('Player API Calls', () => {
 
     let server;
 
@@ -61,27 +61,56 @@ describe('POST /api/addPlayer', () => {
     });
 })
 
-// Old example of user creation
-// Lab.test("creating valid user", function(done) {
-//     var options = {
-//         method: "PUT",
-//         url: "/users/testuser",
-//         payload: {
-//             full_name: "Test User",
-//             age: 19,
-//             image: "dhown783hhdwinx.png"
-//         }
-//     };
- 
-    // server.inject(options, function(response) {
-    //     var result = response.result,
-    //     payload = options.payload;
- 
-    //     Lab.expect(response.statusCode).to.equal(200);   Lab.expect(result.full_name).to.equal(payload.full_name);
-    //     Lab.expect(result.age).to.equal(payload.age);
-    //     Lab.expect(result.image).to.equal(payload.image);
-    //     Lab.expect(result.count).to.equal(0);
- 
-    //     done();
-    // });
-// });
+// Gameplay API calls
+describe('Gameplay API Calls. A player can: ', () => {
+
+    let server;
+
+    beforeEach(async () => {
+        server = await init();
+    });
+
+    afterEach(async () => {
+        await server.stop();
+    });
+
+    it('can start a new game', async () => {
+        const res = await server.inject({
+            method: 'get',
+            url: '/api/new'
+        })
+        expect(res.statusCode).to.equal(200);
+    });
+
+    it('can call a bet', async() => {
+        const res = await server.inject({
+            method: 'get',
+            url: '/api/call'
+        })
+        expect(res.statusCode).to.equal(200);
+    });
+
+    it('can bet an amount', async() => {
+        const res = await server.inject({
+            method: 'get',
+            url: '/api/bet'
+        })
+        expect(res.statusCode).to.equal(200);        
+    });
+
+    it('can fold', async() => {
+        const res = await server.inject({
+            method: 'get',
+            url: '/api/fold'
+        })
+        expect(res.statusCode).to.equal(200);   
+    });
+
+    it('can check', async() => {
+        const res = await server.inject({
+            method: 'get',
+            url: '/api/check'
+        })
+        expect(res.statusCode).to.equal(200);    
+    })
+})
