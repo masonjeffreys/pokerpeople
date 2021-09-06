@@ -1,5 +1,5 @@
 'use strict';
-console.log("Beginning Poker Pig");
+console.log("Beginning Poker For the People");
 
 const { init, start } = require('./server.js');
 
