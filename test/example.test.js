@@ -20,6 +20,20 @@ const { afterEach, beforeEach, describe, it, beforeAll } = exports.lab = Lab.scr
 //     expect(1 + 1).to.equal(2);
 // });
 
+
+// Lab uses Shot under the covers to inject a call into the HTTP chain
+// Shot returns an response object with the following properties:
+
+// statusCode - the HTTP status code.
+// headers - an object containing the headers set.
+// payload - the response payload string.
+// rawPayload - the raw response payload buffer.
+// raw - an object with the injection request and response objects:
+// req - the simulated node request object.
+// res - the simulated node response object.
+// result - the raw handler response (e.g. when not a stream or a view) before it is serialized for transmission. If not available, the value is set to payload. Useful for inspection and reuse of the internal objects returned (instead of parsing the response string).
+// request - the request object.
+
 // Basic server page call test example
 describe('GET /', () => {
 

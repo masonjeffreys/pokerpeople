@@ -25,9 +25,10 @@ describe('GET /', () => {
     it('responds with background pic', async () => {
         const res = await server.inject({
             method: 'get',
-            url: '/'
+            url: '/img/porky.png'
         });
-        console.log(res);
+        //console.log(res);
         expect(res.statusCode).to.equal(200);
+        expect(res.headers['content-type']).to.equal("image/png");
     })
 })
