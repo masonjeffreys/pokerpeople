@@ -1,10 +1,11 @@
 'use strict';
 console.log("Beginning Poker Pig");
 
-const { start, init } = require('./server.js');
+const { init, start } = require('./server.js');
 
-function startAppAndServer(){
-    //init(start());
+async function startAppAndServer(){
+    let server = await init();
+    await start(server);
 }
 
 startAppAndServer();

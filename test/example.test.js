@@ -26,15 +26,11 @@ describe('GET /', () => {
     let server;
 
     beforeEach(async () => {
-        console.log("about to initialize server");
-        console.log("server is ", server);
         server = await init();
-        console.log("initializating server");
     });
 
     afterEach(async () => {
         await server.stop();
-        console.log("server stopped");
     });
 
     it('responds with 200', async () => {
@@ -44,41 +40,32 @@ describe('GET /', () => {
         });
         expect(res.statusCode).to.equal(200);
     });
-
-    it('can add player', async () => {
-        const res = await server.inject({
-            method: 'post',
-            url: '/addPlayer',
-            payload: {
-                name: "Jeff"
-            }
-        })
-        expect(res.statusCode).to.equal(200);
-    });
 })
 
 // Basic server page call test example
-// describe('POST /addPlayer', () => {
+describe('POST /addPlayer', () => {
 
-//     beforeEach(async () => {
-//         server = await init();
-//     });
+    let server;
 
-//     afterEach(async () => {
-//         await server.stop();
-//     });
+    beforeEach(async () => {
+        server = await init();
+    });
 
-//     // it('can add player', async () => {
-//     //     const res = await server.inject({
-//     //         method: 'post',
-//     //         url: '/addPlayer',
-//     //         payload: {
-//     //             name: "Jeff"
-//     //         }
-//     //     })
-//     //     expect(res.statusCode).to.equal(200);
-//     // });
-// })
+    afterEach(async () => {
+        await server.stop();
+    });
+
+    // it('can add player', async () => {
+    //     const res = await server.inject({
+    //         method: 'post',
+    //         url: '/addPlayer',
+    //         payload: {
+    //             name: "Jeff"
+    //         }
+    //     })
+    //     expect(res.statusCode).to.equal(200);
+    // });
+})
 
 // Old example of user creation
 // Lab.test("creating valid user", function(done) {
@@ -92,15 +79,15 @@ describe('GET /', () => {
 //         }
 //     };
  
-//     server.inject(options, function(response) {
-//         var result = response.result,
-//         payload = options.payload;
+    // server.inject(options, function(response) {
+    //     var result = response.result,
+    //     payload = options.payload;
  
-//         Lab.expect(response.statusCode).to.equal(200);   Lab.expect(result.full_name).to.equal(payload.full_name);
-//         Lab.expect(result.age).to.equal(payload.age);
-//         Lab.expect(result.image).to.equal(payload.image);
-//         Lab.expect(result.count).to.equal(0);
+    //     Lab.expect(response.statusCode).to.equal(200);   Lab.expect(result.full_name).to.equal(payload.full_name);
+    //     Lab.expect(result.age).to.equal(payload.age);
+    //     Lab.expect(result.image).to.equal(payload.image);
+    //     Lab.expect(result.count).to.equal(0);
  
-//         done();
-//     });
-// });
+    //     done();
+    // });
+});

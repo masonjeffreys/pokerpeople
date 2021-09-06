@@ -7,13 +7,6 @@ const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
 
-
-
-
-
-
-
-
 // server.route({
 //     method: 'GET',
 //     path: '/account/{username}',
@@ -46,7 +39,6 @@ const GameController =  require('./src/controllers/game');
 //         return request.payload
 //     }
 // });
-
 
 exports.init = async function () {
 
@@ -144,7 +136,7 @@ exports.init = async function () {
     return server;
 };
 
-exports.start = async function () {
+exports.start = async function (server) {
     await server.start();
     console.log('Server running on %s', server.info.uri);
     return server;
