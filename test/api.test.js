@@ -57,6 +57,7 @@ describe('POST /api/addPlayer', () => {
             }
         })
         expect(res.statusCode).to.equal(200);
+        expect(res.result.data.playerId).to.equal(1);
     });
 })
 
