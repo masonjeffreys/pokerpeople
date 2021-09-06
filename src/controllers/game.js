@@ -4,8 +4,12 @@ var Game =  require('../orchestrator');
  * Poker Endpoints
  */
 
-exports.addPlayer = (req, h) => {
-  return {status: 'success', data: Game.addPlayer(req.params.gameId, req.params.playerId)};
+ exports.createPlayer = (req, h) => {
+  return {status: 'success', data: Game.createPlayer(req.payload.firstname, req.payload.lastname)};
+}
+
+exports.addPlayerToGame = (req, h) => {
+  return {status: 'success', data: Game.addPlayer(req.payload.gameId, req.payload.playerId)};
 }
 
 exports.start = (req, h) => {
