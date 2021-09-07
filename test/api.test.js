@@ -59,29 +59,17 @@ describe('POST /api/addPlayer', () => {
         expect(res.statusCode).to.equal(200);
         expect(res.result.data.playerId).to.equal(1);
     });
-})
 
-// Old example of user creation
-// Lab.test("creating valid user", function(done) {
-//     var options = {
-//         method: "PUT",
-//         url: "/users/testuser",
-//         payload: {
-//             full_name: "Test User",
-//             age: 19,
-//             image: "dhown783hhdwinx.png"
-//         }
-//     };
- 
-    // server.inject(options, function(response) {
-    //     var result = response.result,
-    //     payload = options.payload;
- 
-    //     Lab.expect(response.statusCode).to.equal(200);   Lab.expect(result.full_name).to.equal(payload.full_name);
-    //     Lab.expect(result.age).to.equal(payload.age);
-    //     Lab.expect(result.image).to.equal(payload.image);
-    //     Lab.expect(result.count).to.equal(0);
- 
-    //     done();
-    // });
-// });
+    it('can execute functional call', async () => {
+        const res = await server.inject({
+            method: 'post',
+            url: '/api/handleConn',
+            payload: {
+                firstname: "Jeff",
+                lastname: "Mason"
+            }
+        })
+        expect(res.statusCode).to.equal(200);
+        expect(res.result.data).to.equal(1);
+    })
+});
