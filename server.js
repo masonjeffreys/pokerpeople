@@ -11,57 +11,31 @@ const Bcrypt = require('bcrypt');
 const exampleUsers = {
     john: {
         username: 'john',
-        password: '$2a$10$iqJSHD.BGr0E2IxQwYgJmeP3NvhPrXAeLSaGCj6IR/XU5QtjVu5Tm',   // 'secret'
+        password: '$2a$10$iqJSHD.BGr0E2IxQwYgJmeP3NvhPrXAeLSaGCj6IR/XU5QtjVu5Tm',   // 'secret' after BCrypt
         name: 'John Doe',
         id: '2133d32a'
     }
 };
 
-const validate = async (request, username, password) => {
-
+const validate = async (request, username, password, h) => {
+    //await console.log("Here!");
+    console.log("username is: ", username);
+    console.log("password is: ", password);
     const user = exampleUsers[username];
+    if (username === 'help') {
+        return { response: h.redirect('https://hapijs.com/help') };     // custom response
+    }
     if (!user) {
+        console.log("No user exists by username: ", username);
         return { credentials: null, isValid: false };
     }
 
     const isValid = await Bcrypt.compare(password, user.password);
+    console.log("Is valid? ", isValid);
     const credentials = { id: user.id, name: user.name };
 
     return { isValid, credentials };
 };
-
-// server.route({
-//     method: 'GET',
-//     path: '/account/{username}',
-//     handler: (request, h) => {
-//         var accountMock = {};
-//         if (request.params.username == "jeff"){
-//             accountMock = {
-//                 username: "jeff",
-//                 password: "1234",
-//                 website: "https://jeffmason.me"
-//             }
-//         }
-//         return accountMock;
-//     }
-// });
-
-// server.route({
-//     method: "POST",
-//     path: "/account",
-//     options: {
-//         validate: {
-//             payload: Joi.object({
-//                 firstname: Joi.string().required(),
-//                 lastname: Joi.string().required(),
-//                 timestamp: Joi.any().forbidden().default((new Date).getTime())
-//             })
-//         }
-//     },
-//     handler: (request, h) => {
-//         return request.payload
-//     }
-// });
 
 exports.init = async function () {
 
@@ -78,9 +52,9 @@ exports.init = async function () {
     await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
-    await server.register(require('@hapi/basic')); // use basic authentication
+    await server.register(require('@hapi/basic')); // use basic authentication. This creates a scheme.
 
-    server.auth.strategy('simple', 'basic', { validate }); // call the auth method 'simple'
+    server.auth.strategy('simple', 'basic', { validate }); // Implementation of basic authentication. A strategy called 'simple'
 
     // server.auth.strategy('session', 'cookie', {
     //     name: 'sid-example',

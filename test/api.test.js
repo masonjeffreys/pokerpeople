@@ -119,6 +119,7 @@ describe('Gameplay API Calls. A player can: ', () => {
         const res = await server.inject({
             method: 'post',
             url: '/api/handleConn',
+            headers: { 'Authorization': 'Basic am9objpzZWNyZXQ=' },
             payload: {
                 firstname: "Jeff",
                 lastname: "Mason"
