@@ -6,6 +6,29 @@ const Vision = require('@hapi/vision');
 const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
+const Bcrypt = require('bcrypt');
+
+const exampleUsers = {
+    john: {
+        username: 'john',
+        password: '$2a$10$iqJSHD.BGr0E2IxQwYgJmeP3NvhPrXAeLSaGCj6IR/XU5QtjVu5Tm',   // 'secret'
+        name: 'John Doe',
+        id: '2133d32a'
+    }
+};
+
+const validate = async (request, username, password) => {
+
+    const user = exampleUsers[username];
+    if (!user) {
+        return { credentials: null, isValid: false };
+    }
+
+    const isValid = await Bcrypt.compare(password, user.password);
+    const credentials = { id: user.id, name: user.name };
+
+    return { isValid, credentials };
+};
 
 // server.route({
 //     method: 'GET',
@@ -55,6 +78,15 @@ exports.init = async function () {
     await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
+    await server.register(require('@hapi/basic')); // use basic authentication
+
+    server.auth.strategy('simple', 'basic', { validate }); // call the auth method 'simple'
+
+    // server.auth.strategy('session', 'cookie', {
+    //     name: 'sid-example',
+    //     password: '!wsYhFA*C2U6nz=Bu^%A@^F#SF3&ksr6',
+    //     isSecure: false
+    // });
 
     server.views({
         engines: {
@@ -80,6 +112,7 @@ exports.init = async function () {
         path: '/api/handleConn',
         handler: GameController.handleConn,
         options: {
+            auth: 'simple', // Try using simple authentication here
             validate: {
                 payload: Joi.object({
                     firstname: Joi.string().required(),

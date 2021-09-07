@@ -6,11 +6,8 @@ var Functional = require('../functional');
 
  exports.handleConn = (req, h) => {
    let conn = {data: "", status: ""};
-   console.log("Got here");
    conn = Functional.handleConn(conn, req.payload);
-   console.log("Got here 2");
    conn['status'] = 'success';
-   console.log(conn);
    return conn;
 }
 
