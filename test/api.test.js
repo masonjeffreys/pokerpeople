@@ -59,7 +59,8 @@ describe('Player API Calls', () => {
         expect(res.statusCode).to.equal(200);
         expect(res.result.data.playerId).to.equal(1);
     });
-})
+
+});
 
 // Gameplay API calls
 describe('Gameplay API Calls. A player can: ', () => {
@@ -112,5 +113,18 @@ describe('Gameplay API Calls. A player can: ', () => {
             url: '/api/check'
         })
         expect(res.statusCode).to.equal(200);    
-    })
-})
+    });
+
+    it('can execute functional call', async () => {
+        const res = await server.inject({
+            method: 'post',
+            url: '/api/handleConn',
+            payload: {
+                firstname: "Jeff",
+                lastname: "Mason"
+            }
+        })
+        expect(res.statusCode).to.equal(200);
+        expect(res.result.data).to.equal(1);
+    });
+});

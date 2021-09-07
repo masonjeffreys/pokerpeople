@@ -74,6 +74,20 @@ exports.init = async function () {
             });
         }
     });
+
+    server.route({
+        method: 'POST',
+        path: '/api/handleConn',
+        handler: GameController.handleConn,
+        options: {
+            validate: {
+                payload: Joi.object({
+                    firstname: Joi.string().required(),
+                    lastname: Joi.string().required()
+                })
+            }
+        }
+    });
     
     server.route({
         method: 'POST',
