@@ -5,9 +5,13 @@ var Functional = require('../functional');
  */
 
  exports.handleConn = (req, h) => {
-   console.log("got to here");
-   let conn = {};
-  return {status: 'success', data: Functional.handleConn(conn, req.payload)};
+   let conn = {data: "", status: ""};
+   console.log("Got here");
+   conn = Functional.handleConn(conn, req.payload);
+   console.log("Got here 2");
+   conn['status'] = 'success';
+   console.log(conn);
+   return conn;
 }
 
 exports.createPlayer = (req, h) => {
