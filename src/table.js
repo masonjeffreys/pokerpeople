@@ -9,6 +9,9 @@ function Table(id) {
     var _bigBlind = null;
     var _smallBlind = null;
     var _sidePots = [];
+    var _currentBet = 0;
+    var _street = 'preflop';
+
     return Object.freeze({
         get id(){
             return _id;
@@ -18,6 +21,13 @@ function Table(id) {
         },
         set dealerPosition(value){
             _dealerPosition = value;
+            return this;
+        },
+        get activeIndex(){
+            return _activeIndex;
+        },
+        set activeIndex(value){
+            _activeIndex = value;
             return this;
         },
         get smallBlind(){
@@ -40,6 +50,13 @@ function Table(id) {
         set pot(value){
             _pot = value;
             return _pot;
+        },
+        get currentBet(){
+            return _currentBet;
+        },
+        set currentBet(value){
+            _currentBet = value;
+            return _currentBet;
         },
         get burnedCards(){
             return _burnedCards;

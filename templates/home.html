@@ -12,7 +12,7 @@
             height: 100%;
             overflow: hidden;
             background-color: powderblue;
-            background-image: url('http://localhost:3000/img/porky.png');
+            background-image: url('http://localhost:8080/img/porky.png');
             background-repeat: no-repeat;
             background-size: contain;
             background-position: center;}
@@ -40,7 +40,7 @@
         function fetchAndUpdate(endpoint){
             var responseData;
             var ul = document.getElementById("list");
-            fetch('http://localhost:3000/api/' + endpoint)
+            fetch('http://localhost:8080/api/' + endpoint)
             .then(response => response.json())
             .then(data => responseData = data)
             .then(() => {

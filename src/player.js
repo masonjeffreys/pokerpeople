@@ -12,6 +12,10 @@ function Player(id, name) {
       var _bigBlind = false;
 
       return Object.freeze({
+            init: function init(firstname, lastname){
+                  return {playerId: 1, firstname: firstname, lastname: lastname};
+            },
+
             get id(){
                   return _id;
             },
