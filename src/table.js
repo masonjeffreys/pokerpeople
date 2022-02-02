@@ -1,15 +1,12 @@
 function Table(id) {
     var _id = id;
     var _round = null;
-    var _position = null;
     var _dealerPosition = null;
     var _commonCards = [];
     var _burnedCards = [];
-    var _pot = null;
     var _bigBlind = null;
     var _smallBlind = null;
     var _sidePots = [];
-    var _currentBet = 0;
     var _street = 'preflop';
 
     return Object.freeze({
@@ -43,20 +40,6 @@ function Table(id) {
         set bigBlind(value){
             _bigBlind = value;
             return this;
-        },
-        get pot(){
-            return _pot;
-        },
-        set pot(value){
-            _pot = value;
-            return _pot;
-        },
-        get currentBet(){
-            return _currentBet;
-        },
-        set currentBet(value){
-            _currentBet = value;
-            return _currentBet;
         },
         get burnedCards(){
             return _burnedCards;

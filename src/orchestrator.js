@@ -50,7 +50,6 @@ function setupNewGame(){
 function setupHand(){
     // EVERY new hand:
     // Reset player bets.
-    // Reset pot to 0
     // Advance dealer position
     // Make small and big blind bets
     // Shuffle deck
@@ -60,7 +59,6 @@ function setupHand(){
         player.bet = 0;
     })
     table.dealerPosition = Utils.nextValidPlayerIndex(players, table.dealerPosition);
-    table.pot = 0;
 
     // BetTheBlinds
     makeBlindBets();
@@ -69,12 +67,12 @@ function setupHand(){
     deck.init().shuffle();
     Utils.dealOne(players, deck, table.dealerPosition + 1);
     Utils.dealOne(players, deck, table.dealerPosition + 1);
+    Utils.showState(players, table)
 }
 
 function makeBlindBets(){
     // Get Indices for various players
     let smallBlindIndex = Utils.nextValidPlayerIndex(players, table.dealerPosition);
-    console.log("small blind index is ", smallBlindIndex);
     var bigBlindIndex = Utils.nextValidPlayerIndex(players, smallBlindIndex);
 
     // Bet the small blind
@@ -104,7 +102,7 @@ function executePlayerAsk(){
     console.log(`You're in ${player.bet}`);
     console.log(`Bet to you: ${table.currentBet}`);
     console.log(`Hand: ${player.hand}`);
-    var actionOpts = Utils.getOptions(player, table, street)
+    var actionOpts = Utils.getOptions(players, player, table, street)
     console.log("prompt player is")
     ret = promptPlayer(player, actionOpts);
     console.log(ret)
@@ -122,38 +120,35 @@ function promptPlayer(player, actionOpts){
 }
 
 function receiveAction(action, amount = 0){
-    console.log("index is", bettingRound.activeHandPlayersIndex)
     amount = parseInt(amount);
     // Get current player
-    player = handPlayers[bettingRound.activeHandPlayersIndex]
+    player = players[table.activeIndex]
 
     // Handle player's desired action
     switch (action){
         case "bet":
             player.makeBet(amount);
-            bettingRound.addAction(player, "bet", street, amount);
-            bettingRound.table.pot = bettingRound.table.pot + amount;
             break
         case "check":
-            bettingRound.addAction(player, "check", street, amount);
+            // Essentially no change. Just move to next position
+            table.activeIndex = Utils.nextValidPlayerIndex(players, table.activeIndex)
             break
         case "fold":
-            bettingRound.addAction(player, "fold", street);
+            // Change player state and advance to next position
+            player.handState = "OUT"
+            table.activeIndex = Utils.nextValidPlayerIndex(players, table.activeIndex)
             break
         case "call":
-            var callAmount = bettingRound.getCallAmount(player);
-            player.makeBet(callAmount);
-            bettingRound.addAction(player, "call", street, callAmount);
-            bettingRound.table.pot = bettingRound.table.pot + callAmount;
+            player.makeBet(getCallAmount(players, player));
             break
         default:
             throw new Error(`Invalid player action: ${action}, ${amount}`)
     }
     
     // Eval if action shoud stop
-    stopBetting = bettingRound.isDone;
+    stopBetting = Utils.streetComplete();
     if (stopBetting === true){
-        advanceStreet(bettingRound);
+        table.street = advanceStreet(bettingRound);
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
         bettingRound.activeHandPlayersIndex = (1 + bettingRound.activeHandPlayersIndex) % handPlayers.length;

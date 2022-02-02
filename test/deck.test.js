@@ -16,3 +16,11 @@ describe('Deck',()=>{
         expect(deck.init().cardCount()).to.equal(52)
     })
 })
+
+describe('Can remove card',()=>{
+    it('using take', () => {
+        let card = [deck.take()];
+        expect(deck.cardCount()).to.equal(51);
+        expect(deck.listCards().includes(card)).to.equal(false);
+    })
+})
