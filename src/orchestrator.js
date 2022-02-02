@@ -146,27 +146,23 @@ function receiveAction(action, amount = 0){
     }
     
     // Eval if action shoud stop
-    stopBetting = Utils.streetComplete();
-    if (stopBetting === true){
-        table.street = advanceStreet(bettingRound);
+    stopBetting = Utils.isStreetComplete();
+    if (stopBetting == true){
+        table.street = advanceStreet(table, players);
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
-        bettingRound.activeHandPlayersIndex = (1 + bettingRound.activeHandPlayersIndex) % handPlayers.length;
-        return executePlayerAsk(bettingRound, handPlayers, bettingRound.activeHandPlayersIndex);
+        return betAnotherRound();
     }
 
 }
 
-
-
-function betAnotherRound(bettingRound){
+function betAnotherRound(){
     // Initialize another Betting Round. Still deciding if this bettingRound object makes sense
-    var smallBlindIndex = Utils.getNextHandPlayerIndex(table.dealerPosition, handPlayers);
-    executePlayerAsk(bettingRound, handPlayers, smallBlindIndex)
+    executePlayerAsk()
 }
 
-function advanceStreet(bettingRound){
-    if (bettingRound.activePlayersCount == 1){
+function advanceStreet(table, players){
+    if (Utils.activePlayersCount(players) == 1){
         // Winning player, others folded
         var winner = handPlayers.find(p => p.handState == 'IN');
         console.log("Winner: ", winner.name);
@@ -176,7 +172,7 @@ function advanceStreet(bettingRound){
         streetIndex = streetIndex + 1;
         street = STREETS[streetIndex];
         console.log("Next stage: ", STREETS[streetIndex]);
-        bettingRound.street = STREETS[streetIndex];
+        table.street = STREETS[streetIndex];
     
         switch(street){
             case 'flop':
@@ -184,15 +180,15 @@ function advanceStreet(bettingRound){
                 table.addCommonCard(deck.take());
                 table.addCommonCard(deck.take());
                 table.addCommonCard(deck.take());
-                betAnotherRound(bettingRound);
+                startStreet();
             case 'turn':
                 table.addBurnedCard(deck.take());
                 table.addCommonCard(deck.take());
-                betAnotherRound(bettingRound);
+                startStreet();
             case 'river':
                 table.addBurnedCard(deck.take());
                 table.addCommonCard(deck.take());
-                betAnotherRound(bettingRound);
+                startStreet();
             case 'showdown':
                 street = 'complete';
                 var handsByPlayer = [];

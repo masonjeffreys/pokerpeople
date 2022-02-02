@@ -67,9 +67,19 @@ function potForPlayer(players, player){
     return pot;
 }
 
-function streetComplete(){
+function isStreetComplete(){
     // add logic for whether street should be done
     return true;
+}
+
+function activePlayersCount(players){
+    sum = 0;
+    players.forEach(function(player){
+        if (isValidPlayer(player)){
+            sum = sum + 1
+        }
+    })
+    return sum;
 }
 
 function nextValidPlayer(players, prevIndex){
@@ -134,4 +144,5 @@ module.exports.potForPlayer = potForPlayer;
 module.exports.potForAll = potForAll;
 module.exports.getOptions = getOptions;
 module.exports.showState = showState;
-module.exports.streetComplete = streetComplete;
+module.exports.activePlayersCount = activePlayersCount;
+module.exports.isStreetComplete = isStreetComplete;
