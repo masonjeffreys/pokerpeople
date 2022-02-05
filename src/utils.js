@@ -11,8 +11,12 @@ function isValidPlayer(player){
     return (player.handState == "IN");
 }
 
+function isValidBetter(player){
+    return (isValidPlayer(player) && player.chips > 0);
+}
+
 function correctIndex(arrayLen, givenIndex){
-    // ensure that index is in array. If not, loop!
+    // ensure that index is in array. If not, loop index back to beginning of array!
     let index;
     if (givenIndex > arrayLen - 1){
         index = 0; // start at beginning of array
@@ -117,7 +121,7 @@ function getCallAmount(players, player){
     return (playerMaxBet(players) - player.bet);
 }
 
-function getOptions(players, player, table, street){
+function getOptions(players, player, table){
     var actionOpts = [];
     var callAmount = getCallAmount(players, player);
     
@@ -146,3 +150,4 @@ module.exports.getOptions = getOptions;
 module.exports.showState = showState;
 module.exports.activePlayersCount = activePlayersCount;
 module.exports.isStreetComplete = isStreetComplete;
+module.exports.getCallAmount = getCallAmount;

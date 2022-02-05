@@ -12,7 +12,6 @@ const Utils = require('./utils');
 const Solver = require('pokersolver').Hand;
 
 // State definition
-var street = STREETS[0];
 var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")];
 var table = Table(1);
 var deck = Deck(1);
@@ -50,6 +49,8 @@ function setupNewGame(){
 function setupHand(){
     // EVERY new hand:
     // Reset player bets.
+    // Set table street
+    // Set table to be open for new bets
     // Advance dealer position
     // Make small and big blind bets
     // Shuffle deck
@@ -58,7 +59,10 @@ function setupHand(){
     players.forEach(function(player){
         player.bet = 0;
     })
+    table.street = STREETS[0]; // Sets to 'preflop'
     table.dealerPosition = Utils.nextValidPlayerIndex(players, table.dealerPosition);
+    table.betCompleted = false;
+    table.minRaise = table.bigBlind;
 
     // BetTheBlinds
     makeBlindBets();
@@ -87,9 +91,9 @@ function makeBlindBets(){
 }
 
 function applyBet(playerIndex, amount){
-    // Player makes bet first..then table is adjusted.
+    // Player makes bet first..for now we are keeping track of the pot at the table level.
+    // Instead, we'd add all players bets to get the total pot. (Will eventually need side pots).
     players[playerIndex].makeBet(amount);
-    table.pot = table.pot + amount;
 }
 
 function executePlayerAsk(){
@@ -102,21 +106,12 @@ function executePlayerAsk(){
     console.log(`You're in ${player.bet}`);
     console.log(`Bet to you: ${table.currentBet}`);
     console.log(`Hand: ${player.hand}`);
-    var actionOpts = Utils.getOptions(players, player, table, street)
-    console.log("prompt player is")
-    ret = promptPlayer(player, actionOpts);
-    console.log(ret)
-    return ret;
-}
-
-function promptPlayer(player, actionOpts){
-    // Time to find out what the player wants to do
-    // This was using readline-sync in Dev environment
-    var ret = {
+    var actionOpts = Utils.getOptions(players, player, table)
+    console.log("Player options: ", actionOpts);
+    return {
         player: player,
         options: actionOpts
-    }
-    return ret;
+    };
 }
 
 function receiveAction(action, amount = 0){
@@ -135,30 +130,25 @@ function receiveAction(action, amount = 0){
             break
         case "fold":
             // Change player state and advance to next position
-            player.handState = "OUT"
+            player.handState = "FOLD"
             table.activeIndex = Utils.nextValidPlayerIndex(players, table.activeIndex)
             break
         case "call":
-            player.makeBet(getCallAmount(players, player));
+            player.makeBet(Utils.getCallAmount(players, player));
+            table.activeIndex = Utils.nextValidPlayerIndex(players, table.activeIndex)
             break
         default:
             throw new Error(`Invalid player action: ${action}, ${amount}`)
     }
     
     // Eval if action shoud stop
-    stopBetting = Utils.isStreetComplete();
-    if (stopBetting == true){
+    if (table.betCompleted == true){
         table.street = advanceStreet(table, players);
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
-        return betAnotherRound();
+        return executePlayerAsk();
     }
 
-}
-
-function betAnotherRound(){
-    // Initialize another Betting Round. Still deciding if this bettingRound object makes sense
-    executePlayerAsk()
 }
 
 function advanceStreet(table, players){
@@ -169,11 +159,8 @@ function advanceStreet(table, players){
         return false;
     }
     else {
-        streetIndex = streetIndex + 1;
-        street = STREETS[streetIndex];
-        console.log("Next stage: ", STREETS[streetIndex]);
-        table.street = STREETS[streetIndex];
-    
+        table.street = nextStreet(table.street);
+        console.log("New street is: ", table.street);
         switch(street){
             case 'flop':
                 table.addBurnedCard(deck.take());
@@ -218,3 +205,4 @@ function advanceStreet(table, players){
 
 module.exports.startGame = startGame;
 module.exports.receiveAction = receiveAction;
+module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
