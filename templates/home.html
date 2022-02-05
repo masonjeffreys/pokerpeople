@@ -60,8 +60,6 @@
             .then(data => responseData = data)
             .then(() => {
                 var data = responseData.data;
-                console.log("data is");
-                console.log(data);
                 tableDiv.innerHTML= JSON.stringify(data.table);
                 playerDiv.innerHTML= JSON.stringify(data.player);
                 actionsDiv.innerHTML= JSON.stringify(data.options);
