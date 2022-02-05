@@ -28,25 +28,43 @@
         <button type="button" onclick="newGame()">New Game</button>
     </div>
     <main id="main">
-        <button type="button" onclick="check()">Check</button>
-        <button type="button" onclick="call()">Call</button>
-        <button type="button" onclick="bet()">Bet</button>
-        <button type="button" onclick="fold()">Fold</button>
-        <ul id="list">
+        <h3>Table</h3>
+        <div id="table">
             
-        </ul>
+        </div>
+        <h3>Current Player</h3>
+        <div id="player">
+            
+        </div>
+        <h3>Actions</h3>
+        <div id="actions">
+            
+        </div>
+        <button type="button" id="checkBtn" onclick="check()">Check</button>
+        <button type="button" id="callBtn" onclick="call()">Call</button>
+        <button type="button" id="betBtn" onclick="bet()">Bet</button>
+        <button type="button" id="foldBtn" onclick="fold()">Fold</button>
+        <h3>Meta info</h3>
+        <div id="meta">
+            
+        </div>
     </main>
     <script>
         function fetchAndUpdate(endpoint){
             var responseData;
-            var ul = document.getElementById("list");
+            var tableDiv = document.getElementById("table");
+            var playerDiv = document.getElementById("player");
+            var actionsDiv = document.getElementById("actions");
             fetch('http://localhost:8080/api/' + endpoint)
             .then(response => response.json())
             .then(data => responseData = data)
             .then(() => {
-                var li = document.createElement("li");
-                li.appendChild(document.createTextNode(JSON.stringify(responseData.data)));
-                ul.appendChild(li);
+                var data = responseData.data;
+                console.log("data is");
+                console.log(data);
+                tableDiv.innerHTML= JSON.stringify(data.table);
+                playerDiv.innerHTML= JSON.stringify(data.player);
+                actionsDiv.innerHTML= JSON.stringify(data.options);
             });
         }
         function newGame() {

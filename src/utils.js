@@ -140,20 +140,17 @@ function getCallAmount(players, player){
 }
 
 function getOptions(players, player, table){
-    var actionOpts = [];
+    var actionOpts = {fold: true};
     var callAmount = getCallAmount(players, player);
-    
     if ( callAmount > 0 ){
-        actionOpts.push(`${callAmount} to call`);
+        actionOpts.call = callAmount;
     }
     if (callAmount == 0){
-        actionOpts.push(`Check`);
+        actionOpts.check = true;
     }
-    actionOpts.push(`Bet up to ${player.chips}`);
     if (player.chips > 0){
-        actionOpts.push(`All in with ${player.chips} more chips.`)
+        actionOpts.bet = [table.minRaise, player.chips]
     }
-    actionOpts.push(`Fold`)
     return actionOpts;
 }
 

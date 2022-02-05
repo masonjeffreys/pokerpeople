@@ -103,18 +103,21 @@ function executePlayerAsk(){
     var player = players[table.activeIndex];
     var actionOpts = Utils.getOptions(players, player, table)
     // Remind player of current hand table state
-    console.log('\n');
-    console.log("Table id: ", table.id);
-    console.log("Street: ", table.street);
-    console.log("Player up: ", player.name);
-    console.log("Acted in street?: ", player.actedInStreet);
-    console.log("Pot: ", Utils.potForPlayer(players));
-    console.log("You're in: ", player.bet);
-    console.log("Table high bet is: ", Utils.playerMaxBet(players));
-    console.log("Hand: ", player.hand);
-    console.log("Player options: ", actionOpts);
     return {
-        player: player,
+        table: {
+            id: table.id,
+            street: table.street,
+            highBet: Utils.playerMaxBet(players),
+            commonCards: table.commonCards,
+            pot: Utils.potForPlayer(players)
+        },
+        player: {
+            id: player.id,
+            name: player.name,
+            actedInStreet: player.actedInStreet,
+            chips: player.chips,
+            hand: player.hand
+        },
         options: actionOpts
     };
 }
