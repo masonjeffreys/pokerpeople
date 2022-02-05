@@ -10,6 +10,7 @@ function Player(id, name) {
       var _tablePosition = null;
       var _smallBlind = false;
       var _bigBlind = false;
+      var _actedInStreet = false; // how we track whether a betting round is done.
 
       return Object.freeze({
             init: function init(firstname, lastname){
@@ -26,6 +27,15 @@ function Player(id, name) {
 
             set name(value){
                   _name = value;
+                  return this;
+            },
+
+            get actedInStreet(){
+                  return _actedInStreet;
+            },
+
+            set actedInStreet(value){
+                  _actedInStreet = value;
                   return this;
             },
 

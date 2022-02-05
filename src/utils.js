@@ -30,6 +30,7 @@ function correctIndex(arrayLen, givenIndex){
 }
 
 function showState(players, table){
+    console.log("Street is: ", table.street)
     console.log("Table showing: ", table.commonCards)
     console.log("Pot for all is ", potForAll(players))
     players.forEach(function(player){
@@ -71,15 +72,32 @@ function potForPlayer(players, player){
     return pot;
 }
 
-function isStreetComplete(){
+function isStreetComplete(players){
     // add logic for whether street should be done
-    return true;
+    // All players have had a chance to act (blinds don't count)
+    // All players who haven't folded have bet the same amount of money for the round.
+    // This will get more complicated with side pots
+    var currentMaxBet = 0;
+    players.forEach(function(player){
+        if (player.bet > currentMaxBet){
+            currentMaxBet = player.bet
+        }
+    })
+    var streetComplete = true;
+    players.forEach(function(player){
+        if (player.actedInStreet && player.bet == currentMaxBet);
+        else {
+            console.log("Betting round not done. Player ", player.id, " needs to act.")
+            streetComplete = false;
+        }
+    })
+    return streetComplete;
 }
 
 function activePlayersCount(players){
     sum = 0;
     players.forEach(function(player){
-        if (isValidPlayer(player)){
+        if (isValidPlayer(player) == true){
             sum = sum + 1
         }
     })
@@ -151,3 +169,4 @@ module.exports.showState = showState;
 module.exports.activePlayersCount = activePlayersCount;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.getCallAmount = getCallAmount;
+module.exports.playerMaxBet = playerMaxBet;

@@ -1,6 +1,7 @@
 function Table(id) {
     var _id = id;
     var _dealerPosition = null;
+    var _currentHighBet = 0;
     var _activeIndex = null;
     var _commonCards = [];
     var _burnedCards = [];
@@ -8,7 +9,6 @@ function Table(id) {
     var _smallBlind = null;
     var _sidePots = []; // each time only 1 player can go all-in, we'd need to start tracking side pots.
     var _street = 'preflop';
-    var _betCompleted = false; // 'true' would indicate that all players are done betting for that street
     var _minRaise = null; // A raise must be at least equal to the largest prior full bet or raise of the current betting round.
     // A player who raises 50% or more of the largest prior bet but less than a minimum raise must make a full minimum raise.
     // If less than 50% it is a call unless 'raise' is first declared or the player is all-in (Rule 45-B).
@@ -28,18 +28,18 @@ function Table(id) {
             _dealerPosition = value;
             return this;
         },
+        get currentHighBet(){
+            return _currentHighBet;
+        },
+        set currentHighBet(value){
+            _currentHighBet = value;
+            return this;
+        },
         get street(){
             return _street;
         },
         set street(value){
             _street = value;
-            return this;
-        },
-        get betCompleted(){
-            return _betCompleted;
-        },
-        set betCompleted(value){
-            _betCompleted = value;
             return this;
         },
         get activeIndex(){
