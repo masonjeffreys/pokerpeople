@@ -58,7 +58,15 @@ describe('dealOne',()=>{
 })
 
 describe('potForPlayer',()=>{
-    it('will calculated with one pot', () => {
+    it('will be calculated with one pot', () => {
         table.addBet(0, 15);
+        table.addBet(1, 15);
+        expect(Utils.potForPlayer(table, 1)).to.equal(30)
+    })
+    it('will be calculated with multiple pots', () => {
+        table.addPot();
+        table.addBet(1, 20);
+        expect(Utils.potForPlayer(table, 0)).to.equal(30);
+        expect(Utils.potForPlayer(table, 1)).to.equal(50);
     })
 })

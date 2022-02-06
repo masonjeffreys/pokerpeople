@@ -65,14 +65,14 @@ function potForPlayer(table, playerId){
     table.pots.forEach(pot => {
         // First determine if the player participated in the pot.
         var participated = false;
-        pot.forEach(bet => {
+        pot["bets"].forEach(bet => {
             if (bet.playerId == playerId){
                 participated = true;
             }
         })
         // If player participated, they can win that money
         if (participated == true) {
-            pot.forEach(bet => {
+            pot["bets"].forEach(bet => {
                 total = total + bet.amount;
             })
         }
