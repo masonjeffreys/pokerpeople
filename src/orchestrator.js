@@ -15,6 +15,7 @@ const Solver = require('pokersolver').Hand;
 var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")];
 var table = Table(1);
 var deck = Deck(1);
+var handLog = []; // eventually track list of actions taken by players so that they can check what happened?
 var startingChips = 100;
 var smallBlindAmount = 5;
 
@@ -50,7 +51,9 @@ function setupHand(){
     // EVERY new hand:
     // Reset player bets
     // Reset 'acted in Street' prop that indicates whether player has acted in the current street
+    // Clear player hand
     // Set table street
+    // Clear table common cards
     // Advance dealer position
     // Make small and big blind bets
     // Shuffle deck
@@ -59,11 +62,13 @@ function setupHand(){
     players.forEach(function(player){
         player.bet = 0;
         player.actedInStreet = false;
+        player.clearHand();
     })
     table.street = STREETS[0]; // Sets to 'preflop'
     table.currentHighBet = table.bigBlind;
     table.dealerPosition = Utils.nextValidPlayerIndex(players, table.dealerPosition);
     table.minRaise = table.bigBlind;
+    table.clearCommonCards();
 
     // BetTheBlinds
     makeBlindBets();
@@ -118,7 +123,12 @@ function executePlayerAsk(){
             chips: player.chips,
             hand: player.hand
         },
-        options: actionOpts
+        options: actionOpts,
+        results:{
+            winner_name: null,
+            winning_hand: null,
+            amount: null
+        }
     };
 }
 
@@ -234,6 +244,16 @@ function advanceStreet(){
             console.log("winner is ", winningPlayer.name);
             console.log("with hand ", winningHand[0].descr);
             winningPlayer.wins(table.pot);
+            return {
+                table: null,
+                player: null,
+                options: null,
+                results: {
+                    winner_name: winningPlayer.name,
+                    winning_hand: winningHand[0].descr,
+                    amount: table.pot
+                }
+            }
             break;
         default:
             throw new Error("Invalid street could not be matched: ", table.street);

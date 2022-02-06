@@ -27,6 +27,12 @@
         <h2>{{message}}</h2>
         <button type="button" onclick="newGame()">New Game</button>
     </div>
+    <div class="socket">
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" /><button>Send</button>
+        </form>
+    </div>
     <main id="main">
         <h3>Table</h3>
         <div id="table">
@@ -44,25 +50,41 @@
         <button type="button" id="callBtn" onclick="call()">Call</button>
         <button type="button" id="betBtn" onclick="bet()">Bet</button>
         <button type="button" id="foldBtn" onclick="fold()">Fold</button>
-        <h3>Meta info</h3>
-        <div id="meta">
+        <h3>Results</h3>
+        <div id="results">
             
         </div>
     </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value) {
+            socket.emit('chat message', input.value);
+            input.value = '';
+            }
+        });
+    </script>
     <script>
         function fetchAndUpdate(endpoint){
             var responseData;
             var tableDiv = document.getElementById("table");
             var playerDiv = document.getElementById("player");
             var actionsDiv = document.getElementById("actions");
+            var resultsDiv = document.getElementById("results");
             fetch('http://localhost:8080/api/' + endpoint)
             .then(response => response.json())
             .then(data => responseData = data)
             .then(() => {
                 var data = responseData.data;
-                tableDiv.innerHTML= JSON.stringify(data.table);
-                playerDiv.innerHTML= JSON.stringify(data.player);
-                actionsDiv.innerHTML= JSON.stringify(data.options);
+                tableDiv.innerHTML = JSON.stringify(data.table);
+                playerDiv.innerHTML = JSON.stringify(data.player);
+                actionsDiv.innerHTML = JSON.stringify(data.options);
+                resultsDiv.innerHTML = JSON.stringify(data.results);
             });
         }
         function newGame() {

@@ -7,6 +7,7 @@ const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
 const Bcrypt = require('bcrypt');
+const Socket = require("socket.io");
 
 const exampleUsers = {
     john: {
@@ -49,10 +50,18 @@ exports.init = async function () {
         }
     });
 
+
+
     await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
     await server.register(require('@hapi/basic')); // use basic authentication. This creates a scheme.
+
+    const io = Socket(server.listener)
+
+    io.on('connection', (socket) => {
+        console.log('a user connected');
+    });
 
     server.auth.strategy('simple', 'basic', { validate }); // Implementation of basic authentication. A strategy called 'simple'
 

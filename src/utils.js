@@ -11,10 +11,6 @@ function isValidPlayer(player){
     return (player.handState == "IN");
 }
 
-function isValidBetter(player){
-    return (isValidPlayer(player) && player.chips > 0);
-}
-
 function correctIndex(arrayLen, givenIndex){
     // ensure that index is in array. If not, loop index back to beginning of array!
     let index;
@@ -46,7 +42,7 @@ function dealOne(players, deck, startIndex){
     let index = correctIndex(len, startIndex);
     while (iteration < len){
         if (isValidPlayer(players[index])){
-            players[index].hand.push(deck.take());
+            players[index].addCard(deck.take());
         }
         index = correctIndex(len, index + 1);
         iteration = iteration + 1;

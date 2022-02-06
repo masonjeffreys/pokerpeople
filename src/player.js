@@ -3,14 +3,17 @@ function Player(id, name) {
       var _name = name;
       var _hand = [];
       var _chips = null;
-      var _bet = null;
+      var _currentBet = null;
       var _gameState = 'ACTIVE';
       var _handState = 'IN';
-      var _button = false;
+
+      // The following vars seem like they might be outside of what a player should know
+      var _actedInStreet = false; // how we track whether a betting round is done.
+      var _dealerButton = false;
       var _tablePosition = null;
       var _smallBlind = false;
       var _bigBlind = false;
-      var _actedInStreet = false; // how we track whether a betting round is done.
+
 
       return Object.freeze({
             init: function init(firstname, lastname){
@@ -75,12 +78,12 @@ function Player(id, name) {
                   _tablePosition = value;
                   return this;
             },
-            get button(){
-                  return _button;
+            get dealerButton(){
+                  return _dealerButton;
             },
 
-            set button(value){
-                  _button = value;
+            set dealerButton(value){
+                  _dealerButton = value;
                   return this;
             },
             get smallBlind(){
@@ -99,12 +102,12 @@ function Player(id, name) {
                   _bigBlind = value;
                   return this;
             },
-            get bet(){
-                  return _bet;
+            get currentBet(){
+                  return _currentBet;
             },
-            set bet(value){
-                  _bet = value;
-                  return _bet;
+            resetBet: function(){
+                  _currentBet = 0;
+                  return _this;
             },
             makeBet: function(value){
                   _bet = _bet + value;
@@ -113,6 +116,14 @@ function Player(id, name) {
             },
             wins: function(value){
                   _chips = _chips + value;
+                  return this;
+            },
+            addCard: function(value){
+                  _hand.push(value);
+                  return this;
+            },
+            clearHand: function(){
+                  _hand = [];
                   return this;
             }
       });

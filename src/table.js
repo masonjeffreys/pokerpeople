@@ -81,6 +81,9 @@ function Table(id) {
         get commonCards(){
             return _commonCards;
         },
+        clearCommonCards: function(){
+            _commonCards = [];
+        },
         addCommonCard: function(card){
             console.log("adding common ", card);
             _commonCards.push(card);
