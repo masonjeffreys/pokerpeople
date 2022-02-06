@@ -61,6 +61,13 @@ exports.init = async function () {
 
     io.on('connection', (socket) => {
         console.log('a user connected');
+        socket.on('chat message', (msg) => {
+            console.log("chat message received: ", msg);
+            io.emit('chat message', msg);
+        });
+        socket.on('disconnect', () => {
+          console.log('user disconnected');
+        });
     });
 
     server.auth.strategy('simple', 'basic', { validate }); // Implementation of basic authentication. A strategy called 'simple'
