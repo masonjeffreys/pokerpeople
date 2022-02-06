@@ -10,8 +10,10 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // D
 // Require Deck object (Singleton)
 const Utils = require('../src/utils');
 const Deck = require('../src/deck');
+const Table = require('../src/table');
 var players = [{id: 0, handState: "IN", hand:[]},{id: 1, handState: "OUT", hand:[]},{id: 2, handState: "IN", hand: []},{id: 3, handState: "IN", hand:[]}];
 const deck = Deck(1).init();
+const table = Table(1);
 
 describe('correctIndex',()=>{
     it('will loop if needed', () => {
@@ -52,5 +54,11 @@ describe('dealOne',()=>{
             }
         });
         expect(deck.listCards().length).to.equal(49)
+    })
+})
+
+describe('potForPlayer',()=>{
+    it('will calculated with one pot', () => {
+        table.addBet(0, 15);
     })
 })

@@ -59,13 +59,25 @@ function potForAll(players){
     return pot;
 }
 
-function potForPlayer(players, player){
+function potForPlayer(table, playerId){
     // Eventually include side pot logic
-    var pot = 0;
-    players.forEach(player => {
-        pot = pot + player.bet;
+    var total = 0;
+    table.pots.forEach(pot => {
+        // First determine if the player participated in the pot.
+        var participated = false;
+        pot.forEach(bet => {
+            if (bet.playerId == playerId){
+                participated = true;
+            }
+        })
+        // If player participated, they can win that money
+        if (participated == true) {
+            pot.forEach(bet => {
+                total = total + bet.amount;
+            })
+        }
     })
-    return pot;
+    return total;
 }
 
 function isStreetComplete(players){

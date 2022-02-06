@@ -11,8 +11,29 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // D
 const Table = require('../src/table');
 const table = Table(1);
 
-describe('Can xxxx',()=>{
-    it('description', () => {
+describe('Streets',()=>{
+    it('starts with preflop street', () => {
         expect(table.street).to.equal('preflop');
+    })
+})
+
+describe('Handling of pots',()=>{
+    it('starts empty, can add bet to last pot, add pots, reset pots', () => {
+        expect(table.pots).to.equal([{bets: []}]);
+        table.addBet(2, 50);
+        table.addBet(4, 100);
+        table.addPot();
+        table.addBet(1, 100);
+        let obj = [{bets: [
+                        {playerId: 2, amount: 50},
+                        {playerId: 4, amount: 100}
+                    ]},
+                    {bets: [
+                        {playerId: 1, amount: 100}
+                    ]}
+                ];
+        expect(table.pots).to.equal(obj);
+        table.resetPots();
+        expect(table.pots).to.equal([{bets: []}])
     })
 })

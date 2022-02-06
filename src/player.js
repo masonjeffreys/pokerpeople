@@ -3,7 +3,6 @@ function Player(id, name) {
       var _name = name;
       var _hand = [];
       var _chips = null;
-      var _currentBet = null;
       var _gameState = 'ACTIVE';
       var _handState = 'IN';
 
@@ -102,15 +101,7 @@ function Player(id, name) {
                   _bigBlind = value;
                   return this;
             },
-            get currentBet(){
-                  return _currentBet;
-            },
-            resetBet: function(){
-                  _currentBet = 0;
-                  return _this;
-            },
             makeBet: function(value){
-                  _bet = _bet + value;
                   _chips = _chips - value;
                   return this;
             },

@@ -7,7 +7,7 @@ function Table(id) {
     var _burnedCards = [];
     var _bigBlind = null;
     var _smallBlind = null;
-    var _sidePots = []; // each time only 1 player can go all-in, we'd need to start tracking side pots.
+    var _pots = [{bets: []}]; // will have a main pot, then each time only 1 player can go all-in, we'd need to start tracking side pots.
     var _street = 'preflop';
     var _minRaise = null; // A raise must be at least equal to the largest prior full bet or raise of the current betting round.
     // A player who raises 50% or more of the largest prior bet but less than a minimum raise must make a full minimum raise.
@@ -20,6 +20,9 @@ function Table(id) {
     return Object.freeze({
         get id(){
             return _id;
+        },
+        get pots(){
+            return _pots;
         },
         get dealerPosition(){
             return _dealerPosition;
@@ -72,6 +75,22 @@ function Table(id) {
         },
         get burnedCards(){
             return _burnedCards;
+        },
+        resetPots: function(){
+            console.log("clearing all pots");
+            _pots = [{bets: []}];
+            return this;
+        },
+        addPot: function(){
+            console.log("starting new pot")
+            _pots.push({bets: []});
+            return this;
+        },
+        addBet: function (playerId, amount){
+            // Reset value of last pot to be previous value plus the new bet
+            console.log("adding new bet");
+            _pots[_pots.length - 1]["bets"].push({playerId: playerId, amount: amount});
+            return this;
         },
         addBurnedCard: function(card){
             console.log("burning ", card);
