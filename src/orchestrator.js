@@ -97,10 +97,11 @@ function makeBlindBets(){
 }
 
 function applyBet(playerIndex, amount){
-    // Player makes bet first..for now we are NOT keeping track of the total pot at the table level.
-    // But we are tracking the max bet
-    // Instead, we'd add all players bets to get the total pot. (Will eventually need side pots).
+    // Player makes bet
+    // Remove chips from player
+    // Add chips to correct pot on table
     players[playerIndex].makeBet(amount);
+    table.addBet(players[playerIndex].id, amount)
 }
 
 function executePlayerAsk(){
@@ -114,7 +115,7 @@ function executePlayerAsk(){
             street: table.street,
             highBet: Utils.playerMaxBet(players),
             commonCards: table.commonCards,
-            pot: Utils.potForPlayer(players)
+            pot: Utils.potForPlayer(table, player)
         },
         player: {
             id: player.id,
@@ -243,7 +244,7 @@ function advanceStreet(){
             var winningPlayer = handsByPlayer[winningPlayerIndex].player
             console.log("winner is ", winningPlayer.name);
             console.log("with hand ", winningHand[0].descr);
-            winningPlayer.wins(table.pot);
+            winningPlayer.wins(table.potForPlayer(table, player));
             return {
                 table: null,
                 player: null,
@@ -251,7 +252,7 @@ function advanceStreet(){
                 results: {
                     winner_name: winningPlayer.name,
                     winning_hand: winningHand[0].descr,
-                    amount: table.pot
+                    amount: table.potForPlayer(table, player)
                 }
             }
             break;

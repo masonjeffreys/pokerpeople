@@ -50,13 +50,12 @@ function dealOne(players, deck, startIndex){
     return players;
 }
 
-function potForAll(players){
-    // Eventually include side pot logic
-    var pot = 0;
-    players.forEach(player => {
-        pot = pot + player.bet;
+function mainPotTotal(table){
+    var total = 0;
+    table.pots[0]["bets"].forEach(bet => {
+        total = total + bet.amount;
     })
-    return pot;
+    return total;
 }
 
 function potForPlayer(table, playerId){
@@ -168,7 +167,7 @@ module.exports.nextValidPlayer = nextValidPlayer;
 module.exports.nextValidPlayerIndex = nextValidPlayerIndex;
 module.exports.dealOne = dealOne;
 module.exports.potForPlayer = potForPlayer;
-module.exports.potForAll = potForAll;
+module.exports.mainPotTotal = mainPotTotal;
 module.exports.getOptions = getOptions;
 module.exports.showState = showState;
 module.exports.activePlayersCount = activePlayersCount;

@@ -88,7 +88,6 @@ function Table(id) {
         },
         addBet: function (playerId, amount){
             // Reset value of last pot to be previous value plus the new bet
-            console.log("adding new bet");
             _pots[_pots.length - 1]["bets"].push({playerId: playerId, amount: amount});
             return this;
         },

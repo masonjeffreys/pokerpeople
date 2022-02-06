@@ -69,4 +69,7 @@ describe('potForPlayer',()=>{
         expect(Utils.potForPlayer(table, 0)).to.equal(30);
         expect(Utils.potForPlayer(table, 1)).to.equal(50);
     })
+    it('will calculate main pot', () =>{
+        expect(Utils.mainPotTotal(table)).to.equal(30);
+    })
 })
