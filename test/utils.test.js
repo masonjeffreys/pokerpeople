@@ -11,7 +11,10 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // D
 const Utils = require('../src/utils');
 const Deck = require('../src/deck');
 const Table = require('../src/table');
-var players = [{id: 0, handState: "IN", hand:[]},{id: 1, handState: "OUT", hand:[]},{id: 2, handState: "IN", hand: []},{id: 3, handState: "IN", hand:[]}];
+var players = [{id: 0, handState: "IN", hand:[], chips: 0},
+                {id: 1, handState: "OUT", hand:[], chips: 50},
+                {id: 2, handState: "IN", hand: [], chips: 50},
+                {id: 3, handState: "IN", hand:[], chips: 50}];
 const deck = Deck(1).init();
 const table = Table(1);
 
@@ -44,7 +47,7 @@ describe('nextValidPlayer',()=>{
 
 describe('dealOne',()=>{
     it('each player will recieve one card', () => {
-        let players2 = Utils.dealOne(players, deck, 0)
+        let players2 = Utils.dealOne(players, deck, 0);
         players2.forEach(player => {
             if (player.handState == "IN"){
                 console.log("player.hand ", player.hand)
@@ -59,17 +62,22 @@ describe('dealOne',()=>{
 
 describe('potForPlayer',()=>{
     it('will be calculated with one pot', () => {
-        table.addBet(0, 15);
-        table.addBet(1, 15);
-        expect(Utils.potForPlayer(table, 1)).to.equal(30)
+        table.addBet(0, 15); // Player 0 is out of chips now.
+        expect(Utils.potForPlayer(table, players[1])).to.equal(15)
     })
     it('will be calculated with multiple pots', () => {
         table.addPot();
         table.addBet(1, 20);
-        expect(Utils.potForPlayer(table, 0)).to.equal(30);
-        expect(Utils.potForPlayer(table, 1)).to.equal(50);
+        expect(Utils.potForPlayer(table, players[0])).to.equal(15);
+        expect(Utils.potForPlayer(table, players[1])).to.equal(35);
     })
     it('will calculate main pot', () =>{
-        expect(Utils.mainPotTotal(table)).to.equal(30);
+        expect(Utils.mainPotTotal(table)).to.equal(15);
+    })
+})
+
+describe('potTotals',()=>{
+    it('will return summary', () => {
+        expect(Utils.potTotals(table)).to.equal([15,20]);
     })
 })

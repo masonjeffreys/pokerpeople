@@ -25,12 +25,33 @@ function correctIndex(arrayLen, givenIndex){
     return index;
 }
 
+function playerCurrentBet(table,player){
+    let totals = [];
+    table.pots.forEach( function(pot,index) {
+        totals[index] = 0;
+        pot["bets"].forEach(bet => {
+            if (bet.playerId == player.id) {
+                totals[index] = totals[index] + bet.amount;
+            }
+        })
+    })
+    return totals;
+}
+
+function playerCurrentBetInt(table, player){
+    const total = playerCurrentBet(table, player).reduce(add, 0); // with initial value to avoid when the array is empty
+    function add(accumulator, a) {
+        return accumulator + a;
+    }
+    return total;
+}
+
 function showState(players, table){
     console.log("Street is: ", table.street)
     console.log("Table showing: ", table.commonCards)
-    console.log("Pot for all is ", potForAll(players))
+    console.log("Pot for all is ", mainPotTotal(table))
     players.forEach(function(player){
-        console.log("Player ", player.id, " has: ", player.hand, " and current bet is: ", player.bet)
+        console.log("Player ", player.id, " has: ", player.hand, " and current bet is: ", playerCurrentBet(table, player))
     })
     console.log("Current player index is: ", table.activeIndex)
 }
@@ -58,42 +79,75 @@ function mainPotTotal(table){
     return total;
 }
 
-function potForPlayer(table, playerId){
-    // Eventually include side pot logic
-    var total = 0;
-    table.pots.forEach(pot => {
-        // First determine if the player participated in the pot.
-        var participated = false;
+function potTotals(table){
+    let totals = [];
+    table.pots.forEach( function(pot,index){
+        totals[index] = 0;
         pot["bets"].forEach(bet => {
-            if (bet.playerId == playerId){
-                participated = true;
-            }
+            totals[index] = totals[index] + bet.amount;
         })
-        // If player participated, they can win that money
-        if (participated == true) {
-            pot["bets"].forEach(bet => {
-                total = total + bet.amount;
-            })
-        }
+    })
+    return totals;
+}
+
+function allPotsTotal(table){
+    let total = 0;
+    table.pots.forEach(pot => {
+        pot["bets"].forEach(bet => {
+            total = total + bet.amount;
+        })
     })
     return total;
 }
 
-function isStreetComplete(players){
+function potForPlayer(table, player){
+    // Eventually include side pot logic
+    // If player still has chips, they are a part of all pots
+    var total = 0;
+    if (player.chips > 0){
+        total = allPotsTotal(table);
+    }
+
+    // Player is out of chips
+    else {
+        table.pots.forEach(pot => {
+            // First determine if the player participated in the pot.        
+            var participated = false;
+            pot["bets"].forEach(bet => {
+                if (bet.playerId == player.id){
+                    participated = true;
+                }
+            })
+            // If player participated, they can win that money
+            if (participated == true) {
+                pot["bets"].forEach(bet => {
+                    total = total + bet.amount;
+                })
+            }
+        })
+    }
+    
+    return total;
+}
+
+function isStreetComplete(table, players){
     // add logic for whether street should be done
     // All players have had a chance to act (blinds don't count)
     // All players who haven't folded have bet the same amount of money for the round.
     // This will get more complicated with side pots
     var currentMaxBet = 0;
     players.forEach(function(player){
-        if (player.bet > currentMaxBet){
-            currentMaxBet = player.bet
+        if (playerCurrentBetInt(table, player) > currentMaxBet){
+            currentMaxBet = playerCurrentBetInt(table, player)
         }
     })
+    console.log("currentMaxBet is ", currentMaxBet);
     var streetComplete = true;
     players.forEach(function(player){
-        if (player.actedInStreet && player.bet == currentMaxBet);
-        else {
+        console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
+        if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
+            console.log(player.id, " is complete.")
+        } else {
             console.log("Betting round not done. Player ", player.id, " needs to act.")
             streetComplete = false;
         }
@@ -132,23 +186,24 @@ function nextValidPlayerIndex(players, prevIndex){
     return i;
 }
 
-function playerMaxBet(players){
+function playerMaxBet(table, players){
     var max = 0;
     players.forEach(player => {
-        if (player.bet > max){
-            max = player.bet;
+        let pcb = playerCurrentBetInt(table, player);
+        if (pcb > max){
+            max = pcb;
         }
     })
     return max;
 }
 
-function getCallAmount(players, player){
-    return (playerMaxBet(players) - player.bet);
+function getCallAmount(table, players, player){
+    return (playerMaxBet(table, players) - playerCurrentBetInt(table, player));
 }
 
 function getOptions(players, player, table){
     var actionOpts = {fold: true};
-    var callAmount = getCallAmount(players, player);
+    var callAmount = getCallAmount(table, players, player);
     if ( callAmount > 0 ){
         actionOpts.call = callAmount;
     }
@@ -168,9 +223,11 @@ module.exports.nextValidPlayerIndex = nextValidPlayerIndex;
 module.exports.dealOne = dealOne;
 module.exports.potForPlayer = potForPlayer;
 module.exports.mainPotTotal = mainPotTotal;
+module.exports.potTotals = potTotals;
 module.exports.getOptions = getOptions;
 module.exports.showState = showState;
 module.exports.activePlayersCount = activePlayersCount;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.getCallAmount = getCallAmount;
 module.exports.playerMaxBet = playerMaxBet;
+module.exports.playerCurrentBet = playerCurrentBet;
