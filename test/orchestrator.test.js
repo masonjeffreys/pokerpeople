@@ -27,6 +27,7 @@ describe('can get new game ready',()=>{
     it('will start with correct data', () => {
         let table2 = Orchestrator.setupNewGame(gameConfig);
         expect(table2.street).to.equal('preflop');
+        expect(table2.pots).to.equal([{bets: []}]);
         let player0 = table2.players[0];
         expect(player0.name).to.equal("Dealer");
         expect(player0.chips).to.equal(gameConfig["startingChips"]);
