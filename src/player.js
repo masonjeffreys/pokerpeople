@@ -2,7 +2,7 @@ function Player(id, name) {
       var _id = id;
       var _name = name;
       var _hand = [];
-      var _chips = null;
+      var _chips = 0;
       var _gameState = 'ACTIVE';
       var _handState = 'IN';
 

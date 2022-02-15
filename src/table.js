@@ -1,5 +1,6 @@
 function Table(id) {
     var _id = id;
+    var _players = [];
     var _dealerPosition = null;
     var _currentHighBet = 0;
     var _activeIndex = null;
@@ -75,6 +76,12 @@ function Table(id) {
         },
         get burnedCards(){
             return _burnedCards;
+        },
+        get players(){
+            return _players;
+        },
+        addPlayer: function(player){
+            _players.push(player);
         },
         resetPots: function(){
             console.log("clearing all pots");

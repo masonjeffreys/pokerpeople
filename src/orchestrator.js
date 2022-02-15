@@ -16,20 +16,24 @@ var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Play
 var table = Table(1);
 var deck = Deck(1);
 var handLog = []; // eventually track list of actions taken by players so that they can check what happened?
-var startingChips = 100;
-var smallBlindAmount = 5;
+
+// Things that might be different from Game to Game
+const gameConfig = {
+    startingChips: 100,
+    smallBlindAmount: 5
+}
 
 function nextStreet(currentStreet){
     return STREETS[STREETS.indexOf(currentStreet) + 1] || STREETS[0]
 }
 
-function startGame(){
-    setupNewGame();
+function startGame(gameConfig){
+    setupNewGame(gameConfig);
     setupHand();
     return executePlayerAsk();
 };
 
-function setupNewGame(){
+function setupNewGame(gameConfig){
     // Set up 'initial start' params (things that aren't done on every hand)
     // Set player positions at table
     // Give players chips
@@ -37,14 +41,16 @@ function setupNewGame(){
 
     // Seat n players from position 0..n-1, add starting chips for each player, and set bet = 0.
     players.forEach(function(player, index){
-        player.chips = startingChips;
+        player.chips = gameConfig["startingChips"];
         // should Player know their position? Or Table?
         player.tablePosition = index;
+        table.addPlayer(player);
     });
 
     table.dealerPosition = -1; // We will advance this to 0 when the hand is setup
-    table.smallBlind = smallBlindAmount;
-    table.bigBlind = 2 * smallBlindAmount;
+    table.smallBlind = gameConfig["smallBlindAmount"];
+    table.bigBlind = 2 * gameConfig["smallBlindAmount"];
+    return table;
 }
 
 function setupHand(){
@@ -261,6 +267,9 @@ function advanceStreet(){
     }
 }
 
+
 module.exports.startGame = startGame;
 module.exports.receiveAction = receiveAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
+module.exports.setupNewGame = setupNewGame;
+module.exports.setupHand = setupHand;
