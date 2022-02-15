@@ -27,15 +27,43 @@
 
 <body>
     <div class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4">
-        <h1>{{title}}</h1>
-        <h2>{{message}}</h2>
-        
+        <div class="shrink-0">
+            <img class="h-12 w-12" src="/img/porky.png" alt="ChitChat Logo">
+        </div>
+        <div>
+            <div class="text-xl font-medium text-black">{{title}}</div>
+            <p class="text-slate-500">{{message}}</p>
+          </div>
     </div>
     <main id="main">
-        <button type="button" onclick="newGame()">New Game</button>
-        <h3>Table</h3>
-        <div id="table">
-            
+        <button class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="newGame()">New Game</button>
+        <div class="grid grid-cols-3 gap-4">
+            <div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
+                <div class="text-xl font-medium text-black">Player 1</div>
+                <p id="player1chips" class="text-slate-500"></p>
+            </div>
+            <div id="player2" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
+                <div class="text-xl font-medium text-black">Player 2</div>
+                <p id="player2chips" class="text-slate-500"></p>
+            </div>
+            <div id="player3" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
+                <div class="text-xl font-medium text-black">Player 3</div>
+                <p id="player3chips" class="text-slate-500"></p>
+            </div>
+            <div id="player4" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
+                <div id="player4name" class="text-xl font-medium text-black">Player 4</div>
+                <p id="player4chips" class="text-slate-500"></p>
+            </div>
+        </div>
+        <div id="table" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+            <div id="street" class="">
+            </div>
+            <div id="mainPot" class="">
+            </div>
+            <div id="highBet" class=""> 
+            </div>
+            <ol id="commonCards" class="">
+            </ol>
         </div>
         <h3>Current Player</h3>
         <div id="player">
@@ -45,23 +73,22 @@
         <div id="actions">
             
         </div>
-        <button type="button" id="checkBtn" onclick="check()">Check</button>
-        <button type="button" id="callBtn" onclick="call()">Call</button>
-        <button type="button" id="betBtn" onclick="bet()">Bet</button>
-        <button type="button" id="foldBtn" onclick="fold()">Fold</button>
+        <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
+        <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
+        <button type="button" id="betBtn" onclick="bet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Bet</button>
+        <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
         <h3>Results</h3>
         <div id="results">
             
         </div>
     </main>
-    <div id="col2">
-        <div class="socket">
-            <h3>Table chat:</h3>
-            <ul id="messages"></ul>
-            <form id="form" action="">
-                <input id="input" autocomplete="off" /><button>Send</button>
-            </form>
-        </div>
+    <div class="socket">
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <label class="text-gray-600 font-light">Group chat</label>
+            <input id="input" type='text' placeholder="Enter your message here here" class="w-full mt-2 mb-6 px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-green-500">
+            <button class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"/>Send</button>  
+        </form>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -87,7 +114,7 @@
     <script>
         function fetchAndUpdate(endpoint){
             var responseData;
-            var tableDiv = document.getElementById("table");
+            
             var playerDiv = document.getElementById("player");
             var actionsDiv = document.getElementById("actions");
             var resultsDiv = document.getElementById("results");
@@ -96,11 +123,34 @@
             .then(data => responseData = data)
             .then(() => {
                 var data = responseData.data;
-                tableDiv.innerHTML = JSON.stringify(data.table);
+                updateOtherPlayers(data.stacks);
+                updateTable(data.table);
                 playerDiv.innerHTML = JSON.stringify(data.player);
                 actionsDiv.innerHTML = JSON.stringify(data.options);
                 resultsDiv.innerHTML = JSON.stringify(data.results);
             });
+        }
+        function updateOtherPlayers(stacks) {
+            for (let i = 0; i < stacks.length; i++) {
+                var chipLabel = document.getElementById("player" + stacks[i]["playerId"] + "chips");
+                if (chipLabel){
+                    chipLabel.innerHTML = stacks[i]["chips"];
+                }
+            }
+        }
+        function updateTable(table){
+            document.getElementById("street").innerHTML = "Street: " + table["street"];
+            document.getElementById("mainPot").innerHTML = "Pot: " + table["pots"][0];
+            document.getElementById("highBet").innerHTML = "High bet: " + table["highBet"];
+            showCommonCards(table["commonCards"]);
+        }
+        function showCommonCards(cardArray){
+            let cardList = document.getElementById("commonCards"); 
+            for (let i = 0; i < cardArray.length; i++) {
+                var item = document.createElement('li');
+                item.textContent = cardArray[i];
+                cardList.appendChild(item);
+            }
         }
         function newGame() {
             fetchAndUpdate('new');
