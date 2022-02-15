@@ -20,7 +20,7 @@ exports.addPlayerToGame = (req, h) => {
 }
 
 exports.start = (req, h) => {
-  return {status: 'success', data: Game.startGame()};
+  return {status: 'success', data: Game.startGame(Game.gameConfig)};
 };
 
 exports.bet = (req, h) => {

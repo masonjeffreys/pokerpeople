@@ -20,7 +20,8 @@ var handLog = []; // eventually track list of actions taken by players so that t
 // Things that might be different from Game to Game
 const gameConfig = {
     startingChips: 100,
-    smallBlindAmount: 5
+    smallBlindAmount: 5,
+    testMode: false
 }
 
 function nextStreet(currentStreet){
@@ -112,6 +113,10 @@ function executePlayerAsk(){
     // Ask player for action
     var player = players[table.activeIndex];
     var actionOpts = Utils.getOptions(players, player, table)
+    var stacks = [];
+    players.forEach(function(player){
+        stacks.push({playerId: player.id, chips: player.chips})
+    })
     // Remind player of current hand table state
     return {
         table: {
@@ -119,7 +124,8 @@ function executePlayerAsk(){
             street: table.street,
             highBet: Utils.playerMaxBet(table, players),
             commonCards: table.commonCards,
-            pot: Utils.potTotals(table)
+            pots: Utils.potTotals(table),
+            activeIndex: table.activeIndex
         },
         player: {
             id: player.id,
@@ -128,6 +134,7 @@ function executePlayerAsk(){
             chips: player.chips,
             hand: player.hand
         },
+        stacks: stacks,
         options: actionOpts,
         results:{
             winner_name: null,
@@ -273,3 +280,4 @@ module.exports.receiveAction = receiveAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
 module.exports.setupNewGame = setupNewGame;
 module.exports.setupHand = setupHand;
+module.exports.gameConfig = gameConfig;
