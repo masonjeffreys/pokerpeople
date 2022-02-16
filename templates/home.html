@@ -167,6 +167,7 @@
         }
         function showCommonCards(cardArray){
             let cardList = document.getElementById("commonCards"); 
+            cardList.innerHTML = ""; // clear list first
             for (let i = 0; i < cardArray.length; i++) {
                 var item = document.createElement('li');
                 item.textContent = cardArray[i];
