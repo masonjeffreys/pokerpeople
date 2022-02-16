@@ -143,9 +143,18 @@
         }
         function updateTable(table){
             document.getElementById("street").innerHTML = "Street: " + table["street"];
-            document.getElementById("mainPot").innerHTML = "Pot: " + table["pots"][0];
             document.getElementById("highBet").innerHTML = "High bet: " + table["highBet"];
+            showPots(table["pots"]);
             showCommonCards(table["commonCards"]);
+        }
+        function showPots(potsArray){
+            for (let i = 0; i < potsArray.length; i++) {
+                if (i == 0){
+                    document.getElementById("mainPot").innerHTML = "Pot: " + JSON.stringify(potsArray[0]);
+                } else {
+                    console.log("Multiple pots!")
+                }
+            }
         }
         function updatePlayer(player){
             var handLabel = document.getElementById("player" + player["playerId"] + "hand"); 
