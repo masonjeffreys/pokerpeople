@@ -113,9 +113,9 @@ function executePlayerAsk(){
     // Ask player for action
     var player = players[table.activeIndex];
     var actionOpts = Utils.getOptions(players, player, table)
-    var stacks = [];
+    var playersInfo = [];
     players.forEach(function(player){
-        stacks.push({playerId: player.id, chips: player.chips})
+        playersInfo.push({playerId: player.id, chips: player.chips, name: player.name, actedInStreet: player.actedInStreet})
     })
     // Remind player of current hand table state
     return {
@@ -127,14 +127,11 @@ function executePlayerAsk(){
             pots: Utils.potTotals(table),
             activeIndex: table.activeIndex
         },
+        playersInfo: playersInfo,
         player: {
-            id: player.id,
-            name: player.name,
-            actedInStreet: player.actedInStreet,
-            chips: player.chips,
+            playerId: player.id,
             hand: player.hand
         },
-        stacks: stacks,
         options: actionOpts,
         results:{
             winner_name: null,

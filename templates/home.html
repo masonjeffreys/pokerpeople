@@ -38,21 +38,25 @@
     <main id="main">
         <button class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="newGame()">New Game</button>
         <div class="grid grid-cols-3 gap-4">
-            <div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
-                <div class="text-xl font-medium text-black">Player 1</div>
+            <div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+                <div id="player1name" class="text-xl font-medium"></div>
                 <p id="player1chips" class="text-slate-500"></p>
+                <p id="player1hand" class="text-slate-500"></p>
             </div>
-            <div id="player2" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
-                <div class="text-xl font-medium text-black">Player 2</div>
+            <div id="player2" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+                <div id="player2name" class="text-xl font-medium"></div>
                 <p id="player2chips" class="text-slate-500"></p>
+                <p id="player2hand" class="text-slate-500"></p>
             </div>
-            <div id="player3" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
-                <div class="text-xl font-medium text-black">Player 3</div>
+            <div id="player3" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+                <div id="player3name" class="text-xl font-medium"></div>
                 <p id="player3chips" class="text-slate-500"></p>
+                <p id="player3hand" class="text-slate-500"></p>
             </div>
-            <div id="player4" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center">
-                <div id="player4name" class="text-xl font-medium text-black">Player 4</div>
+            <div id="player4" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+                <div id="player4name" class="text-xl font-medium"></div>
                 <p id="player4chips" class="text-slate-500"></p>
+                <p id="player4hand" class="text-slate-500"></p>
             </div>
         </div>
         <div id="table" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
@@ -64,10 +68,6 @@
             </div>
             <ol id="commonCards" class="">
             </ol>
-        </div>
-        <h3>Current Player</h3>
-        <div id="player">
-            
         </div>
         <h3>Actions</h3>
         <div id="actions">
@@ -114,8 +114,6 @@
     <script>
         function fetchAndUpdate(endpoint){
             var responseData;
-            
-            var playerDiv = document.getElementById("player");
             var actionsDiv = document.getElementById("actions");
             var resultsDiv = document.getElementById("results");
             fetch('http://localhost:8080/api/' + endpoint)
@@ -123,18 +121,23 @@
             .then(data => responseData = data)
             .then(() => {
                 var data = responseData.data;
-                updateOtherPlayers(data.stacks);
+                updateOtherPlayers(data.playersInfo);
                 updateTable(data.table);
-                playerDiv.innerHTML = JSON.stringify(data.player);
+                updatePlayer(data.player);
+                activatePlayer(data.playersInfo, data.table);
                 actionsDiv.innerHTML = JSON.stringify(data.options);
                 resultsDiv.innerHTML = JSON.stringify(data.results);
             });
         }
-        function updateOtherPlayers(stacks) {
-            for (let i = 0; i < stacks.length; i++) {
-                var chipLabel = document.getElementById("player" + stacks[i]["playerId"] + "chips");
+        function updateOtherPlayers(playersInfo) {
+            for (let i = 0; i < playersInfo.length; i++) {
+                var chipLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "chips");
+                var nameLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "name");
                 if (chipLabel){
-                    chipLabel.innerHTML = stacks[i]["chips"];
+                    chipLabel.innerHTML = playersInfo[i]["chips"];
+                }
+                if (nameLabel){
+                    nameLabel.innerHTML = playersInfo[i]["name"];
                 }
             }
         }
@@ -143,6 +146,24 @@
             document.getElementById("mainPot").innerHTML = "Pot: " + table["pots"][0];
             document.getElementById("highBet").innerHTML = "High bet: " + table["highBet"];
             showCommonCards(table["commonCards"]);
+        }
+        function updatePlayer(player){
+            var handLabel = document.getElementById("player" + player["playerId"] + "hand"); 
+            if (handLabel){
+                handLabel.innerHTML = JSON.stringify(player["hand"]);
+            }
+        }
+        function activatePlayer(playersInfo, table){
+            var activePlayerId = playersInfo[table["activeIndex"]]["playerId"];
+            for (let i = 0; i < playersInfo.length; i++) {
+                var item = document.getElementById("player" + playersInfo[i]["playerId"]);
+                if (item){
+                    item.classList.remove("text-purple-600");
+                    if (playersInfo[i]["playerId"] == activePlayerId) {
+                        item.classList.add("text-purple-600");
+                    }
+                } 
+            }
         }
         function showCommonCards(cardArray){
             let cardList = document.getElementById("commonCards"); 
