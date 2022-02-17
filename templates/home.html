@@ -135,6 +135,7 @@
         <h1 class="text-3xl font-bold text-gray-900">{{title}}</h1>
         <p class="text-slate-500">{{message}}</p>
         <button class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="newGame()">New Game</button>
+        <button class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Next Hand</button>
       </div>
     </header>
     <main>
@@ -172,14 +173,12 @@
                 <ol id="commonCards" class="">
                 </ol>
                 <div id="results">
-                
                 </div>
             </div>
             <div class="bg-white mt-4">
                 <div class="max-w-2xl mx-auto py-4 px-2 lg:max-w-7xl lg:px-8">
-                    <div id="actions">
-                
-                    </div>
+                  <div id="actions">
+                  </div>
                   <div class="mt-2 grid grid-cols-4 gap-y-10 gap-x-6 xl:gap-x-8">
                       <div class="mt-2 flex justify-between">
                             <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
@@ -188,8 +187,11 @@
                         <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
                       </div>
                       <div class="mt-2 flex justify-between">
-                        <button type="button" id="betBtn" onclick="bet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Bet</button>
-                      </div>
+                        <div class="relative text-gray-700">
+                            <input id="betAmount" class="w-full h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="text" placeholder="Amount"/>
+                            <button onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+                        </div>
+                    </div>
                       <div class="mt-2 flex justify-between">
                         <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
                       </div>
@@ -225,8 +227,6 @@
     <script>
         function fetchAndUpdate(endpoint){
             var responseData;
-            var actionsDiv = document.getElementById("actions");
-            var resultsDiv = document.getElementById("results");
             fetch('http://localhost:8080/api/' + endpoint)
             .then(response => response.json())
             .then(data => responseData = data)
@@ -236,11 +236,25 @@
                 updateTable(data.table);
                 updatePlayer(data.player);
                 activatePlayer(data.playersInfo, data.table);
-                actionsDiv.innerHTML = JSON.stringify(data.options);
-                resultsDiv.innerHTML = JSON.stringify(data.results);
+                updateResults(data.results);
             });
         }
+        function updateActions(actions){
+          var actionsDiv = document.getElementById("actions");
+          if (actions){
+            actionsDiv.innerHTML = JSON.stringify(options);
+          }
+        }
+        function updateResults(results){
+          var resultsDiv = document.getElementById("results");
+          if (results){
+            resultsDiv.innerHTML = JSON.stringify(results);
+          } else {
+            resultsDiv.innerHTML = "";
+          }
+        }
         function updateOtherPlayers(playersInfo) {
+          if (playersInfo){
             for (let i = 0; i < playersInfo.length; i++) {
                 var chipLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "chips");
                 var nameLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "name");
@@ -251,14 +265,18 @@
                     nameLabel.innerHTML = playersInfo[i]["name"];
                 }
             }
+          }
         }
         function updateTable(table){
+          if (table){
             document.getElementById("street").innerHTML = "Street: " + table["street"];
             document.getElementById("highBet").innerHTML = "High bet: " + table["highBet"];
             showPots(table["pots"]);
             showCommonCards(table["commonCards"]);
+          }
         }
         function showPots(potsArray){
+          if (potsArray){
             for (let i = 0; i < potsArray.length; i++) {
                 if (i == 0){
                     document.getElementById("mainPot").innerHTML = "Pot: " + JSON.stringify(potsArray[0]);
@@ -266,14 +284,18 @@
                     console.log("Multiple pots!")
                 }
             }
+          }
         }
         function updatePlayer(player){
+          if (player){
             var handLabel = document.getElementById("player" + player["playerId"] + "hand"); 
             if (handLabel){
-                handLabel.innerHTML = JSON.stringify(player["hand"]);
+                handLabel.innerHTML = renderCard(player["hand"][0]) + renderCard(player["hand"][1]);
             }
+          }
         }
         function activatePlayer(playersInfo, table){
+          if (playersInfo && table){
             var activePlayerId = playersInfo[table["activeIndex"]]["playerId"];
             for (let i = 0; i < playersInfo.length; i++) {
                 var item = document.getElementById("player" + playersInfo[i]["playerId"]);
@@ -284,30 +306,59 @@
                     }
                 } 
             }
+          }
         }
         function showCommonCards(cardArray){
             let cardList = document.getElementById("commonCards"); 
             cardList.innerHTML = ""; // clear list first
             for (let i = 0; i < cardArray.length; i++) {
                 var item = document.createElement('li');
-                item.textContent = cardArray[i];
+                item.textContent = renderCard(cardArray[i]);
                 cardList.appendChild(item);
             }
         }
         function newGame() {
             fetchAndUpdate('new');
         }
+        function nextHand() {
+            fetchAndUpdate('nextHand');
+        }
         function check() {
             fetchAndUpdate('check');
         }
         function bet() {
-            fetchAndUpdate('bet');
+            var amount = document.getElementById("betAmount").value;
+            console.log("betting ", amount);
+            fetchAndUpdate('bet?amount=' + amount);
         }
         function call() {
             fetchAndUpdate('call');
         }
         function fold() {
             fetchAndUpdate('fold');
+        }
+        function renderCard(cardString){
+          var num = cardString.charAt(0);
+          var suit = cardString.charAt(1);
+          if (num == "T"){
+            num = "10";
+          }
+          return (num + htmlSuit(suit))
+        } 
+        function htmlSuit(suitString){
+          switch (suitString) {
+            case 'c':
+              return "♣";
+            case 'd':
+              return "🔸";
+            case 'h':
+              return "🧡";
+            case 's':
+              return "♠";
+            default:
+              console.log(`Sorry, no suit match for  ${suitString}.`);
+              return suitString;
+          }
         }
     </script>
 </body>

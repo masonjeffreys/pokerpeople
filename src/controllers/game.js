@@ -39,6 +39,10 @@ exports.fold = (req, h) => {
   return {status: 'success', data: Game.receiveAction('fold')};
 };
 
+exports.nextHand = (req, h) => {
+  return {status: 'success', data: Game.nextHand()};
+};
+
 // /**
 //  * Get Dog by ID
 //  */

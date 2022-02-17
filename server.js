@@ -131,6 +131,12 @@ exports.init = async function () {
         path: '/api/new',
         handler: GameController.start
     });
+
+    server.route({
+        method: 'GET',
+        path: '/api/nextHand',
+        handler: GameController.nextHand
+    });
     
     server.route({
         method: 'GET',

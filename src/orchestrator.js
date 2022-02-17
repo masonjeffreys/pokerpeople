@@ -54,6 +54,11 @@ function setupNewGame(gameConfig){
     return table;
 }
 
+function nextHand(){
+    setupHand();
+    return executePlayerAsk();
+}
+
 function setupHand(){
     // EVERY new hand:
     // Reset 'acted in Street' prop that indicates whether player has acted in the current street
@@ -132,12 +137,7 @@ function executePlayerAsk(){
             playerId: player.id,
             hand: player.hand
         },
-        options: actionOpts,
-        results:{
-            winner_name: null,
-            winning_hand: null,
-            amount: null
-        }
+        options: actionOpts
     };
 }
 
@@ -273,6 +273,7 @@ function advanceStreet(){
 
 
 module.exports.startGame = startGame;
+module.exports.nextHand = nextHand;
 module.exports.receiveAction = receiveAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
 module.exports.setupNewGame = setupNewGame;
