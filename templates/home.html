@@ -86,13 +86,40 @@
             updatePlayer(data.player);
             activatePlayer(data.playersInfo, data.table);
             updateResults(data.results);
+            updateActions(data.actionOpts);
         });
     }
 
-    function updateActions(actions){
-      var actionsDiv = document.getElementById("actions");
-      if (actions){
-        actionsDiv.innerHTML = JSON.stringify(options);
+    function updateActions(actionsOpts){
+      console.log("actions are: ", actionsOpts);
+      var callBtn = document.getElementById("callBtn");
+      var checkBtn = document.getElementById("checkBtn");
+      var foldBtn = document.getElementById("foldBtn");
+      var betBtn = document.getElementById("betBtn");
+      if (actionsOpts.call){
+        callBtn.classList.remove("invisible");
+        callBtn.innerHTML = "Call: " + actionsOpts.call;
+      } else {
+        callBtn.classList.remove("invisible");
+        callBtn.classList.add("invisible");
+      }
+      if (actionsOpts.fold){
+        foldBtn.classList.remove("invisible");
+      } else {
+        foldBtn.classList.remove("invisible");
+        foldBtn.classList.add("invisible");
+      }
+      if (actionsOpts.check){
+        checkBtn.classList.remove("invisible");
+      } else {
+        checkBtn.classList.remove("invisible");
+        checkBtn.classList.add("invisible");
+      }
+      if (actionsOpts.bet){
+        betBtn.classList.remove("invisible");
+      } else {
+        betBtn.classList.remove("invisible");
+        betBtn.classList.add("invisible");
       }
     }
 

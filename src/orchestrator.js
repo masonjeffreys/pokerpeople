@@ -150,7 +150,7 @@ function executePlayerAsk(){
             playerId: player.id,
             hand: player.hand
         },
-        options: actionOpts
+        actionOpts: actionOpts
     };
 }
 
