@@ -15,7 +15,6 @@ const Solver = require('pokersolver').Hand;
 var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")];
 var table = Table(1);
 var deck = Deck(1);
-var handLog = []; // eventually track list of actions taken by players so that they can check what happened?
 
 // Things that might be different from Game to Game
 const gameConfig = {
@@ -77,6 +76,9 @@ function setupHand(){
     table.street = STREETS[0]; // Sets to 'preflop'
     table.currentHighBet = table.bigBlind;
     table.dealerPosition = Utils.nextValidPlayerIndex(players, table.dealerPosition);
+    // Not sure whether to set button on player or table or both?
+    // Depends how people are allowed to join/leave the game?
+    players[table.dealerPosition].button = true;
     table.minRaise = table.bigBlind;
     table.clearCommonCards();
 
@@ -93,7 +95,9 @@ function setupHand(){
 function makeBlindBets(){
     // Get Indices for various players
     let smallBlindIndex = Utils.nextValidPlayerIndex(players, table.dealerPosition);
+    players[smallBlindIndex].smallBlind = true;
     var bigBlindIndex = Utils.nextValidPlayerIndex(players, smallBlindIndex);
+    players[bigBlindIndex].bigBlind = true;
 
     // Bet the small blind
     applyBet(smallBlindIndex, table.smallBlind)
@@ -120,7 +124,16 @@ function executePlayerAsk(){
     var actionOpts = Utils.getOptions(players, player, table)
     var playersInfo = [];
     players.forEach(function(player){
-        playersInfo.push({playerId: player.id, chips: player.chips, name: player.name, actedInStreet: player.actedInStreet})
+        playersInfo.push({playerId: player.id,
+            chips: player.chips,
+            name: player.name,
+            actedInStreet: player.actedInStreet,
+            button: player.button,
+            smallBlind:  player.smallBlind,
+            bigBlind: player.bigBlind,
+            gameState: player.gameState,
+            handState: player.handState
+        })
     })
     // Remind player of current hand table state
     return {

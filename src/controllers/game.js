@@ -1,15 +1,7 @@
 var Game = require('../orchestrator');
-var Functional = require('../functional');
 /**
  * Poker Endpoints
  */
-
- exports.handleConn = (req, h) => {
-   let conn = {data: "", status: ""};
-   conn = Functional.handleConn(conn, req.payload);
-   conn['status'] = 'success';
-   return conn;
-}
 
 exports.createPlayer = (req, h) => {
   return {status: 'success', data: Game.createPlayer(req.payload.firstname, req.payload.lastname)};

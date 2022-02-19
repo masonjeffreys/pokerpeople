@@ -8,7 +8,7 @@ function Player(id, name) {
 
       // The following vars seem like they might be outside of what a player should know
       var _actedInStreet = false; // how we track whether a betting round is done.
-      var _dealerButton = false;
+      var _button = false;
       var _tablePosition = null;
       var _smallBlind = false;
       var _bigBlind = false;
@@ -77,12 +77,12 @@ function Player(id, name) {
                   _tablePosition = value;
                   return this;
             },
-            get dealerButton(){
-                  return _dealerButton;
+            get button(){
+                  return _button;
             },
 
-            set dealerButton(value){
-                  _dealerButton = value;
+            set button(value){
+                  _button = value;
                   return this;
             },
             get smallBlind(){

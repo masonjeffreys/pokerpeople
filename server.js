@@ -83,7 +83,9 @@ exports.init = async function () {
             html: require('handlebars')
         },
         relativeTo: __dirname,
-        path: 'templates'
+        path: 'templates',
+        layout: 'layout',
+        layoutPath: 'templates'
     });
     
     server.route({
@@ -94,21 +96,6 @@ exports.init = async function () {
                 title: 'Poker Pig',
                 message: 'Bring home the bacon for charity'
             });
-        }
-    });
-
-    server.route({
-        method: 'POST',
-        path: '/api/handleConn',
-        handler: GameController.handleConn,
-        options: {
-            auth: 'simple', // Try using simple authentication here
-            validate: {
-                payload: Joi.object({
-                    firstname: Joi.string().required(),
-                    lastname: Joi.string().required()
-                })
-            }
         }
     });
     
