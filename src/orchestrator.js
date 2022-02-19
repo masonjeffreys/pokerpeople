@@ -72,6 +72,10 @@ function setupHand(){
     players.forEach(function(player){
         player.actedInStreet = false;
         player.clearHand();
+        player.button = false;
+        player.smallBlind = false;
+        player.bigBlind = false;
+        player.handState = "IN";
     })
     table.street = STREETS[0]; // Sets to 'preflop'
     table.currentHighBet = table.bigBlind;
