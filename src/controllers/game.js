@@ -7,12 +7,12 @@ exports.createPlayer = (req, h) => {
   return {status: 'success', data: Game.createPlayer(req.payload.firstname, req.payload.lastname)};
 }
 
-exports.addPlayerToGame = (req, h) => {
-  return {status: 'success', data: Game.addPlayer(req.payload.gameId, req.payload.playerId)};
+exports.addPlayer = (req, h) => {
+  return {status: 'success', players: Game.addPlayerToGame(req.query.gameId, req.query.playerId)};
 }
 
-exports.start = (req, h) => {
-  return {status: 'success', data: Game.startGame(Game.gameConfig)};
+exports.new = (req, h) => {
+  return {status: 'success', gameId: Game.newGame(Game.gameConfig)};
 };
 
 exports.bet = (req, h) => {
@@ -32,7 +32,7 @@ exports.fold = (req, h) => {
 };
 
 exports.nextHand = (req, h) => {
-  return {status: 'success', data: Game.nextHand()};
+  return {status: 'success', data: Game.nextHand(req.query.gameId)};
 };
 
 // /**

@@ -82,12 +82,18 @@
         .then(data => responseData = data)
         .then(() => {
             var data = responseData.data;
-            updateAllPlayers(data.playersInfo);
-            updateTable(data.table);
-            updatePlayer(data.player);
-            activatePlayer(data.playersInfo, data.table);
-            updateResults(data.results);
-            updateActions(data.actionOpts);
+            var gameId = responseData.gameId;
+            if (gameId) {
+              console.log("new game id: ", gameId, ". Add players!")
+            }
+            if (data){
+              updateAllPlayers(data.playersInfo);
+              updateTable(data.table);
+              updatePlayer(data.player);
+              activatePlayer(data.playersInfo, data.table);
+              updateResults(data.results);
+              updateActions(data.actionOpts);
+            }
         });
     }
 
@@ -247,8 +253,11 @@
     function newGame() {
         fetchAndUpdate('new');
     }
+    function addPlayer() {
+        fetchAndUpdate('addPlayer?gameId=1&playerId=1');
+    }
     function nextHand() {
-        fetchAndUpdate('nextHand');
+        fetchAndUpdate('nextHand?gameId=1');
     }
     function check() {
         fetchAndUpdate('check');

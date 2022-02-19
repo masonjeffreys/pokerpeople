@@ -112,11 +112,17 @@ exports.init = async function () {
             }
         }
     });
+
+    server.route({
+        method: 'GET',
+        path: '/api/addPlayer',
+        handler: GameController.addPlayer
+    });
     
     server.route({
         method: 'GET',
         path: '/api/new',
-        handler: GameController.start
+        handler: GameController.new
     });
 
     server.route({

@@ -5,16 +5,25 @@ const STREETS = ['preflop', 'flop', 'turn', 'river', 'showdown', 'complete']
 const Table = require('./table');
 const Player = require('./player');
 const Deck = require('./deck');
-// const BettingRound = require('./bettingRound');
 const Utils = require('./utils');
+
 // Using a MIT license poker solver
 // https://github.com/goldfire/pokersolver
 const Solver = require('pokersolver').Hand;
 
-// State definition
-var players = [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")];
-var table = Table(1);
-var deck = Deck(1);
+// Until we have a DB, we will store games here in memory, get the right game, update state, and store again.
+let Games = [
+    // {id: 1,
+    // gameCode: "abc",
+    // players: [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")],
+    // table: Table(1),
+    // deck: Deck(1)}
+]
+
+// Until we have a DB, we will store list of player here in memory, get the right player, update player, etc.
+let Players = [
+    Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")
+]
 
 // Things that might be different from Game to Game
 const gameConfig = {
@@ -23,42 +32,72 @@ const gameConfig = {
     testMode: false
 }
 
+function getGameById(id){
+    return Games.filter(x => x.id === parseInt(id))[0]
+}
+
+function getPlayerById(id){
+    return Players.filter(x => x.id === parseInt(id))[0]
+}
+
 function nextStreet(currentStreet){
     return STREETS[STREETS.indexOf(currentStreet) + 1] || STREETS[0]
 }
 
-function startGame(gameConfig){
-    setupNewGame(gameConfig);
-    setupHand();
-    return executePlayerAsk();
-};
-
-function setupNewGame(gameConfig){
-    // Set up 'initial start' params (things that aren't done on every hand)
-    // Set player positions at table
-    // Give players chips
+function newGame(gameConfig){
+    // Create a deck and table
+    // Set up 'initial start' params (things that aren't done on every hand) for table
     // Set table blind levels
+    // Return game object
 
-    // Seat n players from position 0..n-1, add starting chips for each player, and set bet = 0.
-    players.forEach(function(player, index){
-        player.chips = gameConfig["startingChips"];
-        // should Player know their position? Or Table?
-        player.tablePosition = index;
-        table.addPlayer(player);
-    });
+    let deck = Deck(1);
+    let table = Table(1);
 
     table.dealerPosition = -1; // We will advance this to 0 when the hand is setup
     table.smallBlind = gameConfig["smallBlindAmount"];
     table.bigBlind = 2 * gameConfig["smallBlindAmount"];
-    return table;
+    table.startingChips = gameConfig["startingChips"];
+
+    let game = {
+        id: Games.length + 1,
+        gameCode: "abc",
+        players: [],
+        table: table,
+        deck: deck,
+    }
+
+    Games.push(game);
+    return game.id;
 }
 
-function nextHand(){
-    setupHand();
-    return executePlayerAsk();
+function addPlayerToGame(gameId, playerId){
+    // Set player at table for first time
+    let game = getGameById(gameId);
+    let player = getPlayerById(playerId);
+
+    // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
+    game.players.push(player);
+    game.table.addPlayer(player);
+
+    // Give players chips
+    player.chips = game.table.startingChips;
+
+    // should Player know their position? Or Table? Or Game?
+    // Seat n players from position 0..n-1, add starting chips for each player
+    let index = game.players.length - 1;
+    player.tablePosition = index;
+    return game.players;
 }
 
-function setupHand(){
+function nextHand(gameId){
+    let game = getGameById(gameId);
+    console.log("Game " + gameId + " is: ")
+    console.log(game);
+    setupHand(game);
+    return executePlayerAsk(game);
+}
+
+function setupHand(game){
     // EVERY new hand:
     // Reset 'acted in Street' prop that indicates whether player has acted in the current street
     // Clear player hand
@@ -69,7 +108,7 @@ function setupHand(){
     // Shuffle deck
     // Deal 2 cards to each active player
     
-    players.forEach(function(player){
+    game.players.forEach(function(player){
         player.actedInStreet = false;
         player.clearHand();
         player.button = false;
@@ -77,57 +116,57 @@ function setupHand(){
         player.bigBlind = false;
         player.handState = "IN";
     })
-    table.street = STREETS[0]; // Sets to 'preflop'
-    table.currentHighBet = table.bigBlind;
-    table.dealerPosition = Utils.nextValidPlayerIndex(players, table.dealerPosition);
+    game.table.street = STREETS[0]; // Sets to 'preflop'
+    game.table.currentHighBet = game.table.bigBlind;
+    game.table.dealerPosition = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
     // Not sure whether to set button on player or table or both?
     // Depends how people are allowed to join/leave the game?
-    players[table.dealerPosition].button = true;
-    table.minRaise = table.bigBlind;
-    table.clearCommonCards();
+    game.players[game.table.dealerPosition].button = true;
+    game.table.minRaise = game.table.bigBlind;
+    game.table.clearCommonCards();
 
     // BetTheBlinds
-    makeBlindBets();
+    makeBlindBets(game);
 
     // Grab a new deck, shuffle, and deal  2 cards to each player
-    deck.init().shuffle();
-    Utils.dealOne(players, deck, table.dealerPosition + 1);
-    Utils.dealOne(players, deck, table.dealerPosition + 1);
-    Utils.showState(players, table)
+    game.deck.init().shuffle();
+    Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
+    Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
+    Utils.showState(game.players, game.table)
 }
 
-function makeBlindBets(){
+function makeBlindBets(game){
     // Get Indices for various players
-    let smallBlindIndex = Utils.nextValidPlayerIndex(players, table.dealerPosition);
-    players[smallBlindIndex].smallBlind = true;
-    var bigBlindIndex = Utils.nextValidPlayerIndex(players, smallBlindIndex);
-    players[bigBlindIndex].bigBlind = true;
+    let smallBlindIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
+    game.players[smallBlindIndex].smallBlind = true;
+    var bigBlindIndex = Utils.nextValidPlayerIndex(game.players, smallBlindIndex);
+    game.players[bigBlindIndex].bigBlind = true;
 
     // Bet the small blind
-    applyBet(smallBlindIndex, table.smallBlind)
+    applyBet(game, smallBlindIndex, game.table.smallBlind)
 
     // Bet the big blind
-    applyBet(bigBlindIndex, table.bigBlind)
+    applyBet(game, bigBlindIndex, game.table.bigBlind)
 
     // Advance betting round one more time to get to active player
     // This player is 'under the gun'
-    table.activeIndex = Utils.nextValidPlayerIndex(players, bigBlindIndex);
+    game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, bigBlindIndex);
 }
 
-function applyBet(playerIndex, amount){
+function applyBet(game, playerIndex, amount){
     // Player makes bet
     // Remove chips from player
     // Add chips to correct pot on table
-    players[playerIndex].makeBet(amount);
-    table.addBet(players[playerIndex].id, amount)
+    game.players[playerIndex].makeBet(amount);
+    game.table.addBet(game.players[playerIndex].id, amount)
 }
 
-function executePlayerAsk(){
+function executePlayerAsk(game){
     // Ask player for action
-    var player = players[table.activeIndex];
-    var actionOpts = Utils.getOptions(players, player, table)
+    var player = game.players[game.table.activeIndex];
+    var actionOpts = Utils.getOptions(game.players, player, game.table)
     var playersInfo = [];
-    players.forEach(function(player){
+    game.players.forEach(function(player){
         playersInfo.push({playerId: player.id,
             chips: player.chips,
             name: player.name,
@@ -142,12 +181,12 @@ function executePlayerAsk(){
     // Remind player of current hand table state
     return {
         table: {
-            id: table.id,
-            street: table.street,
-            highBet: Utils.playerMaxBet(table, players),
-            commonCards: table.commonCards,
-            pots: Utils.potTotals(table),
-            activeIndex: table.activeIndex
+            id: game.table.id,
+            street: game.table.street,
+            highBet: Utils.playerMaxBet(game.table, game.players),
+            commonCards: game.table.commonCards,
+            pots: Utils.potTotals(game.table),
+            activeIndex: game.table.activeIndex
         },
         playersInfo: playersInfo,
         player: {
@@ -289,10 +328,10 @@ function advanceStreet(){
 }
 
 
-module.exports.startGame = startGame;
+module.exports.newGame = newGame;
+module.exports.addPlayerToGame = addPlayerToGame;
 module.exports.nextHand = nextHand;
+module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
-module.exports.setupNewGame = setupNewGame;
-module.exports.setupHand = setupHand;
 module.exports.gameConfig = gameConfig;

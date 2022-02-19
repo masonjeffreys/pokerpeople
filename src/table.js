@@ -1,6 +1,7 @@
 function Table(id) {
     var _id = id;
     var _players = [];
+    var _startingChips = 0;
     var _dealerPosition = null;
     var _currentHighBet = 0;
     var _activeIndex = null;
@@ -37,6 +38,13 @@ function Table(id) {
         },
         set currentHighBet(value){
             _currentHighBet = value;
+            return this;
+        },
+        get startingChips(){
+            return _startingChips;
+        },
+        set startingChips(value){
+            _startingChips = value;
             return this;
         },
         get street(){
