@@ -3,13 +3,44 @@ var Game = require('../orchestrator');
  * Poker Endpoints
  */
 
+exports.getUserId = (existingUserData) => {
+  console.log("Made it here: ", existingUserData);
+  if (existingUserData){
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+exports.joinGame = async (req, h) => {
+  console.log(req.payload);
+  const { firstName, lastName, gameId } = req.payload;
+  if (!firstName || !lastName || !gameId) {
+      console.log("Missing firstname, lastname, or gameId");
+      // return internals.renderHtml.login('Missing firstname, lastname, or gameId');
+  }
+
+  // Try to find user with given credentials
+
+  // const account = internals.users.find(
+  //     (user) => user.name === username && user.password === password
+  // );
+
+  // if (!account) {
+  //     return internals.renderHtml.login('Invalid username or password');
+  // }
+
+  req.cookieAuth.set({ id: 100 });
+  return h.redirect('/game');
+};
+
 exports.createPlayer = (req, h) => {
   return {status: 'success', data: Game.createPlayer(req.payload.firstname, req.payload.lastname)};
-}
+};
 
 exports.addPlayer = (req, h) => {
   return {status: 'success', players: Game.addPlayerToGame(req.query.gameId, req.query.playerId)};
-}
+};
 
 exports.new = (req, h) => {
   return {status: 'success', gameId: Game.newGame(Game.gameConfig)};

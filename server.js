@@ -7,8 +7,8 @@ const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
 const Bcrypt = require('bcrypt');
-const Socket = require("socket.io");
-
+const Socket = require("socket.io"); 
+ 
 const exampleUsers = {
     john: {
         username: 'john',
@@ -55,7 +55,7 @@ exports.init = async function () {
     await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
-    await server.register(require('@hapi/basic')); // use basic authentication. This creates a scheme.
+    await server.register(require('@hapi/cookie')); // use for login/logout
 
     const io = Socket(server.listener)
 
@@ -70,14 +70,6 @@ exports.init = async function () {
         });
     });
 
-    server.auth.strategy('simple', 'basic', { validate }); // Implementation of basic authentication. A strategy called 'simple'
-
-    // server.auth.strategy('session', 'cookie', {
-    //     name: 'sid-example',
-    //     password: '!wsYhFA*C2U6nz=Bu^%A@^F#SF3&ksr6',
-    //     isSecure: false
-    // });
-
     server.views({
         engines: {
             html: require('handlebars')
@@ -87,12 +79,71 @@ exports.init = async function () {
         layout: 'layout',
         layoutPath: 'templates'
     });
+
+    server.auth.strategy('session', 'cookie', {
+        cookie: {
+            name: 'sid-example',
+            password: '!wsYhFA*C2U6nz=Bu^%A@^F#SF3&kSR6',
+            isSecure: false
+        },
+        redirectTo: '/unauthenticated',
+        validateFunc: async (req, session) => {
+
+            // const account = await users.find(
+            //     (user) => (user.id === session.id)
+            // );
+
+            // if (!account) {
+
+            //     return { valid: false };
+            // }
+
+            return { valid: true, credentials: {id: 1} };
+        }
+    });
+
+    server.auth.default('session');
     
     server.route({
         method: 'GET',
         path: '/',
+        options: {
+            auth: false
+        },
         handler: (req, h) => {
             return h.view('home', {
+                title: 'Poker Pig',
+                message: 'Bring home the bacon for charity'
+            });
+        }
+    });
+
+    server.route({
+        method: 'POST',
+        path: '/joinGame',
+        handler: GameController.joinGame,
+        options: {
+            auth: {
+                mode: 'try'
+            },
+            validate: {
+                payload: Joi.object({
+                    firstName: Joi.string().required(),
+                    lastName: Joi.string().required(),
+                    gameId: Joi.string().required()
+                })
+            }
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/game',
+        options: {
+            auth: false
+        },
+        handler: (req, h) => {
+            return h.view('game', {
                 title: 'Poker Pig',
                 message: 'Bring home the bacon for charity'
             });
@@ -160,6 +211,9 @@ exports.init = async function () {
         // using the directory handler requires Inert to be registered
         method: 'GET',
         path: '/{param*}',
+        options: {
+            auth: false
+        },
         handler: {
             directory: {
                 path: Path.join(__dirname, 'public'),

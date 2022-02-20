@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/basic": "^6.0.0",
+    "@hapi/cookie": "^11.0.2",
     "@hapi/hapi": "^20.1.0",
     "@hapi/inert": "^6.0.3",
     "@hapi/joi": "^17.1.1",
@@ -38,7 +39,8 @@
     "watch": [
       "src/",
       "public/",
-      "templates/"
+      "templates/",
+      "server.js"
     ],
     "ext": "js,json,html"
   }

@@ -1,0 +1,299 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="grid grid-cols-4 gap-4">
+      <div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+          <div id="player1name" class="text-xl font-medium"></div>
+          <p id="player1chips" class="text-slate-500"></p>
+          <p id="player1hand" class="text-slate-500"></p>
+          <div id="player1button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player1smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player1bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      </div>
+      <div id="player2" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+          <div id="player2name" class="text-xl font-medium"></div>
+          <p id="player2chips" class="text-slate-500"></p>
+          <p id="player2hand" class="text-slate-500"></p>
+          <div id="player2button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player2smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player2bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      </div>
+      <div id="player3" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+          <div id="player3name" class="text-xl font-medium"></div>
+          <p id="player3chips" class="text-slate-500"></p>
+          <p id="player3hand" class="text-slate-500"></p>
+          <div id="player3button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player3smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player3bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      </div>
+      <div id="player4" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+          <div id="player4name" class="text-xl font-medium"></div>
+          <p id="player4chips" class="text-slate-500"></p>
+          <p id="player4hand" class="text-slate-500"></p>
+          <div id="player4button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player4smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+          <div id="player4bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      </div>
+  </div>
+  <div id="table" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center mt-4">
+      <div id="street" class="">
+      </div>
+      <div id="mainPot" class="">
+      </div>
+      <div id="highBet" class=""> 
+      </div>
+      <ol id="commonCards" class="">
+      </ol>
+      <div id="results">
+      </div>
+  </div>
+  <div class="bg-white mt-4">
+      <div class="max-w-2xl mx-auto py-4 px-2 lg:max-w-7xl lg:px-8">
+        <div id="actions">
+        </div>
+        <div class="mt-2 grid grid-cols-4 gap-y-10 gap-x-6 xl:gap-x-8">
+            <div class="mt-2 flex justify-between">
+                  <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
+            </div>
+            <div class="mt-2 flex justify-between">
+              <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
+            </div>
+            <div class="mt-2 flex justify-between">
+              <label id="betLabel"></label>
+              <div class="relative text-gray-700">
+                  <input id="betAmount" class="w-full h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="text" placeholder="Amount"/>
+                  <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+              </div>
+          </div>
+            <div class="mt-2 flex justify-between">
+              <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+            </div>
+        </div>
+      </div>
+  </div>
+</div>
+    
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/menus.js"></script>
+<script src="/js/socket.js"></script>
+<script>
+    function fetchAndUpdate(endpoint){
+        var responseData;
+        fetch('http://localhost:8080/api/' + endpoint)
+        .then(response => response.json())
+        .then(data => responseData = data)
+        .then(() => {
+            var data = responseData.data;
+            var gameId = responseData.gameId;
+            if (gameId) {
+              console.log("new game id: ", gameId, ". Add players!")
+            }
+            if (data){
+              updateAllPlayers(data.playersInfo);
+              updateTable(data.table);
+              updatePlayer(data.player);
+              activatePlayer(data.playersInfo, data.table);
+              updateResults(data.results);
+              updateActions(data.actionOpts);
+            }
+        });
+    }
+
+    function updateActions(actionsOpts){
+      console.log("actions are: ", actionsOpts);
+      var callBtn = document.getElementById("callBtn");
+      var checkBtn = document.getElementById("checkBtn");
+      var foldBtn = document.getElementById("foldBtn");
+      var betLabel = document.getElementById("betLabel");
+      var betBtn = document.getElementById("betBtn");
+      if (actionsOpts.call){
+        callBtn.classList.remove("invisible");
+        callBtn.innerHTML = "Call: " + actionsOpts.call;
+      } else {
+        callBtn.classList.remove("invisible");
+        callBtn.classList.add("invisible");
+      }
+      if (actionsOpts.fold){
+        foldBtn.classList.remove("invisible");
+      } else {
+        foldBtn.classList.remove("invisible");
+        foldBtn.classList.add("invisible");
+      }
+      if (actionsOpts.check){
+        checkBtn.classList.remove("invisible");
+      } else {
+        checkBtn.classList.remove("invisible");
+        checkBtn.classList.add("invisible");
+      }
+      if (actionsOpts.bet){
+        betBtn.classList.remove("invisible");
+        betLabel.classList.remove("invisible");
+        betLabel.innerHTML = actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
+      } else {
+        betBtn.classList.remove("invisible");
+        betBtn.classList.add("invisible");
+        betLabel.classList.remove("invisible");
+        betLabel.classList.add("invisible");
+      }
+    }
+
+    function updateResults(results){
+      var resultsDiv = document.getElementById("results");
+      if (results){
+        resultsDiv.innerHTML = JSON.stringify(results);
+      } else {
+        resultsDiv.innerHTML = "";
+      }
+    }
+
+    function updateAllPlayers(playersInfo) {
+      if (playersInfo){
+        for (let i = 0; i < playersInfo.length; i++) {
+          console.log("player ", i, " info is: ", playersInfo[i]);
+            var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
+            var chipLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "chips");
+            var nameLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "name");
+            var buttonLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "button");
+            var smallBlindLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "smallBlind");
+            var bigBlindLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "bigBlind");
+            if (playerBox){
+              if (playersInfo[i].handState == "FOLD" || playersInfo[i].gameState == "OUT"){
+                playerBox.classList.remove('bg-white');
+                playerBox.classList.remove('shadow-lg');
+                playerBox.classList.add('bg-slate-300');
+              } else {
+                playerBox.classList.remove('bg-slate-300');
+                playerBox.classList.add('shadow-lg');
+                playerBox.classList.add('bg-white');
+              }
+            }
+            if (chipLabel){
+                chipLabel.innerHTML = playersInfo[i]["chips"];
+            }
+            if (nameLabel){
+                nameLabel.innerHTML = playersInfo[i]["name"];
+            }
+            if (buttonLabel){
+              if (playersInfo[i]["button"]){
+                buttonLabel.innerHTML = "D";
+              } else {
+                buttonLabel.innerHTML = "";
+              }  
+            }
+            if (smallBlindLabel){
+              if (playersInfo[i]["smallBlind"]){
+                smallBlindLabel.innerHTML = "S";
+              } else {
+                smallBlindLabel.innerHTML = "";
+              }
+            }
+            if (bigBlindLabel){
+              if (playersInfo[i]["bigBlind"]){
+                bigBlindLabel.innerHTML = "B";
+              } else {
+                bigBlindLabel.innerHTML = "";
+              }
+            }
+
+        }
+      }
+    }
+
+    function updateTable(table){
+      if (table){
+        document.getElementById("street").innerHTML = "Street: " + table["street"];
+        document.getElementById("highBet").innerHTML = "High bet: " + table["highBet"];
+        showPots(table["pots"]);
+        showCommonCards(table["commonCards"]);
+      }
+    }
+
+    function showPots(potsArray){
+      if (potsArray){
+        for (let i = 0; i < potsArray.length; i++) {
+            if (i == 0){
+                document.getElementById("mainPot").innerHTML = "Pot: " + JSON.stringify(potsArray[0]);
+            } else {
+                console.log("Multiple pots!")
+            }
+        }
+      }
+    }
+    function updatePlayer(player){
+      if (player){
+        var handLabel = document.getElementById("player" + player["playerId"] + "hand"); 
+        if (handLabel){
+            handLabel.innerHTML = renderCard(player["hand"][0]) + renderCard(player["hand"][1]);
+        }
+      }
+    }
+    function activatePlayer(playersInfo, table){
+      if (playersInfo && table){
+        var activePlayerId = playersInfo[table["activeIndex"]]["playerId"];
+        for (let i = 0; i < playersInfo.length; i++) {
+            var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
+            if (playerBox){
+                playerBox.classList.remove("ring-2");
+                playerBox.classList.remove("ring-green-300");
+                if (playersInfo[i]["playerId"] == activePlayerId) {
+                  playerBox.classList.add("ring-2");
+                  playerBox.classList.add("ring-green-300");
+                }
+            } 
+        }
+      }
+    }
+    function showCommonCards(cardArray){
+        let cardList = document.getElementById("commonCards"); 
+        cardList.innerHTML = ""; // clear list first
+        for (let i = 0; i < cardArray.length; i++) {
+            var tableBox = document.createElement('li');
+            tableBox.textContent = renderCard(cardArray[i]);
+            cardList.appendChild(tableBox);
+        }
+    }
+    function newGame() {
+        fetchAndUpdate('new');
+    }
+    function addPlayer() {
+        fetchAndUpdate('addPlayer?gameId=1&playerId=1');
+    }
+    function nextHand() {
+        fetchAndUpdate('nextHand?gameId=1');
+    }
+    function check() {
+        fetchAndUpdate('check');
+    }
+    function bet() {
+        var amount = document.getElementById("betAmount").value;
+        console.log("betting ", amount);
+        fetchAndUpdate('bet?amount=' + amount);
+    }
+    function call() {
+        fetchAndUpdate('call');
+    }
+    function fold() {
+        fetchAndUpdate('fold');
+    }
+    function renderCard(cardString){
+      var num = cardString.charAt(0);
+      var suit = cardString.charAt(1);
+      if (num == "T"){
+        num = "10";
+      }
+      return (num + htmlSuit(suit))
+    } 
+    function htmlSuit(suitString){
+      switch (suitString) {
+        case 'c':
+          return "♣";
+        case 'd':
+          return "🔸";
+        case 'h':
+          return "🧡";
+        case 's':
+          return "♠";
+        default:
+          console.log(`Sorry, no suit match for  ${suitString}.`);
+          return suitString;
+      }
+    }
+</script>
