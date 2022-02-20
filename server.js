@@ -128,9 +128,26 @@ exports.init = async function () {
             },
             validate: {
                 payload: Joi.object({
-                    firstName: Joi.string().required(),
-                    lastName: Joi.string().required(),
-                    gameId: Joi.string().required()
+                    firstName: Joi.string().min(1).max(140).required(),
+                    lastName: Joi.string().min(1).max(140).required(),
+                    gameId: Joi.string().min(1).max(6).required(),
+                })
+            }
+        }
+    });
+
+    server.route({
+        method: 'POST',
+        path: '/newGame',
+        handler: GameController.newGame,
+        options: {
+            auth: {
+                mode: 'try'
+            },
+            validate: {
+                payload: Joi.object({
+                    firstName: Joi.string().min(1).max(140).required(),
+                    lastName: Joi.string().min(1).max(140).required()
                 })
             }
         }

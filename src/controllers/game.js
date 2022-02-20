@@ -34,6 +34,17 @@ exports.joinGame = async (req, h) => {
   return h.redirect('/game');
 };
 
+exports.newGame = async (req, h) => {
+  console.log(req.payload);
+  const { firstName, lastName } = req.payload;
+  if (!firstName || !lastName ) {
+      console.log("Missing firstname or lastname");
+      // return internals.renderHtml.login('Missing firstname, lastname, or gameId');
+  }
+  req.cookieAuth.set({ id: 101 });
+  return h.redirect('/game');
+};
+
 exports.createPlayer = (req, h) => {
   return {status: 'success', data: Game.createPlayer(req.payload.firstname, req.payload.lastname)};
 };
