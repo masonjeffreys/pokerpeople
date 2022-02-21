@@ -61,6 +61,7 @@ function setupHand(game){
     // Depends how people are allowed to join/leave the game?
     game.players[game.table.dealerPosition].button = true;
     game.table.minRaise = game.table.bigBlind;
+    game.table.resetPots();
     game.table.clearCommonCards();
 
     // BetTheBlinds
@@ -187,6 +188,7 @@ function receiveAction(game, action, amount = 0){
 function getWinDetailsByFold(game){
     var winningPlayer = game.players.find(p => Utils.isValidPlayer(p));
     console.log("Winner: ", winningPlayer.prettyName());
+    winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
     return {
         table: null,
         player: null,
