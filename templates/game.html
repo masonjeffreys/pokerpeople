@@ -106,26 +106,26 @@
       var foldBtn = document.getElementById("foldBtn");
       var betLabel = document.getElementById("betLabel");
       var betBtn = document.getElementById("betBtn");
-      if (actionsOpts.call){
+      if (actionsOpts && actionsOpts.call){
         callBtn.classList.remove("invisible");
         callBtn.innerHTML = "Call: " + actionsOpts.call;
       } else {
         callBtn.classList.remove("invisible");
         callBtn.classList.add("invisible");
       }
-      if (actionsOpts.fold){
+      if (actionsOpts && actionsOpts.fold){
         foldBtn.classList.remove("invisible");
       } else {
         foldBtn.classList.remove("invisible");
         foldBtn.classList.add("invisible");
       }
-      if (actionsOpts.check){
+      if (actionsOpts && actionsOpts.check){
         checkBtn.classList.remove("invisible");
       } else {
         checkBtn.classList.remove("invisible");
         checkBtn.classList.add("invisible");
       }
-      if (actionsOpts.bet){
+      if (actionsOpts && actionsOpts.bet){
         betBtn.classList.remove("invisible");
         betLabel.classList.remove("invisible");
         betLabel.innerHTML = actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
