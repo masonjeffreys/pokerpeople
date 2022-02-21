@@ -45,6 +45,13 @@ describe('nextValidPlayer',()=>{
     })
 })
 
+describe('filteringFunction', ()=>{
+    it('can filter on array and attrName and attrValue', () => {
+        let answer = Utils.getByAttributeValue([{id: 1, firstName: "test"}],"id",1);
+        expect(answer.firstName).to.equal("test");
+    })
+})
+
 describe('dealOne',()=>{
     it('each player will recieve one card', () => {
         let players2 = Utils.dealOne(players, deck, 0);

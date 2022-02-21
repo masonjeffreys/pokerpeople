@@ -6,37 +6,67 @@ const Vision = require('@hapi/vision');
 const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
+const Player = require('./src/player');
 const Bcrypt = require('bcrypt');
-const Socket = require("socket.io"); 
- 
-const exampleUsers = {
-    john: {
-        username: 'john',
-        password: '$2a$10$iqJSHD.BGr0E2IxQwYgJmeP3NvhPrXAeLSaGCj6IR/XU5QtjVu5Tm',   // 'secret' after BCrypt
-        name: 'John Doe',
-        id: '2133d32a'
-    }
-};
+const Socket = require("socket.io");
 
-const validate = async (request, username, password, h) => {
-    //await console.log("Here!");
-    console.log("username is: ", username);
-    console.log("password is: ", password);
-    const user = exampleUsers[username];
-    if (username === 'help') {
-        return { response: h.redirect('https://hapijs.com/help') };     // custom response
-    }
-    if (!user) {
-        console.log("No user exists by username: ", username);
-        return { credentials: null, isValid: false };
-    }
+// Until we have a DB, we will store games here in memory, get the right game, update state, and store again.
+let Games = [
+    // {id: 1,
+    // gameCode: "abc",
+    // players: [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")],
+    // table: Table(1),
+    // deck: Deck(1)}
+  ]
+  
+  // Until we have a DB, we will store list of player here in memory, get the right player, update player, etc.
+  let Players = [
+    // Player(1, "Dealer")
+  ]
 
-    const isValid = await Bcrypt.compare(password, user.password);
-    console.log("Is valid? ", isValid);
-    const credentials = { id: user.id, name: user.name };
+  function createNewPlayer(userData){
+    let newId = Players.length;
+    let firstName = userData["firstName"];
+    let lastName = userData["lastName"];
+    let newPlayer = Player(newId, firstName, lastName);
+    Players.push(Player(newId, firstName, lastName));
+    return newPlayer;
+  }
+  
+  function getOrCreateUser(existingUserData){
+    console.log("Made it here: ", existingUserData);
+    if (existingUserData && existingUserData["id"]){
+      let player = Utils.getByAttributeValue(Players, "id", parseInt(existingUserData["id"]));
+      console.log("Found player: ", player);
+      if (!player){
+        return createNewPlayer(existingUserData);
+      } else {
+        return player;
+      }
+    } else {
+      return createNewPlayer(existingUserData);
+    }
+  }
 
-    return { isValid, credentials };
-};
+// const validate = async (request, username, password, h) => {
+//     //await console.log("Here!");
+//     console.log("username is: ", username);
+//     console.log("password is: ", password);
+//     const user = exampleUsers[username];
+//     if (username === 'help') {
+//         return { response: h.redirect('https://hapijs.com/help') };     // custom response
+//     }
+//     if (!user) {
+//         console.log("No user exists by username: ", username);
+//         return { credentials: null, isValid: false };
+//     }
+
+//     const isValid = await Bcrypt.compare(password, user.password);
+//     console.log("Is valid? ", isValid);
+//     const credentials = { id: user.id, name: user.name };
+
+//     return { isValid, credentials };
+// };
 
 exports.init = async function () {
 
@@ -49,8 +79,6 @@ exports.init = async function () {
             }
         }
     });
-
-
 
     await server.initialize();
     await server.register(Vision);
@@ -87,18 +115,40 @@ exports.init = async function () {
             isSecure: false
         },
         redirectTo: '/unauthenticated',
+        // Subsequent requests containing the session cookie are authenticated 
+        // and validated via the provided validateFunc in case the cookie's
+        // encrypted content requires validation on each request.
+
+        // This doesn't set the cookie, just allows the route to proceed or not, reads the existing
+        // session information, and sets that information as credentials on the request
+
+        // Function is only called if session information exists
+        
         validateFunc: async (req, session) => {
+            console.log("In validateFunc(). Session user id is: ", session.user.id);
+            console.log("First player id is: ", Players[0].id);
 
-            // const account = await users.find(
-            //     (user) => (user.id === session.id)
-            // );
+            const user = Players.find(
+                (user) => (user.id === parseInt(session.user.id))
+            );
+            
+            console.log("Current user is: ", user);
+            if (!user) {
+                // return false will be 'unauthenticated'
+                return { valid: false };
+            }
 
-            // if (!account) {
-
-            //     return { valid: false };
-            // }
-
-            return { valid: true, credentials: {id: 1} };
+            // credentials object will now be available as req.auth.credentials
+            
+            return { valid: true,
+                credentials: {
+                    user: {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName
+                    }
+                }
+            }
         }
     });
 
@@ -108,12 +158,25 @@ exports.init = async function () {
         method: 'GET',
         path: '/',
         options: {
-            auth: false
+            auth: {
+                mode: 'try' // We'll use the validateFunc to set user info if session/cookie data exists
+            }
         },
         handler: (req, h) => {
+            console.log("Credentials are: ", req.auth.credentials);
+            let user = {}
+            if (req.auth.credentials){
+                user = req.auth.credentials.user;
+            } else {
+                user = {
+                    firstName: "first name",
+                    lastName: "last name"
+                }
+            }
             return h.view('home', {
                 title: 'Poker Pig',
-                message: 'Bring home the bacon for charity'
+                message: 'Bring home the bacon for charity',
+                user: user
             });
         }
     });
@@ -121,18 +184,31 @@ exports.init = async function () {
     server.route({
         method: 'POST',
         path: '/joinGame',
-        handler: GameController.joinGame,
+        handler: async (req, h) => {
+            console.log("Payload here is: ", req.payload);
+            console.log("Credentials here are: ", req.auth.credentials);
+          
+            let user = {};
+            if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
+              user = getOrCreateUser(req.auth.credentials.user.id);
+            } else {
+              user = getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName});
+            }
+            req.cookieAuth.set({user: {id: user.id}});
+            return h.redirect('/game');
+        },
         options: {
+            // for auth here, we will 'try' and then create a new user if one doesn't exist
             auth: {
                 mode: 'try'
             },
-            validate: {
-                payload: Joi.object({
-                    firstName: Joi.string().min(1).max(140).required(),
-                    lastName: Joi.string().min(1).max(140).required(),
-                    gameId: Joi.string().min(1).max(6).required(),
-                })
-            }
+            // validate: {
+            //     payload: Joi.object({
+            //         firstName: Joi.string().required(),
+            //         lastName: Joi.string().required(),
+            //         gameId: Joi.string().required()
+            //     })
+            // }
         }
     });
 

@@ -7,6 +7,10 @@ function getNextHandPlayerIndex(previousTablePosition, handPlayers){
     }
 }
 
+function getByAttributeValue(array, attrName, attrValue){
+    return array.filter(x => x[attrName] === attrValue)[0]
+}
+
 function isValidPlayer(player){
     return (player.handState == "IN");
 }
@@ -231,3 +235,4 @@ module.exports.isStreetComplete = isStreetComplete;
 module.exports.getCallAmount = getCallAmount;
 module.exports.playerMaxBet = playerMaxBet;
 module.exports.playerCurrentBet = playerCurrentBet;
+module.exports.getByAttributeValue = getByAttributeValue;

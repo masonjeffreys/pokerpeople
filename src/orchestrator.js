@@ -11,33 +11,11 @@ const Utils = require('./utils');
 // https://github.com/goldfire/pokersolver
 const Solver = require('pokersolver').Hand;
 
-// Until we have a DB, we will store games here in memory, get the right game, update state, and store again.
-let Games = [
-    // {id: 1,
-    // gameCode: "abc",
-    // players: [Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")],
-    // table: Table(1),
-    // deck: Deck(1)}
-]
-
-// Until we have a DB, we will store list of player here in memory, get the right player, update player, etc.
-let Players = [
-    Player(1, "Dealer"), Player(2, "SmBnd"), Player(3, "LgBnd"), Player(4, "Jeff Mason")
-]
-
 // Things that might be different from Game to Game
 const gameConfig = {
     startingChips: 100,
     smallBlindAmount: 5,
     testMode: false
-}
-
-function getGameById(id){
-    return Games.filter(x => x.id === parseInt(id))[0]
-}
-
-function getPlayerById(id){
-    return Players.filter(x => x.id === parseInt(id))[0]
 }
 
 function nextStreet(currentStreet){

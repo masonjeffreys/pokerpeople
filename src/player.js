@@ -1,6 +1,7 @@
-function Player(id, name) {
+function Player(id, firstName, lastName) {
       var _id = id;
-      var _name = name;
+      var _firstName = firstName;
+      var _lastName = lastName;
       var _hand = [];
       var _chips = 0;
       var _gameState = 'ACTIVE';
@@ -15,23 +16,30 @@ function Player(id, name) {
 
 
       return Object.freeze({
-            init: function init(firstname, lastname){
-                  return {playerId: 1, firstname: firstname, lastname: lastname};
+            init: function init(id, firstname, lastname){
+                  return {playerId: id, firstname: firstname, lastname: lastname};
             },
 
             get id(){
                   return _id;
             },
-            
-            get name(){
-                  return _name;
-            },
 
-            set name(value){
-                  _name = value;
+            get firstName(){
+                  return _firstName;
+            },
+            set firstName(value){
+                  _firstName = value;
                   return this;
             },
 
+            get lastName(){
+                  return _lastName;
+            },
+            set lastName(value){
+                  _lastName = value;
+                  return this;
+            },
+            
             get actedInStreet(){
                   return _actedInStreet;
             },
@@ -100,6 +108,9 @@ function Player(id, name) {
             set bigBlind(value){
                   _bigBlind = value;
                   return this;
+            },
+            prettyName: function(){
+                  return _firstName + " " + _lastName;
             },
             makeBet: function(value){
                   _chips = _chips - value;
