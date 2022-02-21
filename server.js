@@ -144,11 +144,11 @@ exports.init = async function () {
     const io = Socket(server.listener)
 
     io.on('connection', (socket) => {
-        let roomName = socket.handshake.query;
+        let roomName = socket.handshake.query.gameId;
         socket.join(roomName);
         socket.on('chat message', (msg) => {
             console.log("chat message received: ", msg, "from room: " + socket.handshake.query.gameId);
-            io.to(roomName).emit('chat message', msg);
+            io.to(socket.handshake.query.gameId).emit('chat message', msg);
         });
         socket.on('disconnect', () => {
           console.log('user disconnected');
