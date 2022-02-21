@@ -1,6 +1,11 @@
-var socket = io();
 var form = document.getElementById('form');
 var input = document.getElementById('input');
+
+const socket = io({
+    query: {
+      gameId: 42
+    }
+  });
 
 form.addEventListener('submit', function(e) {
     e.preventDefault();

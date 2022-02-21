@@ -1,4 +1,4 @@
-var Game = require('../orchestrator');
+var Orchestrator = require('../orchestrator');
 var Player = require('../player');
 
 /**
@@ -16,36 +16,35 @@ exports.newGame = async (req, h) => {
   return h.redirect('/game');
 };
 
-exports.createPlayer = (req, h) => {
-  return {status: 'success', data: Game.createPlayer(req.payload.firstname, req.payload.lastname)};
-};
-
 exports.addPlayer = (req, h) => {
-  return {status: 'success', players: Game.addPlayerToGame(req.query.gameId, req.query.playerId)};
+      // Set player at table for first time
+      let game = Utils.getByAttributeValue(Games, "id", parseInt(gameId));
+      let player = Utils.getByAttributeValue(Players, "id", parseInt(playerId));
+  return {status: 'success', players: Orchestrator.addPlayerToGame(req.query.gameId, req.query.playerId)};
 };
 
 exports.new = (req, h) => {
-  return {status: 'success', gameId: Game.newGame(Game.gameConfig)};
+  return {status: 'success', gameId: Orchestrator.newGame(Game.gameConfig)};
 };
 
 exports.bet = (req, h) => {
-    return {status: 'success', data: Game.receiveAction('bet', req.query.amount)};
+    return {status: 'success', data: Orchestrator.receiveAction('bet', req.query.amount)};
 };
 
 exports.call = (req, h) => {
-  return {status: 'success', data: Game.receiveAction('call')};
+  return {status: 'success', data: Orchestrator.receiveAction('call')};
 };
 
 exports.check = (req, h) => {
-  return {status: 'success', data: Game.receiveAction('check')};
+  return {status: 'success', data: Orchestrator.receiveAction('check')};
 };
 
 exports.fold = (req, h) => {
-  return {status: 'success', data: Game.receiveAction('fold')};
+  return {status: 'success', data: Orchestrator.receiveAction('fold')};
 };
 
 exports.nextHand = (req, h) => {
-  return {status: 'success', data: Game.nextHand(req.query.gameId)};
+  return {status: 'success', data: Orchestrator.nextHand(req.query.gameId)};
 };
 
 // /**

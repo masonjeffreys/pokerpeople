@@ -11,48 +11,11 @@ const Utils = require('./utils');
 // https://github.com/goldfire/pokersolver
 const Solver = require('pokersolver').Hand;
 
-// Things that might be different from Game to Game
-const gameConfig = {
-    startingChips: 100,
-    smallBlindAmount: 5,
-    testMode: false
-}
-
 function nextStreet(currentStreet){
     return STREETS[STREETS.indexOf(currentStreet) + 1] || STREETS[0]
 }
 
-function newGame(gameConfig){
-    // Create a deck and table
-    // Set up 'initial start' params (things that aren't done on every hand) for table
-    // Set table blind levels
-    // Return game object
-
-    let deck = Deck(1);
-    let table = Table(1);
-
-    table.dealerPosition = -1; // We will advance this to 0 when the hand is setup
-    table.smallBlind = gameConfig["smallBlindAmount"];
-    table.bigBlind = 2 * gameConfig["smallBlindAmount"];
-    table.startingChips = gameConfig["startingChips"];
-
-    let game = {
-        id: Games.length + 1,
-        gameCode: "abc",
-        players: [],
-        table: table,
-        deck: deck,
-    }
-
-    Games.push(game);
-    return game.id;
-}
-
-function addPlayerToGame(gameId, playerId){
-    // Set player at table for first time
-    let game = getGameById(gameId);
-    let player = getPlayerById(playerId);
-
+function addPlayerToGame(game, player){
     // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
     game.players.push(player);
     game.table.addPlayer(player);
@@ -67,8 +30,7 @@ function addPlayerToGame(gameId, playerId){
     return game.players;
 }
 
-function nextHand(gameId){
-    let game = getGameById(gameId);
+function nextHand(game){
     console.log("Game " + gameId + " is: ")
     console.log(game);
     setupHand(game);
@@ -305,11 +267,8 @@ function advanceStreet(){
     }
 }
 
-
-module.exports.newGame = newGame;
 module.exports.addPlayerToGame = addPlayerToGame;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
-module.exports.gameConfig = gameConfig;

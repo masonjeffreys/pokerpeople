@@ -50,6 +50,10 @@ describe('filteringFunction', ()=>{
         let answer = Utils.getByAttributeValue([{id: 1, firstName: "test"}],"id",1);
         expect(answer.firstName).to.equal("test");
     })
+    it('will return undefined if there are no matches', () => {
+        let answer = Utils.getByAttributeValue([{id: 1, firstName: "test"}],"id",2);
+        expect(answer).to.equal(undefined);
+    })
 })
 
 describe('dealOne',()=>{

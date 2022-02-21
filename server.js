@@ -7,6 +7,9 @@ const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
 const Player = require('./src/player');
+const Table = require('./src/table');
+const Deck = require('./src/deck');
+const Utils = require('./src/utils');
 const Bcrypt = require('bcrypt');
 const Socket = require("socket.io");
 
@@ -23,6 +26,13 @@ let Games = [
   let Players = [
     // Player(1, "Dealer")
   ]
+
+  // Things that might be different from Game to Game
+    const gameConfig = {
+        startingChips: 100,
+        smallBlindAmount: 5,
+        testMode: false
+    }
 
   function createNewPlayer(userData){
     let newId = Players.length;
@@ -47,6 +57,47 @@ let Games = [
       return createNewPlayer(existingUserData);
     }
   }
+
+  function getOrCreateGame(gameId){
+      console.log("madeitHere: ", gameId);
+      let game = {}
+      if (gameId){
+        game = Utils.getByAttributeValue(Games, "id", parseInt(gameId));
+      }
+      console.log("currently, game is: ", game);
+      if (game == undefined ){
+          // No id given or game id didn't match
+          console.log("no game found. Time to create one!")
+          game = newGame(gameConfig);
+      }
+      return game;
+  }
+
+  function newGame(gameConfig){
+    // Create a deck and table
+    // Set up 'initial start' params (things that aren't done on every hand) for table
+    // Set table blind levels
+    // Return game object
+    console.log("creating new game");
+    let deck = Deck(1);
+    let table = Table(1);
+
+    table.dealerPosition = -1; // We will advance this to 0 when the hand is setup
+    table.smallBlind = gameConfig["smallBlindAmount"];
+    table.bigBlind = 2 * gameConfig["smallBlindAmount"];
+    table.startingChips = gameConfig["startingChips"];
+
+    let game = {
+        id: Games.length + 1,
+        gameCode: "abc",
+        players: [],
+        table: table,
+        deck: deck,
+    }
+
+    Games.push(game);
+    return game;
+}
 
 // const validate = async (request, username, password, h) => {
 //     //await console.log("Here!");
@@ -80,6 +131,11 @@ exports.init = async function () {
         }
     });
 
+    const context = {
+        title: 'Poker Pig',
+        message: 'Bring home the bacon for charity'
+    };
+
     await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
@@ -88,10 +144,11 @@ exports.init = async function () {
     const io = Socket(server.listener)
 
     io.on('connection', (socket) => {
-        console.log('a user connected');
+        let roomName = socket.handshake.query;
+        socket.join(roomName);
         socket.on('chat message', (msg) => {
-            console.log("chat message received: ", msg);
-            io.emit('chat message', msg);
+            console.log("chat message received: ", msg, socket.handshake.query.gameId);
+            io.to(roomName).emit('chat message', msg);
         });
         socket.on('disconnect', () => {
           console.log('user disconnected');
@@ -105,7 +162,8 @@ exports.init = async function () {
         relativeTo: __dirname,
         path: 'templates',
         layout: 'layout',
-        layoutPath: 'templates'
+        layoutPath: 'templates',
+        context
     });
 
     server.auth.strategy('session', 'cookie', {
@@ -124,9 +182,8 @@ exports.init = async function () {
 
         // Function is only called if session information exists
         
-        validateFunc: async (req, session) => {
+        validateFunc: (req, session) => {
             console.log("In validateFunc(). Session user id is: ", session.user.id);
-            console.log("First player id is: ", Players[0].id);
 
             const user = Players.find(
                 (user) => (user.id === parseInt(session.user.id))
@@ -165,7 +222,7 @@ exports.init = async function () {
         handler: (req, h) => {
             console.log("Credentials are: ", req.auth.credentials);
             let user = {}
-            if (req.auth.credentials){
+            if (req.auth.credentials && req.auth.credentials.user){
                 user = req.auth.credentials.user;
             } else {
                 user = {
@@ -174,8 +231,6 @@ exports.init = async function () {
                 }
             }
             return h.view('home', {
-                title: 'Poker Pig',
-                message: 'Bring home the bacon for charity',
                 user: user
             });
         }
@@ -194,8 +249,11 @@ exports.init = async function () {
             } else {
               user = getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName});
             }
+
+            let game = getOrCreateGame(req.payload.gameId);
+
             req.cookieAuth.set({user: {id: user.id}});
-            return h.redirect('/game');
+            return h.redirect('/game/' + game.id);
         },
         options: {
             // for auth here, we will 'try' and then create a new user if one doesn't exist
@@ -231,35 +289,18 @@ exports.init = async function () {
 
     server.route({
         method: 'GET',
-        path: '/game',
+        path: '/game/{gameId}',
         options: {
             auth: false
         },
         handler: (req, h) => {
-            return h.view('game', {
-                title: 'Poker Pig',
-                message: 'Bring home the bacon for charity'
-            });
-        }
-    });
-    
-    server.route({
-        method: 'POST',
-        path: '/api/createPlayer',
-        handler: GameController.createPlayer,
-        options: {
-            validate: {
-                payload: Joi.object({
-                    firstname: Joi.string().required(),
-                    lastname: Joi.string().required()
-                })
-            }
+            return h.view('game');
         }
     });
 
     server.route({
         method: 'GET',
-        path: '/api/addPlayer',
+        path: '/api/addPlayer/{gameId}',
         handler: GameController.addPlayer
     });
     
@@ -271,47 +312,95 @@ exports.init = async function () {
 
     server.route({
         method: 'GET',
-        path: '/api/nextHand',
+        path: '/api/nextHand/{gameId}',
         handler: GameController.nextHand
     });
     
     server.route({
         method: 'GET',
-        path: '/api/call',
+        path: '/api/call/{gameId}',
         handler: GameController.call
     });
     
     server.route({
         method: 'GET',
-        path: '/api/bet',
+        path: '/api/bet/{gameId}',
         handler: GameController.bet
     });
     
     server.route({
         method: 'GET',
-        path: '/api/fold',
+        path: '/api/fold/{gameId}',
         handler: GameController.fold
     });
     
     server.route({
         method: 'GET',
-        path: '/api/check',
+        path: '/api/check/{gameId}',
         handler: GameController.check
+    });
+
+    ///////////////
+    // Begin routes for static files and error handling
+    ///////////////
+
+    server.route({
+        // Route for getting random picture
+        // using the directory handler requires Inert to be registered
+        method: 'GET',
+        path: '/img/{param*}',
+        options: {
+            auth: false
+        },
+        handler: {
+            directory: {
+                path: Path.join(__dirname, 'public/img'),
+                listing: true
+            }
+        }
     });
 
     server.route({
         // Route for getting random picture
         // using the directory handler requires Inert to be registered
         method: 'GET',
-        path: '/{param*}',
+        path: '/css/{param*}',
         options: {
             auth: false
         },
         handler: {
             directory: {
-                path: Path.join(__dirname, 'public'),
+                path: Path.join(__dirname, 'public/css'),
                 listing: true
             }
+        }
+    });
+
+    server.route({
+        // Route for getting random picture
+        // using the directory handler requires Inert to be registered
+        method: 'GET',
+        path: '/js/{param*}',
+        options: {
+            auth: false
+        },
+        handler: {
+            directory: {
+                path: Path.join(__dirname, 'public/js'),
+                listing: true
+            }
+        }
+    });
+
+    server.route({
+        method: '*',
+        path: '/{any*}',
+        options: {
+            auth: false
+        },
+        handler: function (request, h) {
+
+            return '404 Error! Page Not Found!';
         }
     });
 
