@@ -170,6 +170,7 @@ function receiveAction(game, action, amount = 0){
     // Or simply advance to the next player
     if (winByFolding(game) == true){
         console.log("Winner due to folding ");
+        return getWinDetailsByFold(game);
     }
     else if (Utils.isStreetComplete(game.table, game.players) == true){
         console.log("Completed street: ", game.table.street);
@@ -183,13 +184,26 @@ function receiveAction(game, action, amount = 0){
 
 }
 
+function getWinDetailsByFold(game){
+    var winningPlayer = game.players.find(p => Utils.isValidPlayer(p));
+    console.log("Winner: ", winningPlayer.prettyName());
+    return {
+        table: null,
+        player: null,
+        options: null,
+        results: {
+            winner_name: winningPlayer.prettyName(),
+            winning_hand: null,
+            amount: Utils.potForPlayer(game.table, winningPlayer)
+        }
+    };
+}
+
 function winByFolding(game){
     if (Utils.activePlayersCount(game.players) == 1){
         // Winning player, others folded
         // Really should check this after every action as game would immediately end
         console.log("only 1 valid player left!")
-        var winner = game.players.find(p => Utils.isValidPlayer(p));
-        console.log("Winner: ", winner.name);
         return true;
     }
     else {

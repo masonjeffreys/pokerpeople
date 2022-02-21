@@ -55,7 +55,7 @@ function getOrCreateGame(gameId){
     if (gameId){
       game = Utils.getByAttributeValue(Games, "id", parseInt(gameId));
     }
-    if (game == undefined ){
+    if (game === undefined ){
         game = newGame(gameConfig);
     }
     return game;

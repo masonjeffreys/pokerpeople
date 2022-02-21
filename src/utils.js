@@ -150,8 +150,11 @@ function isStreetComplete(table, players){
     players.forEach(function(player){
         console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
         if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
-            console.log(player.id, " is complete.")
-        } else {
+            console.log(player.id, " is current with bet.")
+        } else if (player.handState == "FOLD") {
+            console.log(player.id, " has folded.")
+        }
+        else {
             console.log("Betting round not done. Player ", player.id, " needs to act.")
             streetComplete = false;
         }
@@ -236,3 +239,4 @@ module.exports.getCallAmount = getCallAmount;
 module.exports.playerMaxBet = playerMaxBet;
 module.exports.playerCurrentBet = playerCurrentBet;
 module.exports.getByAttributeValue = getByAttributeValue;
+module.exports.isValidPlayer = isValidPlayer;
