@@ -3,7 +3,7 @@ var input = document.getElementById('input');
 
 const socket = io({
     query: {
-      gameId: 42
+      gameId: window.location.pathname.split("/")[2]
     }
   });
 
