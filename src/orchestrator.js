@@ -31,7 +31,7 @@ function addPlayerToGame(game, player){
 }
 
 function nextHand(game){
-    console.log("Game " + gameId + " is: ")
+    console.log("Game " + game.id + " is: ")
     console.log(game);
     setupHand(game);
     return executePlayerAsk(game);
@@ -137,21 +137,21 @@ function executePlayerAsk(game){
     };
 }
 
-function receiveAction(action, amount = 0){
+function receiveAction(game, action, amount = 0){
     // Get amount if needed
     var amount = parseInt(amount);
     // Get current player
 
-    console.log("Table ID is: ", table.id);
-    console.log("active index is: ", table.activeIndex);
+    console.log("Table ID is: ", game.table.id);
+    console.log("active index is: ", game.table.activeIndex);
     console.log("Action is: ", action, " : ", amount);
-    var player = players[table.activeIndex]
+    var player = game.players[game.table.activeIndex]
     player.actedInStreet = true;
 
     // Handle player's desired action
     switch (action){
         case "bet":
-            applyBet(table.activeIndex, amount);
+            applyBet(game, game.table.activeIndex, amount);
             break
         case "check":
             // Essentially no change. Just move to next position
@@ -161,7 +161,7 @@ function receiveAction(action, amount = 0){
             player.handState = "FOLD"
             break
         case "call":
-            applyBet(table.activeIndex, Utils.getCallAmount(table, players, player));
+            applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
             break
         default:
             throw new Error(`Invalid player action: ${action}, ${amount}`)
@@ -170,27 +170,27 @@ function receiveAction(action, amount = 0){
     // Eval if a player won because others folded
     // Or if we need to advance the street
     // Or simply advance to the next player
-    if (winByFolding() == true){
+    if (winByFolding(game) == true){
         console.log("Winner due to folding ");
     }
-    else if (Utils.isStreetComplete(table, players) == true){
-        console.log("Completed street: ", table.street);
-        return advanceStreet();
+    else if (Utils.isStreetComplete(game.table, game.players) == true){
+        console.log("Completed street: ", game.table.street);
+        return advanceStreet(game);
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
         console.log("Advancing to next player");
-        table.activeIndex = Utils.nextValidPlayerIndex(players, table.activeIndex)
-        return executePlayerAsk();
+        game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.activeIndex)
+        return executePlayerAsk(game);
     }
 
 }
 
-function winByFolding(){
-    if (Utils.activePlayersCount(players) == 1){
+function winByFolding(game){
+    if (Utils.activePlayersCount(game.players) == 1){
         // Winning player, others folded
         // Really should check this after every action as game would immediately end
         console.log("only 1 valid player left!")
-        var winner = players.find(p => Utils.isValidPlayer(p));
+        var winner = game.players.find(p => Utils.isValidPlayer(p));
         console.log("Winner: ", winner.name);
         return true;
     }
@@ -201,41 +201,41 @@ function winByFolding(){
     }
 }
 
-function advanceStreet(){
+function advanceStreet(game){
     // Set table to next street
-    table.street = nextStreet(table.street);
-    console.log("New street is: ", table.street);
+    game.table.street = nextStreet(game.table.street);
+    console.log("New street is: ", game.table.street);
     // Players have not acted in this new street
-    players.forEach(function(player){
+    game.players.forEach(function(player){
         player.actedInStreet = false;
     })
     // Set starting player to 'left-of-dealer'
-    table.activeIndex = Utils.nextValidPlayerIndex(players, table.dealerPosition)
+    game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition)
     
-    switch(table.street){
+    switch(game.table.street){
         case 'flop':
-            table.addBurnedCard(deck.take());
-            table.addCommonCard(deck.take());
-            table.addCommonCard(deck.take());
-            table.addCommonCard(deck.take());
-            return executePlayerAsk();
+            game.table.addBurnedCard(game.deck.take());
+            game.table.addCommonCard(game.deck.take());
+            game.table.addCommonCard(game.deck.take());
+            game.table.addCommonCard(game.deck.take());
+            return executePlayerAsk(game);
             break;
         case 'turn':
-            table.addBurnedCard(deck.take());
-            table.addCommonCard(deck.take());
-            return executePlayerAsk();
+            game.table.addBurnedCard(game.deck.take());
+            game.table.addCommonCard(game.deck.take());
+            return executePlayerAsk(game);
             break;
         case 'river':
-            table.addBurnedCard(deck.take());
-            table.addCommonCard(deck.take());
-            return executePlayerAsk();
+            game.table.addBurnedCard(game.deck.take());
+            game.table.addCommonCard(game.deck.take());
+            return executePlayerAsk(game);
             break;
         case 'showdown':
             var handsByPlayer = [];
             var solutions = [];
-            players.forEach(p => {
+            game.players.forEach(p => {
                 if (p.handState == 'IN'){
-                    handsByPlayer.push({player: p, hand: p.hand.concat(table.commonCards)})
+                    handsByPlayer.push({player: p, hand: p.hand.concat(game.table.commonCards)})
                 }
             })
             
@@ -250,7 +250,7 @@ function advanceStreet(){
             var winningPlayer = handsByPlayer[winningPlayerIndex].player
             console.log("winner is ", winningPlayer.name);
             console.log("with hand ", winningHand[0].descr);
-            winningPlayer.wins(Utils.potForPlayer(table, winningPlayer));
+            winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
             return {
                 table: null,
                 player: null,
@@ -258,12 +258,12 @@ function advanceStreet(){
                 results: {
                     winner_name: winningPlayer.name,
                     winning_hand: winningHand[0].descr,
-                    amount: Utils.potForPlayer(table, winningPlayer)
+                    amount: Utils.potForPlayer(game.table, winningPlayer)
                 }
             }
             break;
         default:
-            throw new Error("Invalid street could not be matched: ", table.street);
+            throw new Error("Invalid street could not be matched: ", game.table.street);
     }
 }
 
