@@ -26,7 +26,7 @@ let Players = [
 ]
 
 function createNewPlayer(userData){
-  let newId = Players.length;
+  let newId = Players.length + 1;
   let firstName = userData["firstName"];
   let lastName = userData["lastName"];
   let newPlayer = Player(newId, firstName, lastName);
@@ -35,8 +35,9 @@ function createNewPlayer(userData){
 }
 
 function getOrCreateUser(existingUserData){
-  console.log("Made it here: ", existingUserData);
+  console.log("Get or create user: ", existingUserData);
   if (existingUserData && existingUserData["id"]){
+    console.log("we have the data");
     let player = Utils.getByAttributeValue(Players, "id", parseInt(existingUserData["id"]));
     console.log("Found player: ", player);
     if (!player){
@@ -50,15 +51,11 @@ function getOrCreateUser(existingUserData){
 }
 
 function getOrCreateGame(gameId){
-    console.log("madeitHere: ", gameId);
     let game = {}
     if (gameId){
       game = Utils.getByAttributeValue(Games, "id", parseInt(gameId));
     }
-    console.log("currently, game is: ", game);
     if (game == undefined ){
-        // No id given or game id didn't match
-        console.log("no game found. Time to create one!")
         game = newGame(gameConfig);
     }
     return game;
@@ -101,11 +98,12 @@ exports.validate = (req, session) => {
       (user) => (user.id === parseInt(session.user.id))
   );
   
-  console.log("Current user is: ", user);
   if (!user) {
       // return false will be 'unauthenticated'
       return { valid: false };
   }
+
+  console.log("Current user is: ", user.id, " ", user.firstName);
 
   // credentials object will now be available as req.auth.credentials
   
@@ -122,24 +120,23 @@ exports.validate = (req, session) => {
 
 exports.viewGame = (req, h) => {
   let game = Utils.getByAttributeValue(Games, "id", parseInt(req.params.gameId));
-  let player = getOrCreateUser(req.auth.credentials.user.id);
+  let player = getOrCreateUser({id: req.auth.credentials.user.id});
+  console.log("UserId: ", player.id, " is joining gameId: ", game.id);
   Orchestrator.addPlayerToGame(game, player);
   return h.view('game');
 }
 
 exports.joinGame = async (req, h) => {
-  console.log("Payload here is: ", req.payload);
-  console.log("Credentials here are: ", req.auth.credentials);
-
   let user = {};
+
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
-    user = getOrCreateUser(req.auth.credentials.user.id);
+    user = getOrCreateUser({id: req.auth.credentials.user.id});
   } else {
     user = getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName});
   }
 
   let game = getOrCreateGame(req.payload.gameId);
-  
+
   req.cookieAuth.set({user: {id: user.id}});
   return h.redirect('/game/' + game.id);
 }

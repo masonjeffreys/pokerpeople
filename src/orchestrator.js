@@ -31,8 +31,6 @@ function addPlayerToGame(game, player){
 }
 
 function nextHand(game){
-    console.log("Game " + game.id + " is: ")
-    console.log(game);
     setupHand(game);
     return executePlayerAsk(game);
 }
@@ -109,7 +107,7 @@ function executePlayerAsk(game){
     game.players.forEach(function(player){
         playersInfo.push({playerId: player.id,
             chips: player.chips,
-            name: player.name,
+            name: player.prettyName(),
             actedInStreet: player.actedInStreet,
             button: player.button,
             smallBlind:  player.smallBlind,
