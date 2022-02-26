@@ -17,17 +17,25 @@ function nextStreet(currentStreet){
 
 function addPlayerToGame(game, player){
     // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
-    game.players.push(player);
-    game.table.addPlayer(player);
+    let alreadyExists = game.players.find(
+        (player) => (player.id === parseInt(player.id))
+    );
+    if (alreadyExists){
+        console.log("player is already in the game");
+        return game.players;
+    } else {
+        game.players.push(player);
+        game.table.addPlayer(player);
 
-    // Give players chips
-    player.chips = game.table.startingChips;
+        // Give players chips
+        player.chips = game.table.startingChips;
 
-    // should Player know their position? Or Table? Or Game?
-    // Seat n players from position 0..n-1, add starting chips for each player
-    let index = game.players.length - 1;
-    player.tablePosition = index;
-    return game.players;
+        // should Player know their position? Or Table? Or Game?
+        // Seat n players from position 0..n-1, add starting chips for each player
+        let index = game.players.length - 1;
+        player.tablePosition = index;
+        return game.players;
+    }
 }
 
 function nextHand(game){

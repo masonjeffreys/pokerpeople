@@ -15,9 +15,18 @@ form.addEventListener('submit', function(e) {
     }
 });
 
+function addPlayerSocket(){
+  console.log("inside socket method client");
+  socket.emit('add player', {playerId: "15"});
+}
+
 socket.on('chat message', function(msg) {
     var item = document.createElement('li');
     item.textContent = msg;
     messages.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
 });
+
+socket.on('player added', function(msg){
+  console.log("player added");
+})

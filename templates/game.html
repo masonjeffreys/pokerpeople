@@ -1,39 +1,10 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-  <button id="addPlayerBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="addPlayer()">Add Player</button>
+  <button id="addPlayerBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="addPlayerSocket()">Add Player</button>
   <button id="nextHandBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Deal</button>
-  <div class="grid grid-cols-4 gap-4">
-      <div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
-          <div id="player1name" class="text-xl font-medium"></div>
-          <p id="player1chips" class="text-slate-500"></p>
-          <p id="player1hand" class="text-slate-500"></p>
-          <div id="player1button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player1smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player1bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      </div>
-      <div id="player2" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
-          <div id="player2name" class="text-xl font-medium"></div>
-          <p id="player2chips" class="text-slate-500"></p>
-          <p id="player2hand" class="text-slate-500"></p>
-          <div id="player2button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player2smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player2bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      </div>
-      <div id="player3" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
-          <div id="player3name" class="text-xl font-medium"></div>
-          <p id="player3chips" class="text-slate-500"></p>
-          <p id="player3hand" class="text-slate-500"></p>
-          <div id="player3button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player3smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player3bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      </div>
-      <div id="player4" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
-          <div id="player4name" class="text-xl font-medium"></div>
-          <p id="player4chips" class="text-slate-500"></p>
-          <p id="player4hand" class="text-slate-500"></p>
-          <div id="player4button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player4smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-          <div id="player4bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      </div>
+  <div id="playersContainer" class="grid grid-cols-4 gap-4">
+    {{#each playersInfo}}
+      {{this.name}} (Player Index: {{@index}})
+    {{/each}}
   </div>
   <div id="table" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center mt-4">
       <div id="street" class="">
@@ -46,6 +17,17 @@
       </ol>
       <div id="results">
       </div>
+  </div>
+  <div id="self" class="bg-blue">
+    <h4>Self</h4>
+    <div id="self" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
+      <div id="selfname" class="text-xl font-medium"></div>
+      <p id="selfchips" class="text-slate-500"></p>
+      <p id="selfhand" class="text-slate-500"></p>
+      <div id="selfbutton" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      <div id="selfsmallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      <div id="selfbigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+    </div>
   </div>
   <div class="bg-white mt-4">
       <div class="max-w-2xl mx-auto py-4 px-2 lg:max-w-7xl lg:px-8">
@@ -77,6 +59,8 @@
 <script src="/js/menus.js"></script>
 <script src="/js/socket.js"></script>
 <script>
+    // Eventually convert this to react probably. But iterating with pure JS is easy.
+    // Note the initial call to fetchAndUpdate('state') below to get current state of game when anyone joins
     function fetchAndUpdate(endpoint){
         var responseData;
         fetch('http://localhost:8080/api/' + window.location.pathname.split("/")[2] + '/' + endpoint, {credentials: "same-origin"})
@@ -147,9 +131,12 @@
     }
 
     function updateAllPlayers(playersInfo) {
+      let containerDiv = document.getElementById('playersContainer');
+      containerDiv.innerHTML = "";
       if (playersInfo){
         for (let i = 0; i < playersInfo.length; i++) {
           console.log("player ", i, " info is: ", playersInfo[i]);
+          containerDiv.appendChild(renderPlayer(playersInfo[i]));
             var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
             var chipLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "chips");
             var nameLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "name");
@@ -206,7 +193,7 @@
         showPots(table["pots"]);
         showCommonCards(table["commonCards"]);
       }
-    }
+    } 
 
     function showPots(potsArray){
       if (potsArray){
@@ -262,7 +249,7 @@
         fetchAndUpdate('nextHand');
     }
     function check() {
-        fetchAndUpdate('check');
+      fetchAndUpdate('check');
     }
     function bet() {
         var amount = document.getElementById("betAmount").value;
@@ -298,4 +285,49 @@
           return suitString;
       }
     }
+
+    function renderPlayer(player){
+      console.log("player to render ", player);
+      let playerDiv = document.createElement('div');
+      let playerName = document.createElement('div');
+      let playerButton = document.createElement('div');
+      let playerSmallBlind = document.createElement('div');
+      let playerBigBlind = document.createElement('div');
+      let playerChips = document.createElement('p');
+      let playerHand = document.createElement('p');
+
+      playerDiv.id = 'player' + player.playerId;
+      playerDiv.className = 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center';
+      playerName.id = 'player' + player.playerId + 'name';
+      playerName.className = 'text-xl font-medium';
+      playerChips.id = 'player' + player.playerId + 'chips';
+      playerChips.className = 'text-slate-500';
+      playerHand.id = 'player' + player.playerId + 'hand';
+      playerHand.className = 'text-slate-500';
+      playerButton.id = 'player' + player.playerId + 'Button';
+      playerButton.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
+      playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
+      playerSmallBlind.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
+      playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
+      playerBigBlind.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
+
+
+      // '<div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">'
+      //     <div id="player1name" class="text-xl font-medium"></div>
+      //     <p id="player1chips" class="text-slate-500"></p>
+      //     <p id="player1hand" class="text-slate-500"></p>
+      //     <div id="player1button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      //     <div id="player1smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      //     <div id="player1bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+      // </div>'
+      playerDiv.appendChild(playerName);
+      playerDiv.appendChild(playerChips);
+      playerDiv.appendChild(playerHand);
+      playerDiv.appendChild(playerButton);
+      playerDiv.appendChild(playerSmallBlind);
+      playerDiv.appendChild(playerBigBlind);
+      return playerDiv;
+    }
+
+    fetchAndUpdate('currentState');
 </script>

@@ -118,6 +118,24 @@ exports.validate = (req, session) => {
   }
 }
 
+exports.currentState = (req, h) => {
+  let game = Utils.getByAttributeValue(Games, "id", parseInt(req.params.gameId));
+  var playersInfo = [];
+  game.players.forEach(function(player){
+      playersInfo.push({playerId: player.id,
+          chips: player.chips,
+          name: player.prettyName(),
+          actedInStreet: player.actedInStreet,
+          button: player.button,
+          smallBlind:  player.smallBlind,
+          bigBlind: player.bigBlind,
+          gameState: player.gameState,
+          handState: player.handState
+      })
+  })
+  return {status: 'success', data: {playersInfo: playersInfo}};
+}
+
 exports.viewGame = (req, h) => {
   let game = Utils.getByAttributeValue(Games, "id", parseInt(req.params.gameId));
   let player = getOrCreateUser({id: req.auth.credentials.user.id});
@@ -145,7 +163,10 @@ exports.addPlayer = (req, h) => {
   // Set player at table for first time
   let game = Utils.getByAttributeValue(Games, "id", parseInt(req.params.gameId));
   let player = getOrCreateUser({firstName: "syx", lastName: "afdsn"})
-  return {status: 'success', players: Orchestrator.addPlayerToGame(game, player)};
+  
+  console.log("request is: ", req);
+  console.log("h is: ", h);
+  return {status: 'success', data: Orchestrator.addPlayerToGame(game, player)};
 };
 
 exports.bet = (req, h) => {

@@ -50,20 +50,7 @@ exports.init = async function () {
     await server.register(Vision);
     await server.register(Inert);
     await server.register(require('@hapi/cookie')); // use for login/logout
-
-    const io = Socket(server.listener)
-
-    io.on('connection', (socket) => {
-        let roomName = socket.handshake.query.gameId;
-        socket.join(roomName);
-        socket.on('chat message', (msg) => {
-            console.log("chat message received: ", msg, "from room: " + socket.handshake.query.gameId);
-            io.to(socket.handshake.query.gameId).emit('chat message', msg);
-        });
-        socket.on('disconnect', () => {
-          console.log('user disconnected');
-        });
-    });
+    await server.register(require('./src/realtime'));
 
     server.views({
         engines: {
@@ -150,6 +137,12 @@ exports.init = async function () {
         method: 'GET',
         path: '/game/{gameId}',
         handler: GameController.viewGame
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/api/{gameId}/currentState',
+        handler: GameController.currentState
     });
 
     server.route({
