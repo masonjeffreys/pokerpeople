@@ -63,16 +63,14 @@ function newGame(gameConfig,repo){
   table.startingChips = gameConfig["startingChips"];
 
   let game = {
-      id: Games.length + 1,
+      id: repo.length + 1,
       gameCode: "abc",
       players: [],
       table: table,
       deck: deck,
   }
 
-  if(repo){
-    repo.push(game);
-  }
+  repo.push(game);
 
   return game;
 }
