@@ -18,7 +18,7 @@ function nextStreet(currentStreet){
 function addPlayerToGame(game, player){
     // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
     let alreadyExists = game.players.find(
-        (player) => (player.id === parseInt(player.id))
+        (p) => (p.id === parseInt(player.id))
     );
     if (alreadyExists){
         console.log("player is already in the game");
@@ -110,9 +110,13 @@ function applyBet(game, playerIndex, amount){
 
 function executePlayerAsk(game){
     // Ask player for action
+    console.log("Getting player ask. Game is: ", game)
+    console.log("Players are: ", game.players);
+    console.log("Table active index is")
     var player = game.players[game.table.activeIndex];
     var actionOpts = Utils.getOptions(game.players, player, game.table)
     var playersInfo = [];
+    
     game.players.forEach(function(player){
         playersInfo.push({playerId: player.id,
             chips: player.chips,
@@ -141,6 +145,36 @@ function executePlayerAsk(game){
             hand: player.hand
         },
         actionOpts: actionOpts
+    };
+}
+
+function gameState(game){
+    // Remind all players of current hand table state
+    var playersInfo = [];
+    
+    game.players.forEach(function(player){
+        playersInfo.push({playerId: player.id,
+            chips: player.chips,
+            name: player.prettyName(),
+            actedInStreet: player.actedInStreet,
+            button: player.button,
+            smallBlind:  player.smallBlind,
+            bigBlind: player.bigBlind,
+            gameState: player.gameState,
+            handState: player.handState
+        })
+    })
+    
+    return {
+        table: {
+            id: game.table.id,
+            street: game.table.street,
+            highBet: Utils.playerMaxBet(game.table, game.players),
+            commonCards: game.table.commonCards,
+            pots: Utils.potTotals(game.table),
+            activeIndex: game.table.activeIndex
+        },
+        playersInfo: playersInfo
     };
 }
 
@@ -290,6 +324,7 @@ function advanceStreet(game){
 }
 
 module.exports.addPlayerToGame = addPlayerToGame;
+module.exports.gameState = gameState;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;

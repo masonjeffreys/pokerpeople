@@ -130,11 +130,11 @@ exports.init = async function () {
         handler: GameController.viewGame
     });
 
-    server.route({
-        method: 'GET',
-        path: '/api/{gameId}/addPlayer',
-        handler: GameController.addPlayer
-    });
+    // server.route({
+    //     method: 'GET',
+    //     path: '/api/{gameId}/addPlayer',
+    //     handler: GameController.addPlayer
+    // });
 
     server.route({
         method: 'GET',

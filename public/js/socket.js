@@ -40,8 +40,24 @@ socket.on('player added', function(msg){
 })
 
 socket.on('new state', function(state){
-  console.log("new state ", state);
-  if (state.playersInfo){
-    updateAllPlayers(state.playersInfo);
+  if (state){
+    if (state.playersInfo){
+      updateAllPlayers(state.playersInfo);
+    }
+    if (state.table){
+      updateTable(state.table);
+    }
+    if (state.table && state.playersInfo){
+      activatePlayer(state.playersInfo, state.table);
+    }
+    if (state.player){
+      updatePlayer(state.player);
+    }
+    if (state.results){
+      updateResults(state.results);
+    }
+    if (state.actionOpts){
+      updateActions(state.actionOpts);
+    }
   }
 })

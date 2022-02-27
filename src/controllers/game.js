@@ -48,6 +48,8 @@ function getOrCreateGame(gameId,repo){
     return game;
 }
 
+module.exports.getOrCreateUser = getOrCreateUser;
+
 function newGame(gameConfig,repo){
   // Create a deck and table
   // Set up 'initial start' params (things that aren't done on every hand) for table
@@ -106,15 +108,8 @@ exports.validate = (req, session) => {
   }
 }
 
-exports.viewGame = (req, h) => {
-  let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
-  let player = getOrCreateUser({id: req.auth.credentials.user.id},req.server.app.players);
-  console.log("UserId: ", player.id, " is joining gameId: ", game.id);
-  Orchestrator.addPlayerToGame(game, player);
-  return h.view('game');
-}
-
 exports.joinGame = async (req, h) => {
+  // The post request that creates a user and a game
   let user = {};
 
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
@@ -129,15 +124,17 @@ exports.joinGame = async (req, h) => {
   return h.redirect('/game/' + game.id);
 }
 
-exports.addPlayer = (req, h) => {
-  // Set player at table for first time
-  let game = Utils.getByAttributeValue(Games, "id", parseInt(req.params.gameId));
-  let player = getOrCreateUser({firstName: "syx", lastName: "afdsn"},req.server.app.players)
-  
-  console.log("request is: ", req);
-  console.log("h is: ", h);
-  return {status: 'success', data: Orchestrator.addPlayerToGame(game, player)};
-};
+exports.viewGame = (req, h) => {
+  // Retrieve player and game and add player to game
+  // Render main game play view
+  let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
+  let player = getOrCreateUser({id: req.auth.credentials.user.id},req.server.app.players);
+  console.log("UserId: ", player.id, " is joining gameId: ", game.id);
+  Orchestrator.addPlayerToGame(game, player);
+  return h.view('game');
+}
+
+/// TODO: Replace all the below with websockets calls
 
 exports.bet = (req, h) => {
   let game = getOrCreateGame(req.params.gameId,req.server.app.games);

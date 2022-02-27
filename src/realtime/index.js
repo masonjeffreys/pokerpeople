@@ -26,7 +26,7 @@ exports.plugin = {
 
             // Set up listeners for other room events
             // This will be player actions, player leaving, 
-            socket.on('add player', Handlers.getState);
+            socket.on('add player', Handlers.simulateAnotherPlayerJoining);
             socket.on('newMessage', Handlers.newMessage);
             socket.on('goodbye', Handlers.goodbye);
 

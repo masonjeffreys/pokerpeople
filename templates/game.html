@@ -215,7 +215,7 @@
       }
     }
     function activatePlayer(playersInfo, table){
-      if (playersInfo && table){
+      if (playersInfo && table && table["activeIndex"]){
         var activePlayerId = playersInfo[table["activeIndex"]]["playerId"];
         for (let i = 0; i < playersInfo.length; i++) {
             var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
