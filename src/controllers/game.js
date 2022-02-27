@@ -110,7 +110,8 @@ exports.currentState = (req, h) => {
   let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
   var playersInfo = [];
   game.players.forEach(function(player){
-      playersInfo.push({playerId: player.id,
+      playersInfo.push({
+          playerId: player.id,
           chips: player.chips,
           name: player.prettyName(),
           actedInStreet: player.actedInStreet,

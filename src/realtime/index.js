@@ -1,5 +1,5 @@
 var Handlers = require('./handlers');
-
+var Utils = require('../utils');
 
 
 exports.plugin = {
@@ -8,12 +8,13 @@ exports.plugin = {
     register: async function (server, options, next) {
         let cookieName = options.cookieName;
         let userString = options.userString;
+        let userIdString = options.userIdString;
 
         var io = require('socket.io')(server.listener);
 
         io.on('connection', function (socket) {
             console.log('New connection!');
-            socket.on('hello', Handlers.hello);
+            socket.on('add player', Handlers.getState);
             socket.on('newMessage', Handlers.newMessage);
             socket.on('goodbye', Handlers.goodbye);
         });
@@ -37,12 +38,13 @@ exports.plugin = {
 
                 // we have a userId, so let's get the user
                 // Then maybe we can add to server.auth?
-                let userId = state.states[cookieName][userString];
+                let userId = state.states[cookieName][userString][userIdString];
 
-                let user = {};
+                let user = Utils.getByAttributeValue(server.app.players, "id", parseInt(userId));
 
                 //if the userid is not set, we are not authenticated
                 if (!user) {
+                    console.log("user doesn't exist in websockets");
                     return next(new Error("Session is not authenticated. User not found."));
                 }
 

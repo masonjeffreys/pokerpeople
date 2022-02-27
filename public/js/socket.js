@@ -32,5 +32,5 @@ socket.on('chat message', function(msg) {
 });
 
 socket.on('player added', function(msg){
-  console.log("player added");
+  console.log("player added ", msg);
 })

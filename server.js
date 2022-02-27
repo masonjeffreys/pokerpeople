@@ -39,7 +39,7 @@ exports.init = async function () {
         options: {
             cookieName: 'sid-example',
             userString: 'user',
-            players: GameController.players 
+            userIdString: 'id'
         }
     });
 
