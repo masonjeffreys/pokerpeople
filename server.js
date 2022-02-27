@@ -6,28 +6,7 @@ const Vision = require('@hapi/vision');
 const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
-const Bcrypt = require('bcrypt');
-const Socket = require("socket.io");
-
-// const validate = async (request, username, password, h) => {
-//     //await console.log("Here!");
-//     console.log("username is: ", username);
-//     console.log("password is: ", password);
-//     const user = exampleUsers[username];
-//     if (username === 'help') {
-//         return { response: h.redirect('https://hapijs.com/help') };     // custom response
-//     }
-//     if (!user) {
-//         console.log("No user exists by username: ", username);
-//         return { credentials: null, isValid: false };
-//     }
-
-//     const isValid = await Bcrypt.compare(password, user.password);
-//     console.log("Is valid? ", isValid);
-//     const credentials = { id: user.id, name: user.name };
-
-//     return { isValid, credentials };
-// };
+const RealTime = require('./src/realtime');
 
 exports.init = async function () {
 
@@ -41,16 +20,28 @@ exports.init = async function () {
         }
     });
 
-    const context = {
+    let context = {
         title: 'Poker Pig',
-        message: 'Bring home the bacon for charity'
+        message: 'Bring home the bacon for charity',
     };
+
+    // Until we have a DB, we will store games and players here in memory
+    // get the right game/user, update state, and store again.
+    server.app.players = [];
+    server.app.games = [];
 
     await server.initialize();
     await server.register(Vision);
     await server.register(Inert);
     await server.register(require('@hapi/cookie')); // use for login/logout
-    await server.register(require('./src/realtime'));
+    await server.register({
+        plugin: RealTime,
+        options: {
+            cookieName: 'sid-example',
+            userString: 'user',
+            players: GameController.players 
+        }
+    });
 
     server.views({
         engines: {
