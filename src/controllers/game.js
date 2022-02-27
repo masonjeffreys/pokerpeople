@@ -107,7 +107,7 @@ exports.validate = (req, session) => {
 }
 
 exports.currentState = (req, h) => {
-  let game = Utils.getByAttributeValue(Games, "id", parseInt(req.params.gameId));
+  let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
   var playersInfo = [];
   game.players.forEach(function(player){
       playersInfo.push({playerId: player.id,
