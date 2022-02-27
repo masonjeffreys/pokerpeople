@@ -127,9 +127,9 @@ exports.init = async function () {
                     lastName: Joi.string().required(),
                     gameId: Joi.string().required()
                 }),
-            options: {
-                allowUnknown: true
-            }
+                options: {
+                    allowUnknown: true
+                }
             }
         }
     });
