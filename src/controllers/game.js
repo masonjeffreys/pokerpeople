@@ -113,12 +113,12 @@ exports.joinGame = async (req, h) => {
   let user = {};
 
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
-    user = getOrCreateUser({id: req.auth.credentials.user.id},req.server.app.players);
+    user = getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.players);
   } else {
     user = getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName},req.server.app.players);
   }
 
-  let game = getOrCreateGame(req.payload.gameId,req.server.app.games);
+  let game = getOrCreateGame(req.payload.gameId, req.server.app.games);
 
   req.cookieAuth.set({user: {id: user.id}});
   return h.redirect('/game/' + game.id);

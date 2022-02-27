@@ -16,6 +16,13 @@ exports.init = async function () {
         routes: {
             files: {
                 relativeTo: Path.join(__dirname, 'public')
+            },
+            validate: {
+                failAction: async (request, h, err) => {
+                    // During development, log and respond with the full error.
+                    console.error(err);
+                    throw err;
+                }
             }
         }
     });
@@ -114,13 +121,16 @@ exports.init = async function () {
             auth: {
                 mode: 'try'
             },
-            // validate: {
-            //     payload: Joi.object({
-            //         firstName: Joi.string().required(),
-            //         lastName: Joi.string().required(),
-            //         gameId: Joi.string().required()
-            //     })
-            // }
+            validate: {
+                payload: Joi.object({
+                    firstName: Joi.string().required(),
+                    lastName: Joi.string().required(),
+                    gameId: Joi.string().required()
+                }),
+            options: {
+                allowUnknown: true
+            }
+            }
         }
     });
 
@@ -129,12 +139,6 @@ exports.init = async function () {
         path: '/game/{gameId}',
         handler: GameController.viewGame
     });
-
-    // server.route({
-    //     method: 'GET',
-    //     path: '/api/{gameId}/addPlayer',
-    //     handler: GameController.addPlayer
-    // });
 
     server.route({
         method: 'GET',
