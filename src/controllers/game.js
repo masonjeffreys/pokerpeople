@@ -106,25 +106,6 @@ exports.validate = (req, session) => {
   }
 }
 
-exports.currentState = (req, h) => {
-  let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
-  var playersInfo = [];
-  game.players.forEach(function(player){
-      playersInfo.push({
-          playerId: player.id,
-          chips: player.chips,
-          name: player.prettyName(),
-          actedInStreet: player.actedInStreet,
-          button: player.button,
-          smallBlind:  player.smallBlind,
-          bigBlind: player.bigBlind,
-          gameState: player.gameState,
-          handState: player.handState
-      })
-  })
-  return {status: 'success', data: {playersInfo: playersInfo}};
-}
-
 exports.viewGame = (req, h) => {
   let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
   let player = getOrCreateUser({id: req.auth.credentials.user.id},req.server.app.players);

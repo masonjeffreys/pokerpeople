@@ -24,6 +24,10 @@ function addPlayerSocket(){
   socket.emit('add player', {playerId: "15"});
 }
 
+socket.on('new player', function(msg){
+  console.log('connected ', msg);
+})
+
 socket.on('chat message', function(msg) {
     var item = document.createElement('li');
     item.textContent = msg;
@@ -33,4 +37,11 @@ socket.on('chat message', function(msg) {
 
 socket.on('player added', function(msg){
   console.log("player added ", msg);
+})
+
+socket.on('new state', function(state){
+  console.log("new state ", state);
+  if (state.playersInfo){
+    updateAllPlayers(state.playersInfo);
+  }
 })

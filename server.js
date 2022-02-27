@@ -132,12 +132,6 @@ exports.init = async function () {
 
     server.route({
         method: 'GET',
-        path: '/api/{gameId}/currentState',
-        handler: GameController.currentState
-    });
-
-    server.route({
-        method: 'GET',
         path: '/api/{gameId}/addPlayer',
         handler: GameController.addPlayer
     });
