@@ -19,7 +19,8 @@ exports.validate = (req, session) => {
             user: {
                 id: user.id,
                 firstName: user.firstName,
-                lastName: user.lastName
+                lastName: user.lastName,
+                lastGameCode: user.lastGameCode
             }
         }
     }

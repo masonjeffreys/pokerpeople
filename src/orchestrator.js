@@ -29,6 +29,7 @@ function addPlayerToGame(game, player){
 
         // Give players chips
         player.chips = game.table.startingChips;
+        player.lastGameCode = game.gameCode;
 
         // should Player know their position? Or Table? Or Game?
         // Seat n players from position 0..n-1, add starting chips for each player

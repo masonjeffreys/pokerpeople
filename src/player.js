@@ -3,6 +3,7 @@ function Player(id, firstName, lastName) {
       var _socketId = null;
       var _firstName = firstName;
       var _lastName = lastName;
+      var _lastGameCode = null;
       var _hand = [];
       var _chips = 0;
       var _gameState = 'ACTIVE';
@@ -33,6 +34,15 @@ function Player(id, firstName, lastName) {
                   _socketId = value;
                   return this;
             },
+
+            get lastGameCode(){
+                  return _lastGameCode;
+            },
+
+            set lastGameCode(value){
+                  _lastGameCode = value;
+                  return this;
+            }
 
             get firstName(){
                   return _firstName;
