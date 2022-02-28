@@ -27,9 +27,20 @@ exports.plugin = {
             // Set up listeners for other room events
             // This will be player actions, player leaving, 
             socket.on('add player', Handlers.simulateAnotherPlayerJoining);
+
+            socket.on('next hand', Handlers.nextHand);
+            socket.on('check', Handlers.check);
+            socket.on('call', Handlers.call);
+            socket.on('fold', Handlers.fold);
+            socket.on('bet', Handlers.bet);
+
+            // Add chat functionality
             socket.on('newMessage', Handlers.newMessage);
+
+            // Do something on leaving table?
             socket.on('goodbye', Handlers.goodbye);
 
+            // Do something if socket disconnects
             socket.on("disconnect", (reason) => {
                 console.log("Socket disconnect reason: ", reason);
             });

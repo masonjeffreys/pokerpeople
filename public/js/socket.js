@@ -19,14 +19,32 @@ form.addEventListener('submit', function(e) {
     }
 });
 
-function addPlayerSocket(){
+function addPlayer(){
   console.log("inside socket method client");
-  socket.emit('add player', {playerId: "15"});
+  socket.emit('add player');
 }
 
 socket.on('new player', function(msg){
   console.log('connected ', msg);
 })
+
+function nextHand() {
+  socket.emit('next hand');
+}
+
+function check() {
+  socket.emit('check')
+}
+function bet() {
+    var amount = document.getElementById("betAmount").value;
+    socket.emit('bet',{amount: amount});
+}
+function call() {
+    socket.emit('call');
+}
+function fold() {
+    socket.emit('fold');
+}
 
 socket.on('chat message', function(msg) {
     var item = document.createElement('li');

@@ -1,6 +1,5 @@
 const Orchestrator = require('../orchestrator');
 const Utils = require('../utils');
-const Player = require('../player');
 const Table = require('../table');
 const Deck = require('../deck');
 const Repo = require('../repo');
@@ -46,32 +45,31 @@ exports.viewGame = (req, h) => {
   return h.view('game');
 }
 
-/// TODO: Replace all the below with websockets calls
+/// Replaced all the below with websockets calls
+// exports.bet = (req, h) => {
+//   let game = Repo.getGame(req.params.gameCode,req.server.app.games);
+//   return {status: 'success', data: Orchestrator.receiveAction(game, 'bet', req.query.amount)};
+// };
 
-exports.bet = (req, h) => {
-  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
-  return {status: 'success', data: Orchestrator.receiveAction(game, 'bet', req.query.amount)};
-};
+// exports.call = (req, h) => {
+//   let game = Repo.getGame(req.params.gameCode,req.server.app.games);
+//   return {status: 'success', data: Orchestrator.receiveAction(game, 'call')};
+// };
 
-exports.call = (req, h) => {
-  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
-  return {status: 'success', data: Orchestrator.receiveAction(game, 'call')};
-};
+// exports.check = (req, h) => {
+//   let game = Repo.getGame(req.params.gameCode,req.server.app.games);
+//   return {status: 'success', data: Orchestrator.receiveAction(game, 'check')};
+// };
 
-exports.check = (req, h) => {
-  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
-  return {status: 'success', data: Orchestrator.receiveAction(game, 'check')};
-};
+// exports.fold = (req, h) => {
+//   let game = Repo.getGame(req.params.gameCode,req.server.app.games);
+//   return {status: 'success', data: Orchestrator.receiveAction(game, 'fold')};
+// };
 
-exports.fold = (req, h) => {
-  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
-  return {status: 'success', data: Orchestrator.receiveAction(game, 'fold')};
-};
-
-exports.nextHand = (req, h) => {
-  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
-  return {status: 'success', data: Orchestrator.nextHand(game)};
-};
+// exports.nextHand = (req, h) => {
+//   let game = Repo.getGame(req.params.gameCode,req.server.app.games);
+//   return {status: 'success', data: Orchestrator.nextHand(game)};
+// };
 
 // /**
 //  * Get Dog by ID

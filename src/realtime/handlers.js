@@ -1,10 +1,14 @@
 const Orchestrator = require('../orchestrator');
 const Repo = require('../repo');
 
+function emitStateToRoom(game){
+    let state = Orchestrator.gameState(game);
+    module.parent.socket.server.in("game" + module.parent.socket.handshake.query.gameCode).emit('new state', state);
+}
+
 exports.hello = function () {
     this.emit('Hi back at you');
 };
-
 
 exports.newMessage = function (newMessage) {
     console.log('Got message', newMessage);
@@ -24,15 +28,38 @@ exports.simulateAnotherPlayerJoining = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
     let player = Repo.getOrCreateUser({firstName: "syx", lastName: "afdsn"}, module.parent.server.app.players)
     Orchestrator.addPlayerToGame(game, player);
-    let state = Orchestrator.gameState(game);
-    // Emit new state
-    module.parent.socket.server.in("game" + module.parent.socket.handshake.query.gameCode).emit('new state', state);
+    emitStateToRoom(game);
 };
 
 exports.nextHand = () => {
-    console.log("Next hand");
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.nextHand(game)
+    emitStateToRoom(game);
 }
 
+exports.bet = (msg) => {
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.receiveAction(game, 'bet', parseInt(msg))
+    emitStateToRoom(game);
+};
+
+exports.call = () => {
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.receiveAction(game, 'call')
+    emitStateToRoom(game);
+};
+
+exports.check = () => {
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.receiveAction(game, 'check')
+    emitStateToRoom(game);
+};
+
+exports.fold = () => {
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.receiveAction(game, 'fold')
+    emitStateToRoom(game);
+};
 
 exports.goodbye = function () {
 
