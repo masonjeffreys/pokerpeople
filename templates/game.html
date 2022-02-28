@@ -65,9 +65,9 @@
         .then(data => responseData = data)
         .then(() => {
             var data = responseData.data;
-            var gameId = responseData.gameId;
-            if (gameId) {
-              console.log("new game id: ", gameId, ". Add players!")
+            var gameCode = responseData.gameCode;
+            if (gameCode) {
+              console.log("new game code: ", gameCode, ". Add players!")
             }
             if (data){
               updateAllPlayers(data.playersInfo);

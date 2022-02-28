@@ -136,31 +136,31 @@ exports.init = async function () {
 
     // server.route({
     //     method: 'GET',
-    //     path: '/api/{gameId}/nextHand',
+    //     path: '/api/{gameCode}/nextHand',
     //     handler: GameController.nextHand
     // });
     
     // server.route({
     //     method: 'GET',
-    //     path: '/api/{gameId}/call',
+    //     path: '/api/{gameCode}/call',
     //     handler: GameController.call
     // });
     
     // server.route({
     //     method: 'GET',
-    //     path: '/api/{gameId}/bet',
+    //     path: '/api/{gameCode}/bet',
     //     handler: GameController.bet
     // });
     
     // server.route({
     //     method: 'GET',
-    //     path: '/api/{gameId}/fold',
+    //     path: '/api/{gameCode}/fold',
     //     handler: GameController.fold
     // });
     
     // server.route({
     //     method: 'GET',
-    //     path: '/api/{gameId}/check',
+    //     path: '/api/{gameCode}/check',
     //     handler: GameController.check
     // });
 

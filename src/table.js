@@ -1,5 +1,6 @@
 function Table(id) {
     var _id = id;
+    var _status = 'initial';
     var _players = [];
     var _startingChips = 0;
     var _dealerPosition = null;
@@ -22,6 +23,13 @@ function Table(id) {
     return Object.freeze({
         get id(){
             return _id;
+        },
+        get status(){
+            return _status;
+        },
+        set status(value){
+            _status = value;
+            return this;
         },
         get pots(){
             return _pots;
