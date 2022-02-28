@@ -41,6 +41,9 @@ exports.plugin = {
             socket.on('goodbye', Handlers.goodbye);
 
             // Do something if socket disconnects
+            socket.on("disconnecting", () => {
+                console.log("Disconnecting event ", socket.rooms); // the Set contains at least the socket ID
+            });
             socket.on("disconnect", (reason) => {
                 console.log("Socket disconnect reason: ", reason);
             });
@@ -95,7 +98,12 @@ exports.plugin = {
                     console.log("Socket: User is not in game.");
                     return next(new Error("Session is not authenticated. User not authorized for game."));
                 }
+
                 console.log("Authorized websocket connection user ", userId, " to game ", gameCode);
+
+                // Store socket ID with user for private events later
+                user.socketId = socket.id;
+
                 //everything is fine, session is authenticated and we accept the
                 //connection
 

@@ -40,7 +40,6 @@ function addPlayerToGame(game, player){
 
 function nextHand(game){
     setupHand(game);
-    return executePlayerAsk(game);
 }
 
 function setupHand(game){
@@ -108,76 +107,6 @@ function applyBet(game, playerIndex, amount){
     game.table.addBet(game.players[playerIndex].id, amount)
 }
 
-function executePlayerAsk(game){
-    // Ask player for action
-    console.log("Getting player ask. Game is: ", game)
-    console.log("Players are: ", game.players);
-    console.log("Table active index is")
-    var player = game.players[game.table.activeIndex];
-    var actionOpts = Utils.getOptions(game.players, player, game.table)
-    var playersInfo = [];
-    
-    game.players.forEach(function(player){
-        playersInfo.push({playerId: player.id,
-            chips: player.chips,
-            name: player.prettyName(),
-            actedInStreet: player.actedInStreet,
-            button: player.button,
-            smallBlind:  player.smallBlind,
-            bigBlind: player.bigBlind,
-            gameState: player.gameState,
-            handState: player.handState
-        })
-    })
-    // Remind player of current hand table state
-    return {
-        table: {
-            id: game.table.id,
-            street: game.table.street,
-            highBet: Utils.playerMaxBet(game.table, game.players),
-            commonCards: game.table.commonCards,
-            pots: Utils.potTotals(game.table),
-            activeIndex: game.table.activeIndex
-        },
-        playersInfo: playersInfo,
-        player: {
-            playerId: player.id,
-            hand: player.hand
-        },
-        actionOpts: actionOpts
-    };
-}
-
-function gameState(game){
-    // Remind all players of current hand table state
-    var playersInfo = [];
-    
-    game.players.forEach(function(player){
-        playersInfo.push({playerId: player.id,
-            chips: player.chips,
-            name: player.prettyName(),
-            actedInStreet: player.actedInStreet,
-            button: player.button,
-            smallBlind:  player.smallBlind,
-            bigBlind: player.bigBlind,
-            gameState: player.gameState,
-            handState: player.handState
-        })
-    })
-    
-    return {
-        table: {
-            id: game.table.id,
-            street: game.table.street,
-            highBet: Utils.playerMaxBet(game.table, game.players),
-            commonCards: game.table.commonCards,
-            pots: Utils.potTotals(game.table),
-            activeIndex: game.table.activeIndex
-        },
-        playersInfo: playersInfo
-    };
-}
-
 function receiveAction(game, action, amount = 0){
     // Get amount if needed
     var amount = parseInt(amount);
@@ -222,7 +151,6 @@ function receiveAction(game, action, amount = 0){
         // Move to next player (check earlier in function prevents players that are out from responding)
         console.log("Advancing to next player");
         game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.activeIndex)
-        return executePlayerAsk(game);
     }
 
 }
@@ -274,17 +202,14 @@ function advanceStreet(game){
             game.table.addCommonCard(game.deck.take());
             game.table.addCommonCard(game.deck.take());
             game.table.addCommonCard(game.deck.take());
-            return executePlayerAsk(game);
             break;
         case 'turn':
             game.table.addBurnedCard(game.deck.take());
             game.table.addCommonCard(game.deck.take());
-            return executePlayerAsk(game);
             break;
         case 'river':
             game.table.addBurnedCard(game.deck.take());
             game.table.addCommonCard(game.deck.take());
-            return executePlayerAsk(game);
             break;
         case 'showdown':
             var handsByPlayer = [];
@@ -324,7 +249,6 @@ function advanceStreet(game){
 }
 
 module.exports.addPlayerToGame = addPlayerToGame;
-module.exports.gameState = gameState;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;

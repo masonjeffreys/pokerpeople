@@ -57,29 +57,6 @@
 <script src="/js/socket.js"></script>
 <script>
     // Eventually convert this to react probably. But iterating with pure JS is easy.
-    // Note the initial call to fetchAndUpdate('state') below to get current state of game when anyone joins
-    function fetchAndUpdate(endpoint){
-        var responseData;
-        fetch('http://localhost:8080/api/' + window.location.pathname.split("/")[2] + '/' + endpoint, {credentials: "same-origin"})
-        .then(response => response.json())
-        .then(data => responseData = data)
-        .then(() => {
-            var data = responseData.data;
-            var gameCode = responseData.gameCode;
-            if (gameCode) {
-              console.log("new game code: ", gameCode, ". Add players!")
-            }
-            if (data){
-              updateAllPlayers(data.playersInfo);
-              updateTable(data.table);
-              updatePlayer(data.player);
-              activatePlayer(data.playersInfo, data.table);
-              updateResults(data.results);
-              updateActions(data.actionOpts);
-            }
-        });
-    }
-
     function updateActions(actionsOpts){
       console.log("actions are: ", actionsOpts);
       var callBtn = document.getElementById("callBtn");
@@ -132,7 +109,6 @@
       containerDiv.innerHTML = "";
       if (playersInfo){
         for (let i = 0; i < playersInfo.length; i++) {
-          console.log("player ", i, " info is: ", playersInfo[i]);
           containerDiv.appendChild(renderPlayer(playersInfo[i]));
             var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
             var chipLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "chips");
@@ -262,7 +238,6 @@
     }
 
     function renderPlayer(player){
-      console.log("player to render ", player);
       let playerDiv = document.createElement('div');
       let playerName = document.createElement('div');
       let playerButton = document.createElement('div');
@@ -279,7 +254,7 @@
       playerChips.className = 'text-slate-500';
       playerHand.id = 'player' + player.playerId + 'hand';
       playerHand.className = 'text-slate-500';
-      playerButton.id = 'player' + player.playerId + 'Button';
+      playerButton.id = 'player' + player.playerId + 'button';
       playerButton.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
       playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
       playerSmallBlind.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';

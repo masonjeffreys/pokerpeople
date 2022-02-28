@@ -1,9 +1,17 @@
 const Orchestrator = require('../orchestrator');
+const Decorator = require('../decorator');
 const Repo = require('../repo');
 
 function emitStateToRoom(game){
-    let state = Orchestrator.gameState(game);
-    module.parent.socket.server.in("game" + module.parent.socket.handshake.query.gameCode).emit('new state', state);
+    let state = Decorator.gameState(game);
+    module.parent.socket.server.in("game" + game.gameCode).emit('new state', state);
+}
+
+function emitPrivateStateToEachPlayer(game){
+    game.players.forEach(function(player){
+        let state = Decorator.privateState(game,player);
+        module.parent.socket.server.to(player.socketId).emit('private', state);
+    })
 }
 
 exports.hello = function () {
@@ -21,7 +29,7 @@ exports.getState = () => {
 
     // exposed module.server and module.socket on parent for use here.
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    return Orchestrator.gameState(game);
+    return Decorator.gameState(game);
 };
 
 exports.simulateAnotherPlayerJoining = () => {
@@ -33,8 +41,9 @@ exports.simulateAnotherPlayerJoining = () => {
 
 exports.nextHand = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.nextHand(game)
+    Orchestrator.nextHand(game);
     emitStateToRoom(game);
+    emitPrivateStateToEachPlayer(game);
 }
 
 exports.bet = (msg) => {

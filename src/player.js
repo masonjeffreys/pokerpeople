@@ -1,5 +1,6 @@
 function Player(id, firstName, lastName) {
       var _id = id;
+      var _socketId = null;
       var _firstName = firstName;
       var _lastName = lastName;
       var _hand = [];
@@ -22,6 +23,15 @@ function Player(id, firstName, lastName) {
 
             get id(){
                   return _id;
+            },
+
+            get socketId(){
+                  return _socketId;
+            },
+
+            set socketId(value){
+                  _socketId = value;
+                  return this;
             },
 
             get firstName(){

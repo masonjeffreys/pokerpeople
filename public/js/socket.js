@@ -53,11 +53,16 @@ socket.on('chat message', function(msg) {
     window.scrollTo(0, document.body.scrollHeight);
 });
 
+socket.on('private', function(msg){
+  console.log("Private message: ", msg);
+})
+
 socket.on('player added', function(msg){
   console.log("player added ", msg);
 })
 
 socket.on('new state', function(state){
+  console.log("New state: ", state);
   if (state){
     if (state.playersInfo){
       updateAllPlayers(state.playersInfo);

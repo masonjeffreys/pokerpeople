@@ -3,7 +3,7 @@ function Table(id) {
     var _status = 'initial';
     var _players = [];
     var _startingChips = 0;
-    var _dealerPosition = null;
+    var _dealerPosition = -1; // First player to join will deal after this advances 1 position at a time
     var _currentHighBet = 0;
     var _activeIndex = null;
     var _commonCards = [];
