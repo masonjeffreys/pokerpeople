@@ -7,8 +7,7 @@ const SUITS = [CLUBS, HEARTS, DIAMONDS, SPADES];
 
 const CARD_NAMES = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"];
 
-function Deck(id) {
-    var _id = id;
+function Deck() {
     var _cards = [];
 
     return Object.freeze({

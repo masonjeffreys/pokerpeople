@@ -1,6 +1,6 @@
-function Table(id) {
-    var _id = id;
+function Table() {
     var _status = 'initial';
+    var _numSeats = 10;
     var _players = [];
     var _startingChips = 0;
     var _dealerPosition = -1; // First player to join will deal after this advances 1 position at a time
@@ -23,6 +23,13 @@ function Table(id) {
     return Object.freeze({
         get id(){
             return _id;
+        },
+        get numSeats(){
+            return _numSeats;
+        },
+        set numSeats(value){
+            _numSeats = value;
+            return this;
         },
         get status(){
             return _status;

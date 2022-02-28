@@ -1,9 +1,12 @@
 function Player(id, firstName, lastName) {
+      // User level concerns (consistent no matter the game)
       var _id = id;
-      var _socketId = null;
       var _firstName = firstName;
       var _lastName = lastName;
       var _lastGameCode = null;
+
+      // Game level concerns (i.e. will change with each game)
+      var _socketId = null;
       var _hand = [];
       var _chips = 0;
       var _gameState = 'ACTIVE';
