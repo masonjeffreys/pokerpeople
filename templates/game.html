@@ -1,5 +1,6 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
   <button id="addPlayerBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="addPlayer()">Simulate 'Add Player'</button>
+  <button id="startGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startGame()">Start Game</button>
   <button id="nextHandBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Deal</button>
   <div id="playersContainer" class="grid grid-cols-4 gap-4">
   </div>
@@ -107,15 +108,17 @@
     function updateAllPlayers(playersInfo) {
       let containerDiv = document.getElementById('playersContainer');
       containerDiv.innerHTML = "";
+      // playersInfo will have all players in correct order, index 0 to players.length - 1.
       if (playersInfo){
         for (let i = 0; i < playersInfo.length; i++) {
           containerDiv.appendChild(renderPlayer(playersInfo[i]));
-            var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
-            var chipLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "chips");
-            var nameLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "name");
-            var buttonLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "button");
-            var smallBlindLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "smallBlind");
-            var bigBlindLabel = document.getElementById("player" + playersInfo[i]["playerId"] + "bigBlind");
+            let playerId = playersInfo[i]["playerId"];
+            var playerBox = document.getElementById("player" + playerId);
+            var chipLabel = document.getElementById("player" + playerId + "chips");
+            var nameLabel = document.getElementById("player" + playerId + "name");
+            var buttonLabel = document.getElementById("player" + playerId + "button");
+            var smallBlindLabel = document.getElementById("player" + playerId + "smallBlind");
+            var bigBlindLabel = document.getElementById("player" + playerId + "bigBlind");
             if (playerBox){
               if (playersInfo[i].handState == "FOLD" || playersInfo[i].gameState == "OUT"){
                 playerBox.classList.remove('bg-white');
@@ -188,14 +191,18 @@
       }
     }
     function activatePlayer(playersInfo, table){
-      if (playersInfo && table && table["activeIndex"]){
-        var activePlayerId = playersInfo[table["activeIndex"]]["playerId"];
+      console.log("activating player here");
+      console.log(playersInfo, table);
+      if (table["activeIndex"] !== 'undefined' && table["activeIndex"] != null){
+        var activePlayer = playersInfo[table["activeIndex"]];
+        console.log("activating player index: ", table["activeIndex"]);
+        console.log("matching player is: ", activePlayer);
         for (let i = 0; i < playersInfo.length; i++) {
             var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
             if (playerBox){
                 playerBox.classList.remove("ring-2");
                 playerBox.classList.remove("ring-green-300");
-                if (playersInfo[i]["playerId"] == activePlayerId) {
+                if (playersInfo[i]["playerId"] == activePlayer.playerId) {
                   playerBox.classList.add("ring-2");
                   playerBox.classList.add("ring-green-300");
                 }

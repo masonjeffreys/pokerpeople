@@ -22,6 +22,14 @@ exports.newMessage = function (newMessage) {
     console.log('Got message', newMessage);
 };
 
+exports.startGame = () => {
+    // Only called after players have sat at table.
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.startGame(game);
+    emitStateToRoom(game);
+    emitPrivateStateToEachPlayer(game);
+}
+
 exports.getState = () => {
     // 'this' refers to a socket (and emit for a room will not send back to the original requester)
     // 'this'.server refers to a server (and emit for a room will send back to all people)

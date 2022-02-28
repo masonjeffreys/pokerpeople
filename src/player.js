@@ -45,7 +45,7 @@ function Player(id, firstName, lastName) {
             set lastGameCode(value){
                   _lastGameCode = value;
                   return this;
-            }
+            },
 
             get firstName(){
                   return _firstName;

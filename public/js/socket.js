@@ -28,6 +28,11 @@ socket.on('new player', function(msg){
   console.log('connected ', msg);
 })
 
+function startGame(){
+  console.log("client requesting game start");
+  socket.emit('start game');
+}
+
 function nextHand() {
   socket.emit('next hand');
 }
@@ -71,6 +76,7 @@ socket.on('new state', function(state){
       updateTable(state.table);
     }
     if (state.table && state.playersInfo){
+      console.log("about to activate player");
       activatePlayer(state.playersInfo, state.table);
     }
     if (state.player){

@@ -42,13 +42,17 @@ function createUser(userData, repo){
     table.smallBlind = gameConfig["smallBlindAmount"];
     table.bigBlind = 2 * gameConfig["smallBlindAmount"];
     table.startingChips = gameConfig["startingChips"];
+
+    let testMode = gameConfig["testMode"] || false;
   
     let game = {
         id: repo.length + 1,
         gameCode: gameCode,
+        status: 'unstarted',
         players: [],
         table: table,
         deck: deck,
+        testMode: testMode
     }
   
     repo.push(game);

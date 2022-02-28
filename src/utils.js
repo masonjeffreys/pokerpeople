@@ -50,14 +50,14 @@ function playerCurrentBetInt(table, player){
     return total;
 }
 
-function showState(players, table){
-    console.log("Street is: ", table.street)
-    console.log("Table showing: ", table.commonCards)
-    console.log("Pot for all is ", mainPotTotal(table))
-    players.forEach(function(player){
-        console.log("Player ", player.id, " has: ", player.hand, " and current bet is: ", playerCurrentBet(table, player))
+function logState(game){
+    console.log("Street is: ", game.table.street)
+    console.log("Table showing: ", game.table.commonCards)
+    console.log("Pot for all is ", mainPotTotal(game.table))
+    game.players.forEach(function(player){
+        console.log("Player ", player.id, " has: ", player.hand, " and current bet is: ", playerCurrentBet(game.table, player))
     })
-    console.log("Current player index is: ", table.activeIndex)
+    console.log("Current player index is: ", game.table.activeIndex)
 }
 
 function dealOne(players, deck, startIndex){
@@ -232,7 +232,7 @@ module.exports.potForPlayer = potForPlayer;
 module.exports.mainPotTotal = mainPotTotal;
 module.exports.potTotals = potTotals;
 module.exports.getOptions = getOptions;
-module.exports.showState = showState;
+module.exports.logState = logState;
 module.exports.activePlayersCount = activePlayersCount;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.getCallAmount = getCallAmount;

@@ -1,7 +1,6 @@
 function Table() {
     var _status = 'initial';
     var _numSeats = 10;
-    var _players = [];
     var _startingChips = 0;
     var _dealerPosition = -1; // First player to join will deal after this advances 1 position at a time
     var _currentHighBet = 0;
@@ -21,9 +20,6 @@ function Table() {
 
 
     return Object.freeze({
-        get id(){
-            return _id;
-        },
         get numSeats(){
             return _numSeats;
         },
@@ -99,12 +95,6 @@ function Table() {
         },
         get burnedCards(){
             return _burnedCards;
-        },
-        get players(){
-            return _players;
-        },
-        addPlayer: function(player){
-            _players.push(player);
         },
         resetPots: function(){
             console.log("clearing all pots");

@@ -11,6 +11,19 @@ const Utils = require('./utils');
 // https://github.com/goldfire/pokersolver
 const Solver = require('pokersolver').Hand;
 
+function startGame(game){
+    console.log("game starting now");
+
+    // Check for at least two players?
+    if (game.players.length < 2){
+        throw "Less than two players. Tough to play!"
+    }
+
+    // Game state should advance to in-progress (from 'unstarted', 'in-progress', 'between-hands', 'complete')
+    game.status = 'in-progress';
+    setupHand(game);
+}
+
 function nextStreet(currentStreet){
     return STREETS[STREETS.indexOf(currentStreet) + 1] || STREETS[0]
 }
@@ -25,7 +38,6 @@ function addPlayerToGame(game, player){
         return game.players;
     } else {
         game.players.push(player);
-        game.table.addPlayer(player);
 
         // Give players chips
         player.chips = game.table.startingChips;
@@ -79,7 +91,7 @@ function setupHand(game){
     game.deck.init().shuffle();
     Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
     Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
-    Utils.showState(game.players, game.table)
+    Utils.logState(game)
 }
 
 function makeBlindBets(game){
@@ -143,6 +155,7 @@ function receiveAction(game, action, amount = 0){
     // Or simply advance to the next player
     if (winByFolding(game) == true){
         console.log("Winner due to folding ");
+        game.status = 'complete';
         return getWinDetailsByFold(game);
     }
     else if (Utils.isStreetComplete(game.table, game.players) == true){
@@ -233,10 +246,9 @@ function advanceStreet(game){
             console.log("winner is ", winningPlayer.name);
             console.log("with hand ", winningHand[0].descr);
             winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
+            game.status = 'complete';
             return {
                 table: null,
-                player: null,
-                options: null,
                 results: {
                     winner_name: winningPlayer.name,
                     winning_hand: winningHand[0].descr,
@@ -250,6 +262,7 @@ function advanceStreet(game){
 }
 
 module.exports.addPlayerToGame = addPlayerToGame;
+module.exports.startGame = startGame;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;

@@ -18,6 +18,11 @@ function gameState(game){
     })
     
     return {
+        game: {
+            status: game.status,
+            testMode: game.testMode,
+            gameCode: game.gameCode
+        },
         table: {
             id: game.table.id,
             street: game.table.street,
@@ -39,8 +44,8 @@ function privateState(game, player){
     let activeIndex = game.table.activeIndex;
     let actionOpts = [];
 
-    if (activeIndex){
-        if ( game.table.players[activeIndex].id == player.id ){
+    if (activeIndex !== 'undefined' && activeIndex != null){
+        if ( game.players[activeIndex].id == player.id ){
             actionOpts = Utils.getOptions(game.players, player, game.table);
         }
     }
