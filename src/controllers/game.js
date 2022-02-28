@@ -21,9 +21,9 @@ exports.joinGame = async (req, h) => {
   let gameCode = req.payload.gameCode;
 
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
-    user = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.players);
+    user = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
   } else {
-    user = Repo.getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName},req.server.app.players);
+    user = Repo.getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName},req.server.app.users);
   }
 
   let game = Repo.getGame(gameCode, req.server.app.games);
@@ -39,7 +39,7 @@ exports.viewGame = (req, h) => {
   // Retrieve player and game and add player to game
   // Render main game play view
   let game = Utils.getByAttributeValue(req.server.app.games, "gameCode", req.params.gameCode);
-  let player = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.players);
+  let player = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
   console.log("UserId: ", player.id, " is joining gameId: ", game.id);
   Orchestrator.addPlayerToGame(game, player);
   return h.view('game');

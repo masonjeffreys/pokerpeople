@@ -72,7 +72,7 @@ exports.plugin = {
                 // we have a userId, so let's get the user
                 // Then maybe we can add to server.auth?
                 let userId = state.states[cookieName][userString][userIdString];
-                let user = Utils.getByAttributeValue(server.app.players, "id", parseInt(userId));
+                let user = Utils.getByAttributeValue(server.app.users, "id", parseInt(userId));
 
                 //if the userid is not set, we are not authenticated
                 if (!user) {

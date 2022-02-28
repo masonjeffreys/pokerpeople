@@ -42,7 +42,7 @@ exports.getState = () => {
 
 exports.simulateAnotherPlayerJoining = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    let player = Repo.getOrCreateUser({firstName: "syx", lastName: "afdsn"}, module.parent.server.app.players)
+    let player = Repo.getOrCreateUser({firstName: "syx", lastName: "afdsn"}, module.parent.server.app.users)
     Orchestrator.addPlayerToGame(game, player);
     emitStateToRoom(game);
 };

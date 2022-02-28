@@ -35,7 +35,7 @@ exports.init = async function () {
 
     // Until we have a DB, we will store games and players here in memory
     // get the right game/user, update state, and store again.
-    server.app.players = [];
+    server.app.users = [];
     server.app.games = [];
 
     await server.initialize();
