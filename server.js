@@ -6,6 +6,7 @@ const Vision = require('@hapi/vision');
 const Inert = require('@hapi/inert');
 const Path = require('path');
 const GameController =  require('./src/controllers/game');
+const AuthController = require('./src/controllers/auth');
 const RealTime = require('./src/realtime');
 
 exports.init = async function () {
@@ -76,7 +77,7 @@ exports.init = async function () {
         // session information, and sets that information as credentials on the request
 
         // Function is only called if session information exists
-        validateFunc: GameController.validate
+        validateFunc: AuthController.validate
     });
 
     server.auth.default('session');
@@ -87,9 +88,7 @@ exports.init = async function () {
         options: {
             auth: false
         },
-        handler: (req, h) => {
-            return 'Cannot access this without logging in!<br><a href="/">Home</a>';
-        }
+        handler: AuthController.invalid
     });
     
     server.route({
@@ -100,16 +99,7 @@ exports.init = async function () {
                 mode: 'try' // We'll use the validateFunc to set user info if session/cookie data exists
             }
         },
-        handler: (req, h) => {
-            console.log("Credentials are: ", req.auth.credentials);
-            let user = {}
-            if (req.auth.credentials && req.auth.credentials.user){
-                user = req.auth.credentials.user;
-            }
-            return h.view('home', {
-                user: user
-            });
-        }
+        handler: AuthController.fillFormHomePage
     });
 
     server.route({
@@ -125,7 +115,7 @@ exports.init = async function () {
                 payload: Joi.object({
                     firstName: Joi.string().required(),
                     lastName: Joi.string().required(),
-                    gameId: Joi.string().required()
+                    gameCode: Joi.string().required()
                 }),
                 options: {
                     allowUnknown: true
@@ -136,39 +126,43 @@ exports.init = async function () {
 
     server.route({
         method: 'GET',
-        path: '/game/{gameId}',
+        path: '/game/{gameCode}',
         handler: GameController.viewGame
     });
 
-    server.route({
-        method: 'GET',
-        path: '/api/{gameId}/nextHand',
-        handler: GameController.nextHand
-    });
+
+    /// Old routes before websockets handled everything
+    //////
+
+    // server.route({
+    //     method: 'GET',
+    //     path: '/api/{gameId}/nextHand',
+    //     handler: GameController.nextHand
+    // });
     
-    server.route({
-        method: 'GET',
-        path: '/api/{gameId}/call',
-        handler: GameController.call
-    });
+    // server.route({
+    //     method: 'GET',
+    //     path: '/api/{gameId}/call',
+    //     handler: GameController.call
+    // });
     
-    server.route({
-        method: 'GET',
-        path: '/api/{gameId}/bet',
-        handler: GameController.bet
-    });
+    // server.route({
+    //     method: 'GET',
+    //     path: '/api/{gameId}/bet',
+    //     handler: GameController.bet
+    // });
     
-    server.route({
-        method: 'GET',
-        path: '/api/{gameId}/fold',
-        handler: GameController.fold
-    });
+    // server.route({
+    //     method: 'GET',
+    //     path: '/api/{gameId}/fold',
+    //     handler: GameController.fold
+    // });
     
-    server.route({
-        method: 'GET',
-        path: '/api/{gameId}/check',
-        handler: GameController.check
-    });
+    // server.route({
+    //     method: 'GET',
+    //     path: '/api/{gameId}/check',
+    //     handler: GameController.check
+    // });
 
     ///////////////
     // Begin routes for static files and error handling

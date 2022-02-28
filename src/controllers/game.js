@@ -3,7 +3,7 @@ const Utils = require('../utils');
 const Player = require('../player');
 const Table = require('../table');
 const Deck = require('../deck');
-const { server } = require('@hapi/hapi');
+const Repo = require('../repo');
 
 // Things that might be different from Game to Game
 const gameConfig = {
@@ -12,123 +12,35 @@ const gameConfig = {
     testMode: false
 }
 
-function createNewPlayer(userData,repo){
-  let newId = repo.length + 1;
-  let firstName = userData["firstName"];
-  let lastName = userData["lastName"];
-  let newPlayer = Player(newId, firstName, lastName);
-  repo.push(Player(newId, firstName, lastName));
-  return newPlayer;
-}
-
-function getOrCreateUser(existingUserData,repo){
-  console.log("Get or create user: ", existingUserData);
-  if (existingUserData && existingUserData["id"]){
-    console.log("we have the data");
-    let player = Utils.getByAttributeValue(repo,"id", parseInt(existingUserData["id"]));
-    console.log("Found player: ", player);
-    if (!player){
-      return createNewPlayer(existingUserData,repo);
-    } else {
-      return player;
-    }
-  } else {
-    return createNewPlayer(existingUserData,repo);
-  }
-}
-
-function getOrCreateGame(gameId,repo){
-    let game = {}
-    if (gameId){
-      game = Utils.getByAttributeValue(repo, "id", parseInt(gameId));
-    }
-    if (game === undefined ){
-        game = newGame(gameConfig,repo);
-    }
-    return game;
-}
-
-module.exports.getOrCreateUser = getOrCreateUser;
-
-function newGame(gameConfig,repo){
-  // Create a deck and table
-  // Set up 'initial start' params (things that aren't done on every hand) for table
-  // Set table blind levels
-  // Return game object
-  console.log("creating new game");
-  let deck = Deck(1);
-  let table = Table(1);
-
-  table.dealerPosition = -1; // We will advance this to 0 when the hand is setup
-  table.smallBlind = gameConfig["smallBlindAmount"];
-  table.bigBlind = 2 * gameConfig["smallBlindAmount"];
-  table.startingChips = gameConfig["startingChips"];
-
-  let game = {
-      id: repo.length + 1,
-      gameCode: "abc",
-      players: [],
-      table: table,
-      deck: deck,
-  }
-
-  repo.push(game);
-
-  return game;
-}
-
 /**
  * Poker Endpoints
  */
 
-exports.validate = (req, session) => {
-  console.log("In validateFunc(). Session user id is: ", session.user.id);
-
-  const user = req.server.app.players.find(
-      (user) => (user.id === parseInt(session.user.id))
-  );
-  
-  if (!user) {
-      // return false will be 'unauthenticated'
-      return { valid: false };
-  }
-
-  console.log("Current user is: ", user.id, " ", user.firstName);
-
-  // credentials object will now be available as req.auth.credentials
-  
-  return { valid: true,
-      credentials: {
-          user: {
-              id: user.id,
-              firstName: user.firstName,
-              lastName: user.lastName
-          }
-      }
-  }
-}
-
 exports.joinGame = async (req, h) => {
   // The post request that creates a user and a game
   let user = {};
+  let gameCode = req.payload.gameCode;
 
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
-    user = getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.players);
+    user = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.players);
   } else {
-    user = getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName},req.server.app.players);
+    user = Repo.getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName},req.server.app.players);
   }
 
-  let game = getOrCreateGame(req.payload.gameId, req.server.app.games);
+  let game = Repo.getGame(gameCode, req.server.app.games);
+  if(!game){
+    game = Repo.createGame(Deck(1), Table(1), gameConfig, gameCode, req.server.app.games);
+  }
 
   req.cookieAuth.set({user: {id: user.id}});
-  return h.redirect('/game/' + game.id);
+  return h.redirect('/game/' + game.gameCode);
 }
 
 exports.viewGame = (req, h) => {
   // Retrieve player and game and add player to game
   // Render main game play view
-  let game = Utils.getByAttributeValue(req.server.app.games, "id", parseInt(req.params.gameId));
-  let player = getOrCreateUser({id: req.auth.credentials.user.id},req.server.app.players);
+  let game = Utils.getByAttributeValue(req.server.app.games, "gameCode", req.params.gameCode);
+  let player = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.players);
   console.log("UserId: ", player.id, " is joining gameId: ", game.id);
   Orchestrator.addPlayerToGame(game, player);
   return h.view('game');
@@ -137,27 +49,27 @@ exports.viewGame = (req, h) => {
 /// TODO: Replace all the below with websockets calls
 
 exports.bet = (req, h) => {
-  let game = getOrCreateGame(req.params.gameId,req.server.app.games);
+  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
   return {status: 'success', data: Orchestrator.receiveAction(game, 'bet', req.query.amount)};
 };
 
 exports.call = (req, h) => {
-  let game = getOrCreateGame(req.params.gameId,req.server.app.games);
+  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
   return {status: 'success', data: Orchestrator.receiveAction(game, 'call')};
 };
 
 exports.check = (req, h) => {
-  let game = getOrCreateGame(req.params.gameId,req.server.app.games);
+  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
   return {status: 'success', data: Orchestrator.receiveAction(game, 'check')};
 };
 
 exports.fold = (req, h) => {
-  let game = getOrCreateGame(req.params.gameId,req.server.app.games);
+  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
   return {status: 'success', data: Orchestrator.receiveAction(game, 'fold')};
 };
 
 exports.nextHand = (req, h) => {
-  let game = getOrCreateGame(req.params.gameId,req.server.app.games);
+  let game = Repo.getGame(req.params.gameCode,req.server.app.games);
   return {status: 'success', data: Orchestrator.nextHand(game)};
 };
 

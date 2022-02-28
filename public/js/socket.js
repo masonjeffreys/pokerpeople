@@ -3,7 +3,7 @@ var input = document.getElementById('input');
 
 const socket = io({
     query: {
-      gameId: window.location.pathname.split("/")[2]
+      gameCode: window.location.pathname.split("/")[2]
     },
     auth: {
       token: "abc"

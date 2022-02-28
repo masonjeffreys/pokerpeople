@@ -1,6 +1,7 @@
 const Utils = require('../utils');
 const Orchestrator = require('../orchestrator');
-const Game = require('../controllers/game');
+const GameController = require('../controllers/game');
+const AuthController = require('../controllers/auth');
 
 
 exports.hello = function () {
@@ -20,13 +21,13 @@ exports.getState = () => {
 
     // exposed module.server and module.socket on parent for use here.
 
-    let game = Utils.getByAttributeValue(module.parent.server.app.games, "id", parseInt(module.parent.socket.handshake.query.gameId));
+    let game = Utils.getByAttributeValue(module.parent.server.app.games, "gameCode", module.parent.socket.handshake.query.gameCode);
     return Orchestrator.gameState(game);
 };
 
 exports.simulateAnotherPlayerJoining = () => {
-    let game = Utils.getByAttributeValue(module.parent.server.app.games, "id", parseInt(module.parent.socket.handshake.query.gameId));
-    let player = Game.getOrCreateUser({firstName: "syx", lastName: "afdsn"}, module.parent.server.app.players)
+    let game = Utils.getByAttributeValue(module.parent.server.app.games, "gameCode", parseInt(module.parent.socket.handshake.query.gameCode));
+    let player = AuthController.getOrCreateUser({firstName: "syx", lastName: "afdsn"}, module.parent.server.app.players)
     Orchestrator.addPlayerToGame(game, player);
 
     let state = Orchestrator.gameState(game);

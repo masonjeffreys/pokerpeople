@@ -20,9 +20,9 @@ exports.plugin = {
 
             // As soon as someone joins, broadcast new game state to everyone
             // Everyone needs new state since we have a new player
-            let gameId = socket.handshake.query.gameId;
-            socket.join("game" + gameId);
-            socket.server.to("game" + gameId).emit('new state', Handlers.getState());
+            let gameCode = socket.handshake.query.gameCode;
+            socket.join("game" + gameCode);
+            socket.server.to("game" + gameCode).emit('new state', Handlers.getState());
 
             // Set up listeners for other room events
             // This will be player actions, player leaving, 
@@ -66,8 +66,8 @@ exports.plugin = {
                     return next(new Error("Session is not authenticated. User not found."));
                 }
 
-                let gameId = socket.handshake.query.gameId;
-                let game = Utils.getByAttributeValue(server.app.games, "id", parseInt(gameId));
+                let gameCode = socket.handshake.query.gameCode;
+                let game = Utils.getByAttributeValue(server.app.games, "gameCode", gameCode);
 
                 //if the game is not found, we are not authenticated
                 if (!game) {
@@ -84,7 +84,7 @@ exports.plugin = {
                     console.log("Socket: User is not in game.");
                     return next(new Error("Session is not authenticated. User not authorized for game."));
                 }
-                console.log("Authorized websocket connection user ", userId, " to game ", gameId);
+                console.log("Authorized websocket connection user ", userId, " to game ", gameCode);
                 //everything is fine, session is authenticated and we accept the
                 //connection
 
