@@ -1,6 +1,14 @@
 const Utils = require('./utils');
 
-function gameState(game){
+function privateState(game, player){
+    // Send player cards to them indvidually
+    // Also send actions to that player
+
+    // gamePlayer is the player inside the game that contains the hand
+    let gamePlayer = Utils.getByAttributeValue(game.players, "id", parseInt(player.id));
+    let activeIndex = game.table.activeIndex;
+    let actionOpts = [];
+
     // Remind all players of current hand table state
     var playersInfo = [];
     
@@ -16,6 +24,17 @@ function gameState(game){
             handState: player.handState
         })
     })
+
+    if (game.testMode){
+        // always send options in test mode (so that 1 machine can play for all)
+        actionOpts = Utils.getOptions(game.players, player, game.table);
+    }
+    else if (activeIndex !== 'undefined' && activeIndex != null){
+        if ( game.players[activeIndex].id == player.id ){
+            // This is the active player. Add in options for actions they can take
+            actionOpts = Utils.getOptions(game.players, player, game.table);
+        }
+    }
     
     return {
         game: {
@@ -31,33 +50,13 @@ function gameState(game){
             pots: Utils.potTotals(game.table),
             activeIndex: game.table.activeIndex
         },
-        playersInfo: playersInfo
-    };
-}
-
-function privateState(game, player){
-    // Send player cards to them indvidually
-    // Also send actions to that player
-
-    // gamePlayer is the player inside the game that contains the hand
-    let gamePlayer = Utils.getByAttributeValue(game.players, "id", parseInt(player.id));
-    let activeIndex = game.table.activeIndex;
-    let actionOpts = [];
-
-    if (activeIndex !== 'undefined' && activeIndex != null){
-        if ( game.players[activeIndex].id == player.id ){
-            actionOpts = Utils.getOptions(game.players, player, game.table);
-        }
-    }
-    
-    return {
+        playersInfo: playersInfo,
         player: {
-            id: gamePlayer.id,
+            playerId: gamePlayer.id,
             hand: gamePlayer.hand
         },
         actionOpts: actionOpts
     }
 }
 
-module.exports.gameState = gameState;
 module.exports.privateState = privateState;

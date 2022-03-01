@@ -185,8 +185,12 @@
     function updatePlayer(player){
       if (player){
         var handLabel = document.getElementById("player" + player["playerId"] + "hand"); 
+        var handString = ""
         if (handLabel){
-            handLabel.innerHTML = renderCard(player["hand"][0]) + renderCard(player["hand"][1]);
+          for (let i = 0; i < player["hand"].length; i++) {
+            handString = handString + renderCard(player["hand"][i]);
+          }
+          handLabel.innerHTML = handString;
         }
       }
     }

@@ -1,7 +1,7 @@
 exports.validate = (req, session) => {
     console.log("In validateFunc(). Session user id is: ", session.user.id);
   
-    const user = req.server.app.players.find(
+    const user = req.server.app.users.find(
         (user) => (user.id === parseInt(session.user.id))
     );
     

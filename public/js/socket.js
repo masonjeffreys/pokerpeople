@@ -58,16 +58,8 @@ socket.on('chat message', function(msg) {
     window.scrollTo(0, document.body.scrollHeight);
 });
 
-socket.on('private', function(msg){
-  console.log("Private message: ", msg);
-})
-
-socket.on('player added', function(msg){
-  console.log("player added ", msg);
-})
-
-socket.on('new state', function(state){
-  console.log("New state: ", state);
+socket.on('private', function(state){
+  console.log("Private message: ", state);
   if (state){
     if (state.playersInfo){
       updateAllPlayers(state.playersInfo);
@@ -79,14 +71,18 @@ socket.on('new state', function(state){
       console.log("about to activate player");
       activatePlayer(state.playersInfo, state.table);
     }
-    if (state.player){
-      updatePlayer(state.player);
-    }
     if (state.results){
       updateResults(state.results);
+    }
+    if (state.player){
+      updatePlayer(state.player);
     }
     if (state.actionOpts){
       updateActions(state.actionOpts);
     }
   }
+})
+
+socket.on('player added', function(msg){
+  console.log("player added ", msg);
 })
