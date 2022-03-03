@@ -83,6 +83,8 @@ function setupHand(game){
     game.table.minRaise = game.table.bigBlind;
     game.table.resetPots();
     game.table.clearCommonCards();
+    // Reset results
+    game.results = null;
 
     // BetTheBlinds
     makeBlindBets(game);
@@ -125,7 +127,6 @@ function receiveAction(game, action, amount = 0){
     var amount = parseInt(amount);
     // Get current player
 
-    console.log("Table ID is: ", game.table.id);
     console.log("active index is: ", game.table.activeIndex);
     console.log("Action is: ", action, " : ", amount);
     var player = game.players[game.table.activeIndex]
@@ -156,11 +157,11 @@ function receiveAction(game, action, amount = 0){
     if (winByFolding(game) == true){
         console.log("Winner due to folding ");
         game.status = 'complete';
-        return getWinDetailsByFold(game);
+        getWinDetailsByFold(game);
     }
     else if (Utils.isStreetComplete(game.table, game.players) == true){
         console.log("Completed street: ", game.table.street);
-        return advanceStreet(game);
+        advanceStreet(game);
     } else {
         // Move to next player (check earlier in function prevents players that are out from responding)
         console.log("Advancing to next player");
@@ -173,16 +174,11 @@ function getWinDetailsByFold(game){
     var winningPlayer = game.players.find(p => Utils.isValidPlayer(p));
     console.log("Winner: ", winningPlayer.prettyName());
     winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
-    return {
-        table: null,
-        player: null,
-        options: null,
-        results: {
-            winner_name: winningPlayer.prettyName(),
-            winning_hand: null,
-            amount: Utils.potForPlayer(game.table, winningPlayer)
-        }
-    };
+    game.results = {
+        winner_name: winningPlayer.prettyName(),
+        winning_hand: null,
+        amount: Utils.potForPlayer(game.table, winningPlayer)
+    }
 }
 
 function winByFolding(game){
@@ -243,17 +239,14 @@ function advanceStreet(game){
             console.log("winning hand is: ", winningHand);
             var winningPlayerIndex = winningHand[0].index;
             var winningPlayer = handsByPlayer[winningPlayerIndex].player
-            console.log("winner is ", winningPlayer.name);
+            console.log("winner is ", winningPlayer.prettyName());
             console.log("with hand ", winningHand[0].descr);
             winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
             game.status = 'complete';
-            return {
-                table: null,
-                results: {
-                    winner_name: winningPlayer.name,
-                    winning_hand: winningHand[0].descr,
-                    amount: Utils.potForPlayer(game.table, winningPlayer)
-                }
+            game.results = {
+                winner_name: winningPlayer.prettyName(),
+                winning_hand: winningHand[0].descr,
+                amount: Utils.potForPlayer(game.table, winningPlayer)
             }
             break;
         default:

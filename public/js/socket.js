@@ -74,9 +74,6 @@ socket.on('private', function(state){
     if (state.results){
       updateResults(state.results);
     }
-    if (state.player){
-      updatePlayer(state.player);
-    }
     if (state.actionOpts){
       updateActions(state.actionOpts);
     }

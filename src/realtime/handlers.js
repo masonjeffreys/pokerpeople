@@ -49,7 +49,7 @@ exports.nextHand = () => {
 
 exports.bet = (msg) => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveAction(game, 'bet', parseInt(msg))
+    Orchestrator.receiveAction(game, 'bet', parseInt(msg.amount))
     emitPrivateStateToEachPlayer(game);
 };
 

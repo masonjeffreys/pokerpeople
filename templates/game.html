@@ -119,6 +119,8 @@
             var buttonLabel = document.getElementById("player" + playerId + "button");
             var smallBlindLabel = document.getElementById("player" + playerId + "smallBlind");
             var bigBlindLabel = document.getElementById("player" + playerId + "bigBlind");
+            var handLabel = document.getElementById("player" + playerId + "hand"); 
+
             if (playerBox){
               if (playersInfo[i].handState == "FOLD" || playersInfo[i].gameState == "OUT"){
                 playerBox.classList.remove('bg-white');
@@ -157,7 +159,13 @@
                 bigBlindLabel.innerHTML = "";
               }
             }
-
+            if (handLabel){
+              var handString = ""
+              for (let j = 0; j < playersInfo[j]["hand"].length; j++) {
+                handString = handString + renderCard(playersInfo[i]["hand"][j]);
+              }
+              handLabel.innerHTML = handString;
+            }
         }
       }
     }
@@ -182,18 +190,6 @@
         }
       }
     }
-    function updatePlayer(player){
-      if (player){
-        var handLabel = document.getElementById("player" + player["playerId"] + "hand"); 
-        var handString = ""
-        if (handLabel){
-          for (let i = 0; i < player["hand"].length; i++) {
-            handString = handString + renderCard(player["hand"][i]);
-          }
-          handLabel.innerHTML = handString;
-        }
-      }
-    }
     function activatePlayer(playersInfo, table){
       console.log("activating player here");
       console.log(playersInfo, table);
@@ -214,6 +210,7 @@
         }
       }
     }
+    
     function showCommonCards(cardArray){
         let cardList = document.getElementById("commonCards"); 
         cardList.innerHTML = ""; // clear list first

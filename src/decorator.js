@@ -1,36 +1,39 @@
 const Utils = require('./utils');
 
-function privateState(game, player){
+function privateState(game, player, showHandsForPlayers=[]){
     // Send player cards to them indvidually
     // Also send actions to that player
 
-    // gamePlayer is the player inside the game that contains the hand
-    let gamePlayer = Utils.getByAttributeValue(game.players, "id", parseInt(player.id));
     let activeIndex = game.table.activeIndex;
     let actionOpts = [];
-
     // Remind all players of current hand table state
-    var playersInfo = [];
+    let playersInfo = [];
     
-    game.players.forEach(function(player){
-        playersInfo.push({playerId: player.id,
-            chips: player.chips,
-            name: player.prettyName(),
-            actedInStreet: player.actedInStreet,
-            button: player.button,
-            smallBlind:  player.smallBlind,
-            bigBlind: player.bigBlind,
-            gameState: player.gameState,
-            handState: player.handState
+    game.players.forEach(function(p){
+        let hand = [];
+        if (showHandsForPlayers.includes(p.id) || game.testMode || player.id == p.id){
+            // could show hand if players are all in or game is in test mode
+            hand = p.hand;
+        }
+        playersInfo.push({playerId: p.id,
+            chips: p.chips,
+            name: p.prettyName(),
+            actedInStreet: p.actedInStreet,
+            button: p.button,
+            smallBlind:  p.smallBlind,
+            bigBlind: p.bigBlind,
+            gameState: p.gameState,
+            handState: p.handState,
+            hand: hand
         })
     })
 
-    if (game.testMode){
-        // always send options in test mode (so that 1 machine can play for all)
-        actionOpts = Utils.getOptions(game.players, player, game.table);
-    }
-    else if (activeIndex !== 'undefined' && activeIndex != null){
-        if ( game.players[activeIndex].id == player.id ){
+    if (activeIndex !== 'undefined' && activeIndex != null){
+        if (game.testMode){
+            // always send options in test mode (so that 1 machine can play for all)
+            actionOpts = Utils.getOptions(game.players, game.players[activeIndex], game.table);
+        }
+        else if ( game.players[activeIndex].id == player.id ){
             // This is the active player. Add in options for actions they can take
             actionOpts = Utils.getOptions(game.players, player, game.table);
         }
@@ -51,11 +54,8 @@ function privateState(game, player){
             activeIndex: game.table.activeIndex
         },
         playersInfo: playersInfo,
-        player: {
-            playerId: gamePlayer.id,
-            hand: gamePlayer.hand
-        },
-        actionOpts: actionOpts
+        actionOpts: actionOpts,
+        results: game.results
     }
 }
 
