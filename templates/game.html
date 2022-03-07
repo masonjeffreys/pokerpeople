@@ -3,7 +3,7 @@
   <button id="startTestGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startTestGame()">Start Test Game</button>
   <button id="startGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startGame()">Start Game</button>
   <button id="nextHandBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Deal</button>
-  <div id="playersContainer" class="grid grid-cols-4 gap-4">
+  <div id="playersContainer" class="min-h-[100] grid grid-cols-4 gap-4">
   </div>
   <div id="table" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center mt-4">
       <div id="street" class="">
@@ -59,8 +59,8 @@
 <script src="/js/socket.js"></script>
 <script>
     // Eventually convert this to react probably. But iterating with pure JS is easy.
-    function updateActions(actionsOpts){
-      console.log("actions are: ", actionsOpts);
+    function updateActions(actionsOpts, currentPlayerId){
+      console.log("actions are: ", actionsOpts, " for playerId: ", currentPlayerId);
       var callBtn = document.getElementById("callBtn");
       var checkBtn = document.getElementById("checkBtn");
       var foldBtn = document.getElementById("foldBtn");
@@ -106,14 +106,28 @@
       }
     }
 
-    function updateAllPlayers(playersInfo) {
+    function updateAllPlayers(playersInfo, currentPlayerId){
       let containerDiv = document.getElementById('playersContainer');
       containerDiv.innerHTML = "";
-      // playersInfo will have all players in correct order, index 0 to players.length - 1.
-      if (playersInfo){
-        for (let i = 0; i < playersInfo.length; i++) {
-          containerDiv.appendChild(renderPlayer(playersInfo[i]));
-            let playerId = playersInfo[i]["playerId"];
+      let selfContainer = document.getElementById('self');
+      selfContainer.innerHTML = "";
+      // cycle through each player, starting at self.
+      let startArrayPosition = playersInfo.map(function(o) { return o.playerId; }).indexOf(currentPlayerId);
+      for (var i = startArrayPosition; i < playersInfo.length + startArrayPosition; i++) {
+        let j = i % playersInfo.length;
+        console.log("updating player at: ", j);
+        if (playersInfo[j]["playerId"] == currentPlayerId){
+          addAPlayer(selfContainer, playersInfo[j]);
+        } else {
+          addAPlayer(containerDiv, playersInfo[j]);
+        }
+      }
+      arrangePlayers(containerDiv);
+    }
+
+    function addAPlayer(container, playerInfo) {
+            let playerId = playerInfo["playerId"];
+            container.appendChild(renderPlayer(playerInfo));
             var playerBox = document.getElementById("player" + playerId);
             var chipLabel = document.getElementById("player" + playerId + "chips");
             var nameLabel = document.getElementById("player" + playerId + "name");
@@ -123,7 +137,7 @@
             var handLabel = document.getElementById("player" + playerId + "hand"); 
 
             if (playerBox){
-              if (playersInfo[i].handState == "FOLD" || playersInfo[i].gameState == "OUT"){
+              if (playerInfo.handState == "FOLD" || playerInfo.gameState == "OUT"){
                 playerBox.classList.remove('bg-white');
                 playerBox.classList.remove('shadow-lg');
                 playerBox.classList.add('bg-slate-300');
@@ -134,27 +148,27 @@
               }
             }
             if (chipLabel){
-                chipLabel.innerHTML = playersInfo[i]["chips"];
+                chipLabel.innerHTML = playerInfo["chips"];
             }
             if (nameLabel){
-                nameLabel.innerHTML = playersInfo[i]["name"];
+                nameLabel.innerHTML = playerInfo["name"];
             }
             if (buttonLabel){
-              if (playersInfo[i]["button"]){
+              if (playerInfo["button"]){
                 buttonLabel.innerHTML = "D";
               } else {
                 buttonLabel.innerHTML = "";
               }  
             }
             if (smallBlindLabel){
-              if (playersInfo[i]["smallBlind"]){
+              if (playerInfo["smallBlind"]){
                 smallBlindLabel.innerHTML = "S";
               } else {
                 smallBlindLabel.innerHTML = "";
               }
             }
             if (bigBlindLabel){
-              if (playersInfo[i]["bigBlind"]){
+              if (playerInfo["bigBlind"]){
                 bigBlindLabel.innerHTML = "B";
               } else {
                 bigBlindLabel.innerHTML = "";
@@ -162,12 +176,20 @@
             }
             if (handLabel){
               var handString = ""
-              for (let j = 0; j < playersInfo[i]["hand"].length; j++) {
-                handString = handString + renderCard(playersInfo[i]["hand"][j]);
+              for (let j = 0; j < playerInfo["hand"].length; j++) {
+                handString = handString + renderCard(playerInfo["hand"][j]);
               }
               handLabel.innerHTML = handString;
             }
-        }
+    }
+
+    function arrangePlayers(container){
+      let players = container.getElementsByClassName("player-box");
+      let screenWidth = screen.width;
+      let screenHeight = screen.height;
+      for (let i = 0; i < players.length; i++) {
+        let leftPos = screenWidth/players.length * i;
+        players[i].style="position:absolute; left:" + leftPos + "px;";
       }
     }
 
@@ -192,12 +214,8 @@
       }
     }
     function activatePlayer(playersInfo, table){
-      console.log("activating player here");
-      console.log(playersInfo, table);
       if (table["activeIndex"] !== 'undefined' && table["activeIndex"] != null){
         var activePlayer = playersInfo[table["activeIndex"]];
-        console.log("activating player index: ", table["activeIndex"]);
-        console.log("matching player is: ", activePlayer);
         for (let i = 0; i < playersInfo.length; i++) {
             var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
             if (playerBox){
@@ -256,7 +274,7 @@
       let playerHand = document.createElement('p');
 
       playerDiv.id = 'player' + player.playerId;
-      playerDiv.className = 'p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center';
+      playerDiv.className = 'player-box p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center';
       playerName.id = 'player' + player.playerId + 'name';
       playerName.className = 'text-xl font-medium';
       playerChips.id = 'player' + player.playerId + 'chips';

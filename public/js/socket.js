@@ -67,20 +67,19 @@ socket.on('private', function(state){
   console.log("Private message: ", state);
   if (state){
     if (state.playersInfo){
-      updateAllPlayers(state.playersInfo);
+      updateAllPlayers(state.playersInfo, state.playerId);
     }
     if (state.table){
       updateTable(state.table);
     }
     if (state.table && state.playersInfo){
-      console.log("about to activate player");
       activatePlayer(state.playersInfo, state.table);
     }
     if (state.results){
       updateResults(state.results);
     }
     if (state.actionOpts){
-      updateActions(state.actionOpts);
+      updateActions(state.actionOpts, state.playerId);
     }
   }
 })

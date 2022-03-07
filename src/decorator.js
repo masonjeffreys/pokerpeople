@@ -40,6 +40,7 @@ function privateState(game, player, showHandsForPlayers=[]){
     }
     
     return {
+        playerId: player.id,
         game: {
             status: game.status,
             testMode: game.testMode,
