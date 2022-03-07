@@ -18,7 +18,7 @@ const gameConfig = {
 exports.joinGame = async (req, h) => {
   // The post request that creates a user and a game
   let user = {};
-  let gameCode = req.payload.gameCode;
+  let gameCode = req.payload.gameCode.toLowerCase().replace(/\s/g, '');
 
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
     user = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
