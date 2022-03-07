@@ -28,6 +28,7 @@ exports.plugin = {
             // This will be player actions, player leaving, 
             socket.on('add player', Handlers.simulateAnotherPlayerJoining);
             socket.on('start game', Handlers.startGame);
+            socket.on('start test game', Handlers.startTestGame);
             socket.on('next hand', Handlers.nextHand);
             socket.on('check', Handlers.check);
             socket.on('call', Handlers.call);

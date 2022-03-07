@@ -8,7 +8,7 @@ const Repo = require('../repo');
 const gameConfig = {
     startingChips: 100,
     smallBlindAmount: 5,
-    testMode: true
+    testMode: false
 }
 
 /**

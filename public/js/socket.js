@@ -33,6 +33,11 @@ function startGame(){
   socket.emit('start game');
 }
 
+function startTestGame(){
+  console.log("client requesting test game start");
+  socket.emit('start test game');
+}
+
 function nextHand() {
   socket.emit('next hand');
 }

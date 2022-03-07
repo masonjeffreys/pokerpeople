@@ -24,6 +24,13 @@ exports.startGame = () => {
     emitPrivateStateToEachPlayer(game);
 }
 
+exports.startTestGame = () => {
+    // Only called after players have sat at table.
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    game["testMode"] = true;
+    emitPrivateStateToEachPlayer(game);
+}
+
 exports.getState = () => {
     // 'this' refers to a socket (and emit for a room will not send back to the original requester)
     // 'this'.server refers to a server (and emit for a room will send back to all people)
