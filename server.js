@@ -12,8 +12,7 @@ const RealTime = require('./src/realtime');
 exports.init = async function () {
 
     const server = Hapi.server({
-        port: 8080,
-        host: 'localhost',
+        port: process.env.PORT || 8080,
         routes: {
             files: {
                 relativeTo: Path.join(__dirname, 'public')
