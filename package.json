@@ -44,5 +44,8 @@
       "server.js"
     ],
     "ext": "js,json,html"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
