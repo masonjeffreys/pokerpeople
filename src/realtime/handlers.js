@@ -55,9 +55,14 @@ exports.nextHand = () => {
 }
 
 exports.bet = (msg) => {
-    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveAction(game, 'bet', parseInt(msg.amount))
-    emitPrivateStateToEachPlayer(game);
+    if (msg && msg.amount && typeof(parseInt(msg.amount)) == "number"){
+        let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+        Orchestrator.receiveAction(game, 'bet', parseInt(msg.amount))
+        emitPrivateStateToEachPlayer(game);
+    }
+    else {
+        console.log("Invalid bet. Msg was: ", msg);
+    }
 };
 
 exports.call = () => {

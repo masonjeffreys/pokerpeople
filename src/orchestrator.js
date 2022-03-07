@@ -176,7 +176,7 @@ function getWinDetailsByFold(game){
     winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
     game.results = {
         winner_name: winningPlayer.prettyName(),
-        winning_hand: null,
+        winning_hand: "not shown",
         amount: Utils.potForPlayer(game.table, winningPlayer)
     }
 }
