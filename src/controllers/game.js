@@ -42,7 +42,7 @@ exports.viewGame = (req, h) => {
   let player = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
   console.log("UserId: ", player.id, " is joining gameId: ", game.id);
   Orchestrator.addPlayerToGame(game, player);
-  return h.view('game');
+  return h.view('game', null, {layout: 'minimal'});
 }
 
 /// Replaced all the below with websockets calls

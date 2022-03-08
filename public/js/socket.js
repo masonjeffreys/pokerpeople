@@ -1,5 +1,4 @@
-var form = document.getElementById('form');
-var input = document.getElementById('input');
+
 
 const socket = io({
     query: {
@@ -10,14 +9,18 @@ const socket = io({
     }
   });
 
-
-form.addEventListener('submit', function(e) {
+var chatForm = document.getElementById('form');
+  
+if (chatForm){
+  var input = document.getElementById('input');
+  form.addEventListener('submit', function(e) {
     e.preventDefault();
     if (input.value) {
         socket.emit('chat message', input.value);
         input.value = '';
     }
-});
+  });
+}
 
 function addPlayer(){
   console.log("inside socket method client");
