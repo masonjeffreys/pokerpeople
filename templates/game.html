@@ -1,9 +1,12 @@
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-  <button id="addPlayerBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="addPlayer()">Simulate 'Add Player'</button>
-  <button id="startTestGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startTestGame()">Start Test Game</button>
-  <button id="startGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startGame()">Start Game</button>
-  <button id="nextHandBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Deal</button>
-  <div id="playersContainer" class="min-h-[100] grid grid-cols-4 gap-4">
+<div class="w-screen h-full">
+  <div class="flex items-center justify-center my-2">
+    <button id="addPlayerBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="addPlayer()">Simulate 'Add Player'</button>
+    <button id="startTestGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startTestGame()">Start Test Game</button>
+    <button id="startGameBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startGame()">Start Game</button>
+    <button id="nextHandBtn" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Deal</button>
+  </div>
+  
+  <div id="playersContainer" class="h-20">
   </div>
   <div id="table" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center mt-4">
       <div id="street" class="">
@@ -12,27 +15,18 @@
       </div>
       <div id="highBet" class=""> 
       </div>
-      <ol id="commonCards" class="">
-      </ol>
+      <div id="commonCards" class="">
+      </div>
       <div id="results">
       </div>
   </div>
-  <div id="self" class="bg-blue">
-    <h4>Self</h4>
-    <div id="self" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">
-      <div id="selfname" class="text-xl font-medium"></div>
-      <p id="selfchips" class="text-slate-500"></p>
-      <p id="selfhand" class="text-slate-500"></p>
-      <div id="selfbutton" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      <div id="selfsmallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      <div id="selfbigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-    </div>
-  </div>
-  <div class="bg-white mt-4">
-      <div class="max-w-2xl mx-auto py-4 px-2 lg:max-w-7xl lg:px-8">
+  <div class="bg-white mt-4 max-w-m flex items-center justify-center">
+      <div class="max-w-m mx-auto py-2 px-2">
+        <div id="self">
+        </div>
         <div id="actions">
         </div>
-        <div class="mt-2 grid grid-cols-4 gap-y-10 gap-x-6 xl:gap-x-8">
+        <div class="my-2 grid grid-cols-4 gap-y-10 gap-x-1">
             <div class="mt-2 flex justify-between">
                   <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
             </div>
@@ -187,10 +181,54 @@
       let players = container.getElementsByClassName("player-box");
       let screenWidth = screen.width;
       let screenHeight = screen.height;
-      for (let i = 0; i < players.length; i++) {
-        let leftPos = screenWidth/players.length * i;
-        players[i].style="position:absolute; left:" + leftPos + "px;";
+      let playersCount = players.length;
+      let playerBoxWidth = 133; //px width of box
+      let playerBoxHeight = 100;
+
+      switch (playersCount){
+        case 1:
+          // put at top middle of screen
+          players[0].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
+          break;
+        case 2:
+          // put at upper left and upper right
+          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
+          players[1].style="position:absolute; right:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
+          break;
+        case 3:
+          // put at mid left, upper middle, and mid right
+          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[2].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          break;
+        case 4:
+          // put at mid left, two across top and mid right
+          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[2].style="position:absolute; left:" + (screenWidth/2 + playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[3].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          break;
+        case 5:
+          // put at mid left, three across top and mid right
+          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          players[1].style="position:absolute; left:" + (screenWidth/2 - 2*playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[2].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[3].style="position:absolute; left:" + (screenWidth/2 + 2*playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[4].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          break;
+        case 6:
+          // put at two left, two across top and two right
+          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + 2*playerBoxHeight + "px;";
+          players[1].style="position:absolute; left:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
+          players[2].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[3].style="position:absolute; left:" + (screenWidth/2 + 2*playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[4].style="position:absolute; right:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
+          players[5].style="position:absolute; right:" + "0" + "px;" + "top:" + 2*playerBoxHeight + "px;";
+          break;
       }
+
+
+      
     }
 
     function updateTable(table){
@@ -231,13 +269,12 @@
     }
     
     function showCommonCards(cardArray){
-        let cardList = document.getElementById("commonCards"); 
-        cardList.innerHTML = ""; // clear list first
+        let cardDiv = document.getElementById("commonCards"); 
+        let cardString = "";
         for (let i = 0; i < cardArray.length; i++) {
-            var tableBox = document.createElement('li');
-            tableBox.textContent = renderCard(cardArray[i]);
-            cardList.appendChild(tableBox);
+            cardString = cardString + " " + renderCard(cardArray[i]);
         }
+        cardDiv.innerHTML = cardString; // clear list first
     }
 
     function renderCard(cardString){
