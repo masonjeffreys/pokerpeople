@@ -134,7 +134,7 @@ function receiveAction(game, action, amount = 0){
     player.actedInStreet = true;
     game.lastAction = player.prettyName() + ": " + action;
     if (amount && amount > 0){
-        game.lastAction = game.lastAction + "Amount: " + amount;
+        game.lastAction = game.lastAction + " " + amount;
     }
 
     // Handle player's desired action
