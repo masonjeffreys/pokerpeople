@@ -1,12 +1,12 @@
 <div class="w-screen h-full relative bg-green-700">  
   <div id="playersContainer" class="h-20">
   </div>
-  <div id="table" class="p-6 max-w-[50%] mx-auto bg-white rounded-xl shadow-lg my-4">
+  <div id="table" class="p-2 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-6">
       
       <div id="mainPot" class="">
       </div>
       
-      <div id="commonCards" class="bg-gray-200 w-full h-16">
+      <div id="commonCards" class="bg-gray-200 w-full h-16 flex items-center justify-center gap-1">
       </div>
       <div class="bg-gray-100">
         <div id="highBet" class="inline-block text-left">5000</div>
@@ -269,11 +269,17 @@
     
     function showCommonCards(cardArray){
         let cardDiv = document.getElementById("commonCards"); 
-        let cardString = "";
-        for (let i = 0; i < cardArray.length; i++) {
-            cardString = cardString + " " + renderCard(cardArray[i]);
+        cardDiv.innerHTML = ""; // clear list first
+        for (let i = 0; i < 5; i++) {
+            let newCard = document.createElement('div');
+            newCard.classList = "ring ring-red-300 rounded-lg p-2";
+            if (i < cardArray.length){
+              newCard.innerHTML = renderCard(cardArray[i]);
+            } else {
+              newCard.innerHTML = "*";
+            }
+            cardDiv.appendChild(newCard);
         }
-        cardDiv.innerHTML = cardString; // clear list first
     }
 
     function renderCard(cardString){
