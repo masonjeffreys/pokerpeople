@@ -7,7 +7,7 @@ const Repo = require('../repo');
 // Things that might be different from Game to Game
 const gameConfig = {
     startingChips: 100,
-    smallBlindAmount: 5,
+    smallBlindAmount: 1,
     testMode: false
 }
 

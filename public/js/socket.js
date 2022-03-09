@@ -89,7 +89,7 @@ socket.on('private', function(state){
     if (state.table && state.playersInfo){
       activatePlayer(state.playersInfo, state.table);
     }
-    if (state.results){
+    if (typeof(state.results) !== undefined){
       updateResults(state.results);
     }
     if (state.actionOpts){

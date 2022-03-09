@@ -1,18 +1,19 @@
 <div class="w-screen h-full relative bg-green-700">  
   <div id="playersContainer" class="h-20">
   </div>
-  <div id="table" class="p-2 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-6">
-      
-      <div id="mainPot" class="">
+  <div id="table" class="p-2 pt-6 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-10 relative">
+      <div class="flex justify-center">
+      <div id="mainPot" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
+      </div>
       </div>
       
       <div id="commonCards" class="bg-gray-200 w-full h-16 flex items-center justify-center gap-1">
       </div>
       <div class="bg-gray-100">
-        <div id="highBet" class="inline-block text-left">5000</div>
-        <div id="street" class="inline-block float-right text-right">flop</div>
+        <div id="highBet" class="inline-block text-left text-sm italic text-gray-700"></div>
+        <div id="street" class="inline-block float-right text-right text-sm italic text-gray-700"></div>
       </div>
-      <div id="results">
+      <div id="results" class="text-center mx-auto">
       </div>
   </div>
   <div id="self" class="mx-[25%]">
@@ -84,7 +85,18 @@
     function updateResults(results){
       var resultsDiv = document.getElementById("results");
       if (results){
-        resultsDiv.innerHTML = JSON.stringify(results);
+        let dealButton = document.createElement('button');
+        let resultText = document.createElement('div');
+        resultText.className = "font-semibold text-gray-800 p-2 m-2 bg-green-200 rounded-xl shadow-lg"
+        dealButton.id = "nextHandBtn";
+        dealButton.className = "mx-1 px-4 py-1 text-sm font-semibold rounded-full border border-purple-200 text-white bg-purple-600 border-transparent outline-none ring-2 ring-purple-600 ring-offset-2";
+        dealButton.type = "button";
+        dealButton.onclick = nextHand;
+        dealButton.innerHTML = "Deal";
+        let resultString = "Winner: " + results.winner_name + "!<br>" + results.amount + 'chips<br>' + 'Hand: ' + results.winning_hand;
+        resultText.innerHTML = resultString;
+        resultsDiv.appendChild(resultText);
+        resultsDiv.appendChild(dealButton);
       } else {
         resultsDiv.innerHTML = "";
       }
@@ -232,8 +244,8 @@
 
     function updateTable(table){
       if (table){
-        document.getElementById("street").innerHTML = "Street: " + table["street"];
-        document.getElementById("highBet").innerHTML = "High bet: " + table["highBet"];
+        document.getElementById("street").innerHTML = table["street"];
+        document.getElementById("highBet").innerHTML = "High Bet: " + table["highBet"];
         showPots(table["pots"]);
         showCommonCards(table["commonCards"]);
       }
@@ -245,6 +257,7 @@
             if (i == 0){
                 document.getElementById("mainPot").innerHTML = "Pot: " + JSON.stringify(potsArray[0]);
             } else {
+              document.getElementById("mainPot").innerHTML = "Multiple pots!";
                 console.log("Multiple pots!")
             }
         }

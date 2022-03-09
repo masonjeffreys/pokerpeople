@@ -204,7 +204,7 @@ function advanceStreet(game){
         player.actedInStreet = false;
     })
     // Set starting player to 'left-of-dealer'
-    game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition)
+    game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
     
     switch(game.table.street){
         case 'flop':
