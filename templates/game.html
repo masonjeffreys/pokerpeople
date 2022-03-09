@@ -1,21 +1,16 @@
-<div class="w-screen h-full bg-green-700">
-  <div class="flex items-center justify-center py-2 px-2">
-    <button id="addPlayerBtn" class="mx-1 px-4 py-1 text-sm text-gray-300 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="addPlayer()">Simulate 'Add Player'</button>
-    <button id="startTestGameBtn" class="mx-2 px-4 py-1 text-sm text-gray-300 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startTestGame()">Toggle Test Mode</button>
-    <button id="startGameBtn" class="mx-2 px-4 py-1 text-sm text-gray-300 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="startGame()">Start Game</button>
-    <button id="nextHandBtn" class="mx-1 px-4 py-1 text-sm text-gray-300 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2" type="button" onclick="nextHand()">Deal</button>
-  </div>
-  
+<div class="w-screen h-full relative bg-green-700">  
   <div id="playersContainer" class="h-20">
   </div>
   <div id="table" class="p-6 max-w-[50%] mx-auto bg-white rounded-xl shadow-lg my-4">
-      <div id="street" class="">
-      </div>
+      
       <div id="mainPot" class="">
       </div>
-      <div id="highBet" class=""> 
+      
+      <div id="commonCards" class="bg-gray-200 w-full h-16">
       </div>
-      <div id="commonCards" class="">
+      <div class="bg-gray-100">
+        <div id="highBet" class="inline-block text-left">5000</div>
+        <div id="street" class="inline-block float-right text-right">flop</div>
       </div>
       <div id="results">
       </div>
@@ -23,21 +18,21 @@
   <div id="self" class="mx-[25%]">
     <!--JS will populate a player inside here with appropriate styling-->
   </div>
-  <div id="actions" class="py-2 px-2 flex justify-center w-full bg-white absolute left-0 bottom-0">
-      <div class="my-2 mx-2 inline">
+  <div id="actions" class="py-2 px-2 flex justify-center w-full bg-white absolute left-0 bottom-0 items-end">
+      <div class="my-2 mx-2">
           <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
       </div>
-      <div class="my-2 mx-2 inline">
+      <div class="my-2 mx-2">
         <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
       </div>
-      <div class="my-2 mx-2 inline">
+      <div class="my-2 mx-2 text-center">
         <label id="betLabel"></label>
         <div class="relative text-gray-700">
-            <input id="betAmount" class="w-full h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="text" placeholder="Amount"/>
+            <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="text" placeholder="Amount"/>
             <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
         </div>
     </div>
-    <div class="my-2 mx-2 inline">
+    <div class="my-2 mx-2">
       <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
     </div>
   </div>
@@ -144,22 +139,31 @@
             }
             if (buttonLabel){
               if (playerInfo["button"]){
+                buttonLabel.classList.remove("hidden");
                 buttonLabel.innerHTML = "D";
               } else {
+                buttonLabel.classList.remove("hidden");
+                buttonLabel.classList.add("hidden");
                 buttonLabel.innerHTML = "";
               }  
             }
             if (smallBlindLabel){
               if (playerInfo["smallBlind"]){
-                smallBlindLabel.innerHTML = "S";
+                smallBlindLabel.classList.remove("hidden");
+                smallBlindLabel.innerHTML = "SB";
               } else {
+                smallBlindLabel.classList.remove("hidden");
+                smallBlindLabel.classList.add("hidden");
                 smallBlindLabel.innerHTML = "";
               }
             }
             if (bigBlindLabel){
               if (playerInfo["bigBlind"]){
-                bigBlindLabel.innerHTML = "B";
+                bigBlindLabel.classList.remove("hidden");
+                bigBlindLabel.innerHTML = "BB";
               } else {
+                bigBlindLabel.classList.remove("hidden");
+                bigBlindLabel.classList.add("hidden");
                 bigBlindLabel.innerHTML = "";
               }
             }
@@ -183,24 +187,24 @@
       switch (playersCount){
         case 1:
           // put at top middle of screen
-          players[0].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[0].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:0px;";
           break;
         case 2:
           // put at upper left and upper right
-          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
-          players[1].style="position:absolute; right:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
+          players[0].style="position:absolute; left:" + "0" + "px;" + "top:0px;";
+          players[1].style="position:absolute; right:" + "0" + "px;" + "top:0px;";
           break;
         case 3:
           // put at mid left, upper middle, and mid right
           players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
-          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:0px;";
           players[2].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
           break;
         case 4:
           // put at mid left, two across top and mid right
           players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
-          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
-          players[2].style="position:absolute; left:" + (screenWidth/2 + playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
+          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth) + "px;" + "top:0px;";
+          players[2].style="position:absolute; left:" + (screenWidth/2 + playerBoxWidth) + "px;" + "top:0px;";
           players[3].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
           break;
         case 5:
@@ -252,11 +256,11 @@
         for (let i = 0; i < playersInfo.length; i++) {
             var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
             if (playerBox){
-                playerBox.classList.remove("ring-2");
-                playerBox.classList.remove("ring-green-300");
+                playerBox.classList.remove("ring-4");
+                playerBox.classList.remove("ring-red-700");
                 if (playersInfo[i]["playerId"] == activePlayer.playerId) {
-                  playerBox.classList.add("ring-2");
-                  playerBox.classList.add("ring-green-300");
+                  playerBox.classList.add("ring-4");
+                  playerBox.classList.add("ring-red-700");
                 }
             } 
         }
@@ -299,6 +303,7 @@
     function renderPlayer(player){
       let playerDiv = document.createElement('div');
       let playerName = document.createElement('div');
+      let playerPosition = document.createElement('div');
       let playerButton = document.createElement('div');
       let playerSmallBlind = document.createElement('div');
       let playerBigBlind = document.createElement('div');
@@ -306,19 +311,21 @@
       let playerHand = document.createElement('p');
 
       playerDiv.id = 'player' + player.playerId;
-      playerDiv.className = 'player-box p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center';
+      playerDiv.className = 'player-box p-4 max-w-sm mx-auto bg-white rounded-xl shadow-lg text-center relative';
       playerName.id = 'player' + player.playerId + 'name';
       playerName.className = 'text-xl font-medium';
       playerChips.id = 'player' + player.playerId + 'chips';
-      playerChips.className = 'text-slate-500';
+      playerChips.className = 'text-slate-500 absolute right-[-8px] top-[-8px] ring-4 ring-red-300 rounded-xl p-2';
       playerHand.id = 'player' + player.playerId + 'hand';
       playerHand.className = 'text-slate-500';
+      playerPosition.id = 'player' + player.playerId + 'position';
+      playerPosition.className = 'flex gap-1 absolute bottom-[-8px]';
       playerButton.id = 'player' + player.playerId + 'button';
-      playerButton.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
+      playerButton.className = 'bg-black rounded-xl ring-2 ring-gray-300 ring-inset text-white font-bold px-2';
       playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
-      playerSmallBlind.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
+      playerSmallBlind.className = 'bg-blue-400 rounded-xl ring-2 ring-blue-500 ring-inset text-white font-bold px-2';
       playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
-      playerBigBlind.className = 'bg-white rounded-xl ring-2 ring-pink-300 ring-inset';
+      playerBigBlind.className = 'bg-green-400 rounded-xl ring-2 ring-green-500 ring-inset text-white font-bold px-2';
 
 
       // '<div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">'
@@ -332,9 +339,10 @@
       playerDiv.appendChild(playerName);
       playerDiv.appendChild(playerChips);
       playerDiv.appendChild(playerHand);
-      playerDiv.appendChild(playerButton);
-      playerDiv.appendChild(playerSmallBlind);
-      playerDiv.appendChild(playerBigBlind);
+      playerPosition.appendChild(playerButton);
+      playerPosition.appendChild(playerSmallBlind);
+      playerPosition.appendChild(playerBigBlind);
+      playerDiv.appendChild(playerPosition);
       return playerDiv;
     }
 </script>
