@@ -95,6 +95,9 @@ socket.on('private', function(state){
     if (state.actionOpts){
       updateActions(state.actionOpts, state.playerId);
     }
+    if (state.lastAction){
+      updateLastAction(state.lastAction);
+    }
   }
 })
 

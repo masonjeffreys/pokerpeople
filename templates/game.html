@@ -3,8 +3,8 @@
   </div>
   <div id="table" class="p-2 pt-6 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-10 relative">
       <div class="flex justify-center">
-      <div id="mainPot" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
-      </div>
+        <div id="mainPot" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
+        </div>
       </div>
       
       <div id="commonCards" class="bg-gray-200 w-full h-16 flex items-center justify-center gap-1">
@@ -15,10 +15,13 @@
       </div>
       <div id="results" class="text-center mx-auto">
       </div>
+      <div id="lastAction" class="text-small text-gray-400 italics text-center">
+      </div>
   </div>
   <div id="self" class="mx-[25%]">
     <!--JS will populate a player inside here with appropriate styling-->
   </div>
+ 
   <div id="actions" class="py-2 px-2 flex justify-center w-full bg-white absolute left-0 bottom-0 items-end">
       <div class="my-2 mx-2">
           <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
@@ -93,12 +96,19 @@
         dealButton.type = "button";
         dealButton.onclick = nextHand;
         dealButton.innerHTML = "Deal";
-        let resultString = "Winner: " + results.winner_name + "!<br>" + results.amount + 'chips<br>' + 'Hand: ' + results.winning_hand;
+        let resultString = "Winner: " + results.winner_name + "!<br>" + results.amount + ' chips<br>' + 'Hand: ' + results.winning_hand;
         resultText.innerHTML = resultString;
         resultsDiv.appendChild(resultText);
         resultsDiv.appendChild(dealButton);
       } else {
         resultsDiv.innerHTML = "";
+      }
+    }
+
+    function updateLastAction(lastActionString){
+      let lastActionDiv = document.getElementById('lastAction');
+      if (lastActionDiv){
+        lastActionDiv.innerHTML = lastActionString;
       }
     }
 

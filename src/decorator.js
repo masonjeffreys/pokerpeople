@@ -56,7 +56,8 @@ function privateState(game, player, showHandsForPlayers=[]){
         },
         playersInfo: playersInfo,
         actionOpts: actionOpts,
-        results: game.results
+        results: game.results,
+        lastAction: game.lastAction
     }
 }
 

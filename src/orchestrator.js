@@ -84,6 +84,7 @@ function setupHand(game){
     game.table.resetPots();
     game.table.clearCommonCards();
     // Reset results
+    game.lastAction = "new hand";
     game.results = null;
 
     // BetTheBlinds
@@ -131,6 +132,10 @@ function receiveAction(game, action, amount = 0){
     console.log("Action is: ", action, " : ", amount);
     var player = game.players[game.table.activeIndex]
     player.actedInStreet = true;
+    game.lastAction = player.prettyName() + ": " + action;
+    if (amount && amount > 0){
+        game.lastAction = game.lastAction + "Amount: " + amount;
+    }
 
     // Handle player's desired action
     switch (action){
