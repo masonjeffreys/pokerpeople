@@ -147,8 +147,9 @@ function receiveAction(game, action, amount = 0){
     switch (action){
         case "all in":
             // Player is all in
-            player.allInPotNumber = game.table.allInPotNumber();
+            player.allInPotNumber = game.table.currentPotNumber();
             applyBet(game, game.table.activeIndex, player.chips);
+            break;
         case "bet":
             let callAmount = Utils.getCallAmount(game.table, game.players, player);
             // this is essentially a raise action (range restricted to ensure this)
