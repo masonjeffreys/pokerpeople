@@ -92,3 +92,15 @@ describe('potTotals',()=>{
         expect(Utils.potTotals(table)).to.equal([15,20]);
     })
 })
+
+describe('getBetRange',()=>{
+    it('will return player chip range if player cannot call', () => {
+        expect(Utils.getBetRange(10, 15, 15)).to.equal([10,10])
+    })
+    it('will return player chip range if player can call but not raise', () => {
+        expect(Utils.getBetRange(20, 15, 15)).to.equal([20,20])
+    })
+    it('will return range of (call + minRaise) to all chips in normal situation', () => {
+        expect(Utils.getBetRange(50, 15, 15)).to.equal([30,50])
+    })
+})

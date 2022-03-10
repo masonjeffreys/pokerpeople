@@ -12,7 +12,9 @@ function getByAttributeValue(array, attrName, attrValue){
 }
 
 function isValidPlayer(player){
-    return (player.handState == "IN");
+    // Player must be "IN" and have chips to play
+    // Note that tricky rules apply when the player has less chips than the minBet.
+    return (player.handState == "IN" && player.chips > 0);
 }
 
 function correctIndex(arrayLen, givenIndex){
@@ -139,6 +141,7 @@ function isStreetComplete(table, players){
     // All players have had a chance to act (blinds don't count)
     // All players who haven't folded have bet the same amount of money for the round.
     // This will get more complicated with side pots
+    // Street can also be complete if all players have 0 money left
     var currentMaxBet = 0;
     players.forEach(function(player){
         if (playerCurrentBetInt(table, player) > currentMaxBet){
@@ -209,18 +212,37 @@ function getCallAmount(table, players, player){
 }
 
 function getOptions(players, player, table){
-    var actionOpts = {fold: true};
+    var actionOpts = {fold: true}; // can always fold
     var callAmount = getCallAmount(table, players, player);
-    if ( callAmount > 0 ){
-        actionOpts.call = callAmount;
-    }
     if (callAmount == 0){
         actionOpts.check = true;
-    }
-    if (player.chips > 0){
-        actionOpts.bet = [table.minRaise, player.chips]
-    }
+    } else if ( player.chips >= callAmount ){
+        // non-zero call amount
+        // player can only call if they have enough chips
+        // otherwise they will need to simply go all-in, not being able to call
+        actionOpts.call = callAmount;
+    } 
+    
+    actionOpts.bet = getBetRange(player.chips, callAmount, table.minRaise);
+    
     return actionOpts;
+}
+
+function getBetRange(chips, callAmount, minRaise){
+    if (chips > 0){
+        if (chips < callAmount || chips < (callAmount + minRaise)){
+            // player has chips, but not enough to call. Only option is to go all-in.
+            return [chips, chips]
+        } else if (chips < (callAmount + minRaise)){
+            // player has chips enough to call, but not enough to raise. Min is call, max is all-in
+            return  [callAmount, chips]
+        } else {
+            // player can raise, or go up to full amount of chips
+            return [minRaise + callAmount, chips]
+        }
+    } else {
+        return [];
+    }
 }
 
 module.exports.getNextHandPlayerIndex = getNextHandPlayerIndex;
@@ -240,3 +262,4 @@ module.exports.playerMaxBet = playerMaxBet;
 module.exports.playerCurrentBet = playerCurrentBet;
 module.exports.getByAttributeValue = getByAttributeValue;
 module.exports.isValidPlayer = isValidPlayer;
+module.exports.getBetRange = getBetRange;

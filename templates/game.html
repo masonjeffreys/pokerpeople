@@ -32,7 +32,7 @@
       <div class="my-2 mx-2 text-center">
         <label id="betLabel"></label>
         <div class="relative text-gray-700">
-            <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="text" placeholder="Amount"/>
+            <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="number" placeholder="Amount"/>
             <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
         </div>
     </div>
@@ -53,6 +53,7 @@
       var checkBtn = document.getElementById("checkBtn");
       var foldBtn = document.getElementById("foldBtn");
       var betLabel = document.getElementById("betLabel");
+      var betInput = document.getElementById("betAmount");
       var betBtn = document.getElementById("betBtn");
       if (actionsOpts && actionsOpts.call){
         callBtn.classList.remove("invisible");
@@ -73,13 +74,18 @@
         checkBtn.classList.remove("invisible");
         checkBtn.classList.add("invisible");
       }
-      if (actionsOpts && actionsOpts.bet){
+      if (actionsOpts && actionsOpts.bet && actionsOpts.bet.length > 1){
         betBtn.classList.remove("invisible");
         betLabel.classList.remove("invisible");
+        betInput.classList.remove("invisible");
+        betInput.min = actionsOpts.bet[0];
+        betInput.max = actionOpts.bet[1];
         betLabel.innerHTML = actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
       } else {
         betBtn.classList.remove("invisible");
         betBtn.classList.add("invisible");
+        betInput.classList.remove("invisible");
+        betInput.classList.add("invisible")
         betLabel.classList.remove("invisible");
         betLabel.classList.add("invisible");
       }

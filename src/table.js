@@ -11,6 +11,10 @@ function Table() {
     var _smallBlind = null;
     var _pots = [{bets: []}]; // will have a main pot, then each time only 1 player can go all-in, we'd need to start tracking side pots.
     var _street = 'preflop';
+
+    /// Relating to sidepots and stuff
+    var _actionChanging = true; // true means that players have
+    var _minBet = null;
     var _minRaise = null; // A raise must be at least equal to the largest prior full bet or raise of the current betting round.
     // A player who raises 50% or more of the largest prior bet but less than a minimum raise must make a full minimum raise.
     // If less than 50% it is a call unless 'raise' is first declared or the player is all-in (Rule 45-B).

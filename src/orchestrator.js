@@ -119,6 +119,12 @@ function applyBet(game, playerIndex, amount){
     // Player makes bet
     // Remove chips from player
     // Add chips to correct pot on table
+    let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]);
+    let raiseAmount = amount - callAmount;
+    if (raiseAmount < table.minRaise){
+        throw 'Raise amount not enough' 
+    }
+    game.table.minRaise = raiseAmount;
     game.players[playerIndex].makeBet(amount);
     game.table.addBet(game.players[playerIndex].id, amount)
 }
@@ -210,6 +216,8 @@ function advanceStreet(game){
     })
     // Set starting player to 'left-of-dealer'
     game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
+    // Reset the minRaise
+    game.table.minRaise = game.table.bigBlind;
     
     switch(game.table.street){
         case 'flop':
