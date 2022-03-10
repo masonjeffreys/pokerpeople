@@ -65,6 +65,12 @@ exports.bet = (msg) => {
     }
 };
 
+exports.allIn = () => {
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.receiveAction(game, 'all in')
+    emitPrivateStateToEachPlayer(game);
+};
+
 exports.call = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
     Orchestrator.receiveAction(game, 'call')

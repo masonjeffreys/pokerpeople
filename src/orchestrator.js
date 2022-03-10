@@ -73,6 +73,7 @@ function setupHand(game){
         player.smallBlind = false;
         player.bigBlind = false;
         player.handState = "IN";
+        player.allInPotNumber = null;
     })
     game.table.street = STREETS[0]; // Sets to 'preflop'
     game.table.currentHighBet = game.table.bigBlind;
@@ -80,13 +81,13 @@ function setupHand(game){
     // Not sure whether to set button on player or table or both?
     // Depends how people are allowed to join/leave the game?
     game.players[game.table.dealerPosition].button = true;
-    game.table.minRaise = game.table.bigBlind;
+    
     game.table.resetPots();
     game.table.clearCommonCards();
     // Reset results
     game.lastAction = "new hand";
     game.results = null;
-
+    game.table.minRaise = game.table.bigBlind;
     // BetTheBlinds
     makeBlindBets(game);
 
@@ -121,10 +122,9 @@ function applyBet(game, playerIndex, amount){
     // Add chips to correct pot on table
     let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]);
     let raiseAmount = amount - callAmount;
-    if (raiseAmount < table.minRaise){
-        throw 'Raise amount not enough' 
+    if (raiseAmount > game.table.minRaise){
+        game.table.minRaise = raiseAmount; 
     }
-    game.table.minRaise = raiseAmount;
     game.players[playerIndex].makeBet(amount);
     game.table.addBet(game.players[playerIndex].id, amount)
 }
@@ -145,8 +145,24 @@ function receiveAction(game, action, amount = 0){
 
     // Handle player's desired action
     switch (action){
+        case "all in":
+            // Player is all in
+            player.allInPotNumber = game.table.allInPotNumber();
+            applyBet(game, game.table.activeIndex, player.chips);
         case "bet":
+            let callAmount = Utils.getCallAmount(game.table, game.players, player);
+            // this is essentially a raise action (range restricted to ensure this)
+            // add logic here to check for minimum raise (if player has enough chips to make it)
+            if (amount < callAmount + game.table.minRaise ){
+                // bet wasn't large enough
+                throw 'Not a big enough raise. Player could do more.'
+            }
+            if (amount == player.chips){
+                // Player is all in
+                player.allInPotNumber = game.table.currentPotNumber();
+            }
             applyBet(game, game.table.activeIndex, amount);
+            
             break
         case "check":
             // Essentially no change. Just move to next position

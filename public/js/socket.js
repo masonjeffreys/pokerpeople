@@ -61,13 +61,17 @@ function check() {
 }
 function bet() {
     var amount = document.getElementById("betAmount").value;
-    socket.emit('bet',{amount: amount});
+    socket.emit('bet', {amount: amount});
 }
 function call() {
     socket.emit('call');
 }
 function fold() {
     socket.emit('fold');
+}
+
+function allIn() {
+  socket.emit('all in');
 }
 
 socket.on('chat message', function(msg) {

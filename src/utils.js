@@ -212,7 +212,7 @@ function getCallAmount(table, players, player){
 }
 
 function getOptions(players, player, table){
-    var actionOpts = {fold: true}; // can always fold
+    var actionOpts = {fold: true, allIn: player.chips}; // can always fold or go all in
     var callAmount = getCallAmount(table, players, player);
     if (callAmount == 0){
         actionOpts.check = true;

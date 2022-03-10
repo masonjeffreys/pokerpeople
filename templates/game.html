@@ -24,9 +24,8 @@
  
   <div id="actions" class="py-2 px-2 flex justify-center w-full bg-white absolute left-0 bottom-0 items-end">
       <div class="my-2 mx-2">
-          <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
-      </div>
-      <div class="my-2 mx-2">
+        <!-- can only call or check on a given turn, not both. So we put both in the same div-->
+        <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
         <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
       </div>
       <div class="my-2 mx-2 text-center">
@@ -35,6 +34,9 @@
             <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="number" placeholder="Amount"/>
             <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
         </div>
+    </div>
+    <div class="my-2 mx-2">
+      <button type="button" id="allInBtn" onclick="allIn()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">All In</button>
     </div>
     <div class="my-2 mx-2">
       <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
@@ -55,12 +57,13 @@
       var betLabel = document.getElementById("betLabel");
       var betInput = document.getElementById("betAmount");
       var betBtn = document.getElementById("betBtn");
+      var allInBtn = document.getElementById("allInBtn");
       if (actionsOpts && actionsOpts.call){
-        callBtn.classList.remove("invisible");
+        callBtn.classList.remove("hidden");
         callBtn.innerHTML = "Call: " + actionsOpts.call;
       } else {
-        callBtn.classList.remove("invisible");
-        callBtn.classList.add("invisible");
+        callBtn.classList.remove("hidden");
+        callBtn.classList.add("hidden");
       }
       if (actionsOpts && actionsOpts.fold){
         foldBtn.classList.remove("invisible");
@@ -69,17 +72,24 @@
         foldBtn.classList.add("invisible");
       }
       if (actionsOpts && actionsOpts.check){
-        checkBtn.classList.remove("invisible");
+        checkBtn.classList.remove("hidden");
       } else {
-        checkBtn.classList.remove("invisible");
-        checkBtn.classList.add("invisible");
+        checkBtn.classList.remove("hidden");
+        checkBtn.classList.add("hidden");
+      }
+      if (actionsOpts && actionsOpts.allIn){
+        allInBtn.classList.remove("invisible");
+        allInBtn.innerHTML = "All in: " + actionsOpts.allIn;
+      } else {
+        allInBtn.classList.remove("invisible");
+        allInBtn.classList.add("invisible");
       }
       if (actionsOpts && actionsOpts.bet && actionsOpts.bet.length > 1){
         betBtn.classList.remove("invisible");
         betLabel.classList.remove("invisible");
         betInput.classList.remove("invisible");
         betInput.min = actionsOpts.bet[0];
-        betInput.max = actionOpts.bet[1];
+        betInput.max = actionsOpts.bet[1];
         betLabel.innerHTML = actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
       } else {
         betBtn.classList.remove("invisible");

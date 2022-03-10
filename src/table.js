@@ -100,6 +100,9 @@ function Table() {
         get burnedCards(){
             return _burnedCards;
         },
+        currentPotNumber: function(){
+            return _pots.length;
+        },
         resetPots: function(){
             console.log("clearing all pots");
             _pots = [{bets: []}];

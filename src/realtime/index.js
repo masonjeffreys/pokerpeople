@@ -32,6 +32,7 @@ exports.plugin = {
             socket.on('next hand', Handlers.nextHand);
             socket.on('check', Handlers.check);
             socket.on('call', Handlers.call);
+            socket.on('all in', Handlers.allIn);
             socket.on('fold', Handlers.fold);
             socket.on('bet', Handlers.bet);
 

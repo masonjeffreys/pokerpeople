@@ -18,6 +18,7 @@ function Player(id, firstName, lastName) {
       var _tablePosition = null;
       var _smallBlind = false;
       var _bigBlind = false;
+      var _allInPotNumber = null; // set to the pot number that the player is all-in for;
 
 
       return Object.freeze({
@@ -35,6 +36,15 @@ function Player(id, firstName, lastName) {
 
             set socketId(value){
                   _socketId = value;
+                  return this;
+            },
+
+            get allInPotNumber(){
+                  return _allInPotNumber;
+            },
+
+            set allInPotNumber(value){
+                  _allInPotNumber = value;
                   return this;
             },
 
