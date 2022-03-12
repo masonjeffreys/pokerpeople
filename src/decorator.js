@@ -11,7 +11,7 @@ function privateState(game, player, showHandsForPlayers=[]){
     
     game.players.forEach(function(p){
         let hand = [];
-        if (showHandsForPlayers.includes(p.id) || game.testMode || player.id == p.id){
+        if (showHandsForPlayers.includes(p.id) || game.testMode ||  p.id == player.id || p.publicHand == true){
             // could show hand if players are all in or game is in test mode
             hand = p.hand;
         }
@@ -24,7 +24,9 @@ function privateState(game, player, showHandsForPlayers=[]){
             bigBlind: p.bigBlind,
             gameState: p.gameState,
             handState: p.handState,
-            hand: hand
+            hand: hand,
+            allInPotNumber: p.allInPotNumber,
+            foldPotNumber: p.foldPotNumber
         })
     })
 
@@ -50,8 +52,9 @@ function privateState(game, player, showHandsForPlayers=[]){
             id: game.table.id,
             street: game.table.street,
             highBet: Utils.playerMaxBet(game.table, game.players),
+            minRaise: game.table.minRaise,
             commonCards: game.table.commonCards,
-            pots: Utils.potTotals(game.table),
+            pots: game.table.pots,
             activeIndex: game.table.activeIndex
         },
         playersInfo: playersInfo,

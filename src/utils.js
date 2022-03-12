@@ -1,12 +1,3 @@
-function getNextHandPlayerIndex(previousTablePosition, handPlayers){
-    var i = handPlayers.findIndex(obj => obj.tablePosition >= previousTablePosition + 1 && obj.handState == 'IN');
-    if (i == -1){
-        return 0;
-    } else {
-        return i;
-    }
-}
-
 function getByAttributeValue(array, attrName, attrValue){
     return array.filter(x => x[attrName] === attrValue)[0]
 }
@@ -16,6 +7,28 @@ function isValidPlayer(player){
     // Note that tricky rules apply when the player has less chips than the minBet.
     return (player.handState == "IN" && player.chips > 0);
 }
+
+function isNonFoldedPlayer(player){
+    return (player.handState != "FOLD")
+}
+
+function playerCanBet(player){
+    // To be eligible to bet, player must be valid
+    // Note that tricky rules apply when the player has less chips than the minBet.
+    if (player.allInPotNumber == null){
+        if (isValidPlayer(player)){
+            // player is not all in, not folded and still has chips. So they can bet.
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        // Player is all in
+        return false;
+    }
+}
+
+
 
 function correctIndex(arrayLen, givenIndex){
     // ensure that index is in array. If not, loop index back to beginning of array!
@@ -77,12 +90,16 @@ function dealOne(players, deck, startIndex){
     return players;
 }
 
-function mainPotTotal(table){
+function potTotal(pot){
     var total = 0;
-    table.pots[0]["bets"].forEach(bet => {
+    pot["bets"].forEach(bet => {
         total = total + bet.amount;
     })
     return total;
+}
+
+function mainPotTotal(table){
+    return potTotal(table.pots[0]);
 }
 
 function potTotals(table){
@@ -165,10 +182,20 @@ function isStreetComplete(table, players){
     return streetComplete;
 }
 
-function activePlayersCount(players){
+function nonFoldedPlayersCount(players){
     sum = 0;
     players.forEach(function(player){
-        if (isValidPlayer(player) == true){
+        if (isNonFoldedPlayer(player) == true){
+            sum = sum + 1
+        }
+    })
+    return sum;
+}
+
+function bettablePlayersCount(players){
+    sum = 0;
+    players.forEach(function(player){
+        if (playerCanBet(player) == true){
             sum = sum + 1
         }
     })
@@ -245,7 +272,7 @@ function getBetRange(chips, callAmount, minRaise){
     }
 }
 
-module.exports.getNextHandPlayerIndex = getNextHandPlayerIndex;
+module.exports.bettablePlayersCount = bettablePlayersCount;
 module.exports.correctIndex = correctIndex;
 module.exports.nextValidPlayer = nextValidPlayer;
 module.exports.nextValidPlayerIndex = nextValidPlayerIndex;
@@ -255,7 +282,7 @@ module.exports.mainPotTotal = mainPotTotal;
 module.exports.potTotals = potTotals;
 module.exports.getOptions = getOptions;
 module.exports.logState = logState;
-module.exports.activePlayersCount = activePlayersCount;
+module.exports.nonFoldedPlayersCount = nonFoldedPlayersCount;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.getCallAmount = getCallAmount;
 module.exports.playerMaxBet = playerMaxBet;
@@ -263,3 +290,5 @@ module.exports.playerCurrentBet = playerCurrentBet;
 module.exports.getByAttributeValue = getByAttributeValue;
 module.exports.isValidPlayer = isValidPlayer;
 module.exports.getBetRange = getBetRange;
+module.exports.playerCanBet = playerCanBet;
+module.exports.potTotal = potTotal;

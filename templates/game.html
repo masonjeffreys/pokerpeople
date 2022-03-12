@@ -3,7 +3,7 @@
   </div>
   <div id="table" class="p-2 pt-6 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-10 relative">
       <div class="flex justify-center">
-        <div id="mainPot" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
+        <div id="potHolder" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
         </div>
       </div>
       
@@ -102,8 +102,9 @@
     }
 
     function updateResults(results){
+      // results is an array of winners for each pot
       var resultsDiv = document.getElementById("results");
-      if (results){
+      if (results.length > 0){
         let dealButton = document.createElement('button');
         let resultText = document.createElement('div');
         resultText.className = "font-semibold text-gray-800 p-2 m-2 bg-green-200 rounded-xl shadow-lg"
@@ -112,7 +113,12 @@
         dealButton.type = "button";
         dealButton.onclick = nextHand;
         dealButton.innerHTML = "Deal";
-        let resultString = "Winner: " + results.winner_name + "!<br>" + results.amount + ' chips<br>' + 'Hand: ' + results.winning_hand;
+        let resultString = "";
+        results.forEach(function(potResult){
+          potResult.forEach(function(winner){
+            resultString = resultString + "Winner: " + winner.winner_name + "!<br>" + winner.amount + ' chips<br>' + 'Hand: ' + winner.winning_hand;
+          })
+        })
         resultText.innerHTML = resultString;
         resultsDiv.appendChild(resultText);
         resultsDiv.appendChild(dealButton);
@@ -272,6 +278,7 @@
       if (table){
         document.getElementById("street").innerHTML = table["street"];
         document.getElementById("highBet").innerHTML = "High Bet: " + table["highBet"];
+        // table can and will have multiple pots
         showPots(table["pots"]);
         showCommonCards(table["commonCards"]);
       }
@@ -279,14 +286,19 @@
 
     function showPots(potsArray){
       if (potsArray){
-        for (let i = 0; i < potsArray.length; i++) {
-            if (i == 0){
-                document.getElementById("mainPot").innerHTML = "Pot: " + JSON.stringify(potsArray[0]);
-            } else {
-              document.getElementById("mainPot").innerHTML = "Multiple pots!";
-                console.log("Multiple pots!")
-            }
-        }
+        let potHolder = document.getElementById('potHolder');
+        potHolder.innerHTML = "";
+        potsArray.forEach(function(pot, index){
+          let potDiv = document.createElement('div');
+          potDiv.class = 'pot'
+          potDiv.id = 'pot' + index;
+          let total = 0;
+          pot.bets.forEach(function(bet){
+            total = total + bet.amount;
+          })
+          potDiv.innerHTML = "Pot: " + total;
+          potHolder.appendChild(potDiv);
+        })
       }
     }
     function activatePlayer(playersInfo, table){

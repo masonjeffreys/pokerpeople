@@ -19,6 +19,8 @@ function Player(id, firstName, lastName) {
       var _smallBlind = false;
       var _bigBlind = false;
       var _allInPotNumber = null; // set to the pot number that the player is all-in for;
+      var _foldPotNumber = null; // set to the pot number that the player folded in;
+      var _publicHand = false;
 
 
       return Object.freeze({
@@ -45,6 +47,24 @@ function Player(id, firstName, lastName) {
 
             set allInPotNumber(value){
                   _allInPotNumber = value;
+                  return this;
+            },
+
+            get foldPotNumber(){
+                  return _foldPotNumber;
+            },
+
+            set foldPotNumber(value){
+                  _foldPotNumber = value;
+                  return this;
+            },
+
+            get publicHand(){
+                  return _publicHand;
+            },
+
+            set publicHand(value){
+                  _publicHand = value;
                   return this;
             },
 

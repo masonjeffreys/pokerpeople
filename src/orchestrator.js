@@ -19,7 +19,7 @@ function startGame(game){
         throw "Less than two players. Tough to play!"
     }
 
-    // Game state should advance to in-progress (from 'unstarted', 'in-progress', 'between-hands', 'complete')
+    // Game state should advance to in-progress (from 'unstarted', 'in-progress', 'hand-complete', 'complete')
     game.status = 'in-progress';
     setupHand(game);
 }
@@ -74,6 +74,8 @@ function setupHand(game){
         player.bigBlind = false;
         player.handState = "IN";
         player.allInPotNumber = null;
+        player.foldPotNumber = null;
+        player.publicHand = false;
     })
     game.table.street = STREETS[0]; // Sets to 'preflop'
     game.table.currentHighBet = game.table.bigBlind;
@@ -86,8 +88,12 @@ function setupHand(game){
     game.table.clearCommonCards();
     // Reset results
     game.lastAction = "new hand";
-    game.results = null;
+    game.results = [];
+    // Set the min bet (or min raise on top of a bet)
+    // for the betting round to be equal to the big blind
     game.table.minRaise = game.table.bigBlind;
+    game.table.sidePotPending = false;
+    game.table.playerAllIn = null;
     // BetTheBlinds
     makeBlindBets(game);
 
@@ -133,10 +139,10 @@ function receiveAction(game, action, amount = 0){
     // Get amount if needed
     var amount = parseInt(amount);
     // Get current player
-
     console.log("active index is: ", game.table.activeIndex);
     console.log("Action is: ", action, " : ", amount);
-    var player = game.players[game.table.activeIndex]
+    let player = game.players[game.table.activeIndex]
+    let callAmount = Utils.getCallAmount(game.table, game.players, player);
     player.actedInStreet = true;
     game.lastAction = player.prettyName() + ": " + action;
     if (amount && amount > 0){
@@ -146,30 +152,36 @@ function receiveAction(game, action, amount = 0){
     // Handle player's desired action
     switch (action){
         case "all in":
-            // Player is all in
+            // Player is all in. Any bet amount is legal here.
             player.allInPotNumber = game.table.currentPotNumber();
+            game.table.playerAllIn = player.playerId;
+            if (amount < callAmount + game.table.minRaise){
+                // not a full bet - remaining players can either fold or call, but can't raise
+                // no side pot can be started here, but could be started on next betting rounds
+                game.table.allInFullBet = false;
+            } else {
+                // full bet - remaining players can fold, call, raise which can lead to side pot.
+                // reset 'actedInStreet to reflect this.
+                // Use this to calculate options for next player and control game flow
+                game.table.allInFullBet = true;
+            }
             applyBet(game, game.table.activeIndex, player.chips);
             break;
         case "bet":
-            let callAmount = Utils.getCallAmount(game.table, game.players, player);
-            // this is essentially a raise action (range restricted to ensure this)
+            // this is essentially a raise action (range restricted to ensure this) but not an all-in
             // add logic here to check for minimum raise (if player has enough chips to make it)
             if (amount < callAmount + game.table.minRaise ){
                 // bet wasn't large enough
                 throw 'Not a big enough raise. Player could do more.'
             }
-            if (amount == player.chips){
-                // Player is all in
-                player.allInPotNumber = game.table.currentPotNumber();
-            }
             applyBet(game, game.table.activeIndex, amount);
-            
             break
         case "check":
             // Essentially no change. Just move to next position
             break
         case "fold":
             // Change player state and advance to next position
+            player.allInPotNumber = game.table.currentPotNumber(); // track the pot that the player folded in
             player.handState = "FOLD"
             break
         case "call":
@@ -179,15 +191,27 @@ function receiveAction(game, action, amount = 0){
             throw new Error(`Invalid player action: ${action}, ${amount}`)
     }
     
-    // Eval if a player won because others folded
-    // Or if we need to advance the street
-    // Or simply advance to the next player
-    if (winByFolding(game) == true){
-        console.log("Winner due to folding ");
+    advanceGame(game);
+
+}
+
+function advanceGame(game){
+    // After a player takes some action, need to evaluate game state:
+    // - game could be over (only 1 person is bettable or no one is bettable)
+    // - hand could be over (someone just folded)
+    // - hand needs to continue but betting is over? -> cover this through normal flow
+    // - street could be over
+    // - OR we just need to advance to the next player
+    if (isGameComplete(game)){
+        console.log("Game over!: ", game.status);
         game.status = 'complete';
-        getWinDetailsByFold(game);
-    }
-    else if (Utils.isStreetComplete(game.table, game.players) == true){
+        throw 'game is complete!';
+    } else if (isHandComplete(game)){
+        game.status = 'muck-check'
+        console.log("Completed Hand: ", game.status);
+        distributeWinnings(game);
+        // muck-check
+    } else if (Utils.isStreetComplete(game.table, game.players)){
         console.log("Completed street: ", game.table.street);
         advanceStreet(game);
     } else {
@@ -195,32 +219,55 @@ function receiveAction(game, action, amount = 0){
         console.log("Advancing to next player");
         game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.activeIndex)
     }
-
 }
 
-function getWinDetailsByFold(game){
-    var winningPlayer = game.players.find(p => Utils.isValidPlayer(p));
-    console.log("Winner: ", winningPlayer.prettyName());
-    winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
-    game.results = {
-        winner_name: winningPlayer.prettyName(),
-        winning_hand: "not shown",
-        amount: Utils.potForPlayer(game.table, winningPlayer)
+
+function isGameComplete(game){
+    // Game is complete if game status is between-hands
+    // AND only 1 player is active and still has chips
+    if (game.status == 'hand-complete'){
+        let remainingPlayers = 0;
+        game.players.forEach(function(player){
+            if (player.gameState == 'ACTIVE' && player.chips > 0){
+                remainingPlayers = remainingPlayers + 1;
+            }
+        })
+        return (remainingPlayers <= 1);
+    } else {
+        return false;
+    }
+}
+
+function isHandComplete(game){
+    // Hand can be complete after a player action if:
+    // - only 1 player in the last pot hasn't folded
+    // - if all players are out of chips, we still let them advance through the
+    // ---- game flow at their own pace, so we don't need to consider that 'handComplete'
+    if (winByFolding(game) == true){
+        console.log("Winner due to folding ");
+        game.status = 'hand-complete';
+        return true;
+    } 
+    else {
+        return false;
     }
 }
 
 function winByFolding(game){
-    if (Utils.activePlayersCount(game.players) == 1){
-        // Winning player, others folded
-        // Really should check this after every action as game would immediately end
-        console.log("only 1 valid player left!")
-        return true;
-    }
-    else {
-        // Do nothing, so play proceeds
-        console.log("no folded win at this point");
-        return false;
-    }
+    // Imagine a situation with a side pot. To have a win by folding, 
+    // all players involved in side pot (those have not already folded or gone all in)
+    // have to have acted and only 1 is in a non-folded state
+    
+    let playersLeft = 0;
+    game.players.forEach(function(player){
+        if (player.foldPotNumber || player.allInPotNumber){
+            console.log("Player ", player.id, " is folded or all in.");
+        } else {
+            console.log("Player ", player.id, " is still active.");
+            playersLeft = playersLeft + 1;
+        }
+    })
+    return (playersLeft == 1);
 }
 
 function advanceStreet(game){
@@ -252,37 +299,96 @@ function advanceStreet(game){
             game.table.addCommonCard(game.deck.take());
             break;
         case 'showdown':
-            var handsByPlayer = [];
-            var solutions = [];
-            game.players.forEach(p => {
-                if (p.handState == 'IN'){
-                    handsByPlayer.push({player: p, hand: p.hand.concat(game.table.commonCards)})
-                }
-            })
-            
-            handsByPlayer.forEach(function(h, i){
-                var solution = Solver.solve(h.hand);
-                solution.index = i;
-                solutions.push(solution);
-            })
-            var winningHand = Solver.winners(solutions);
-            console.log("winning hand is: ", winningHand);
-            var winningPlayerIndex = winningHand[0].index;
-            var winningPlayer = handsByPlayer[winningPlayerIndex].player
-            console.log("winner is ", winningPlayer.prettyName());
-            console.log("with hand ", winningHand[0].descr);
-            winningPlayer.wins(Utils.potForPlayer(game.table, winningPlayer));
-            game.status = 'complete';
-            game.results = {
-                winner_name: winningPlayer.prettyName(),
-                winning_hand: winningHand[0].descr,
-                amount: Utils.potForPlayer(game.table, winningPlayer)
-            }
+            // Showdown means that the hand is over, time to evaulate
+            // winners based on potentially multiple pots/side pots
+            distributeWinnings(game); // modifies the results array
+            game.status = 'hand-complete';
             break;
         default:
             throw new Error("Invalid street could not be matched: ", game.table.street);
     }
 }
+
+function distributeWinnings(game){
+    // cycle through pots since we may have to handle multiple pots
+    // game.results is an array matching with pots
+    game.table.pots.forEach(function(pot, index){
+        let potResults = evalPot(game.table, pot, index, game.players);
+        console.log("pot results are ", potResults);
+        game.results.push(potResults);
+    })
+}
+
+function evalPot(table, pot, potIndex, players){
+    // for a single pot, find winner (or winners for a tie)
+    // need to handle win by folding as well
+
+    let potTotal = Utils.potTotal(pot);
+    let resultsList = [];
+
+    // Get list of Ids who could win the pot (i.e. they didn't )
+    let playerIdsInPot = [];
+
+    players.forEach(function(player){
+        if (player.allInPotNumber &&  player.allInPotNumber < potIndex) {
+            // player went all in before this pot, so we skip them
+        } else if (player.allInPotNumber &&  player.allInPotNumber < potIndex){
+            // player went folded before this pot, so we skip them
+        } else if (player.gameState == "ACTIVE"){
+            // player is still in (i.e. hasn't left the table)
+            playerIdsInPot.push(player.id);
+        } else {
+            throw 'No players can win this pot? Bug!!'
+        }
+    })
+
+    console.log("Potential winners of pot index ", potIndex, " are ", playerIdsInPot);
+
+    // First check to see if there is only 1 potential winner for this pot (others have folded)
+    if (playerIdsInPot.length == 1){
+        // only 1 player can win, so we can get them directly
+        let winningPlayer = Utils.getByAttributeValue(players,"id", playerIdsInPot[0]);
+        winningPlayer.wins(potTotal);
+        console.log("Winner by : ", winningPlayer.prettyName());
+        resultsList.push({
+            winner_name: winningPlayer.prettyName(),
+            winning_hand: "maybe muck?",
+            amount: potTotal
+        })
+    } else {
+        // Need to evaluate who wins. Could still be multiple winners if there is a tie.
+        let handsByPlayer = [];
+        let solutions = [];
+        playerIdsInPot.forEach(pId => {
+            let player = Utils.getByAttributeValue(players,"id", pId);
+            handsByPlayer.push({player: player, hand: player.hand.concat(table.commonCards)})
+        })
+        handsByPlayer.forEach(function(h, i){
+            let solution = Solver.solve(h.hand);
+            solution.index = i;
+            solutions.push(solution);
+        })
+
+        let winningHands = Solver.winners(solutions);
+        let winnersCount = winningHands.length;
+
+        winningHands.forEach(function(winningHand,index){
+            let winningPlayer = handsByPlayer[index].player
+            winningPlayer.wins(potTotal/winnersCount);
+            resultsList.push({
+                winner_name: winningPlayer.prettyName(),
+                winning_hand: winningHand.descr,
+                amount: potTotal/winnersCount
+            })
+            console.log("winner is ", winningPlayer.prettyName());
+            console.log("with hand ", winningHand.descr);
+            console.log("amount: ", potTotal/winnersCount);
+            console.log("winning hand is: ", winningHand);
+        })
+    }
+    return resultsList;
+}
+
 
 module.exports.addPlayerToGame = addPlayerToGame;
 module.exports.startGame = startGame;

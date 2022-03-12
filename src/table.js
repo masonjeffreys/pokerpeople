@@ -13,8 +13,8 @@ function Table() {
     var _street = 'preflop';
 
     /// Relating to sidepots and stuff
-    var _actionChanging = true; // true means that players have
-    var _minBet = null;
+    var _sidePotPending = false;
+    var _playerAllIn = false;
     var _minRaise = null; // A raise must be at least equal to the largest prior full bet or raise of the current betting round.
     // A player who raises 50% or more of the largest prior bet but less than a minimum raise must make a full minimum raise.
     // If less than 50% it is a call unless 'raise' is first declared or the player is all-in (Rule 45-B).
@@ -99,6 +99,20 @@ function Table() {
         },
         get burnedCards(){
             return _burnedCards;
+        },
+        get allInFullBet(){
+            return _allInFullBet;
+        },
+        set allInFullBet(value){
+            _allInFullBet = value;
+            return this;
+        },
+        get playerAllIn(){
+            return _playerAllIn;
+        },
+        set playerAllIn(value){
+            _playerAllIn = value;
+            return this;
         },
         currentPotNumber: function(){
             return _pots.length;
