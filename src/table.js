@@ -9,7 +9,7 @@ function Table() {
     var _burnedCards = [];
     var _bigBlind = null;
     var _smallBlind = null;
-    var _pots = [{bets: []}]; // will have a main pot, then each time only 1 player can go all-in, we'd need to start tracking side pots.
+    var _pots = [{id: 0, playerAmounts: {}, highBet: 0}]; // will have a main pot, then each time only 1 player can go all-in, we'd need to start tracking side pots.
     var _street = 'preflop';
 
     /// Relating to sidepots and stuff
@@ -119,21 +119,24 @@ function Table() {
         },
         resetPots: function(){
             console.log("clearing all pots");
-            _pots = [{bets: []}];
+            _pots = [{id: 0, playerAmounts: {}, highBet: 0}];
             return this;
         },
         addPot: function(){
             console.log("starting new pot")
-            _pots.push({bets: []});
+            _pots.push({id: _pots.length, playerAmounts: {}, highBet: 0});
             return this;
         },
-        addBet: function (playerId, amount, potIndex=null){
+        addBet: function (playerId, amount, potIndex = _pots.length - 1 ){
             // Reset value of last pot to be previous value plus the new bet
-            if (potIndex){
-                _pots[potIndex]["bets"].push({playerId: playerId, amount: amount});
-            } else {
-                _pots[_pots.length - 1]["bets"].push({playerId: playerId, amount: amount});
+            console.log("** looking for pot ", potIndex);
+            console.log("pot is ", _pots[potIndex]);
+            let prevEntry = _pots[potIndex].playerAmounts[playerId];
+            let prevAmount = 0;
+            if (prevEntry){
+                prevAmount = prevEntry.amount;
             }
+            _pots[potIndex].playerAmounts[playerId] = {amount: prevAmount + amount}
             return this;
         },
         addBurnedCard: function(card){

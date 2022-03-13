@@ -47,12 +47,12 @@ function correctIndex(arrayLen, givenIndex){
 function playerCurrentBet(table,player){
     let totals = [];
     table.pots.forEach( function(pot,index) {
-        totals[index] = 0;
-        pot["bets"].forEach(bet => {
-            if (bet.playerId == player.id) {
-                totals[index] = totals[index] + bet.amount;
-            }
-        })
+        let playerBet = pot.playerAmounts[player.id];
+        let playerBetAmount = 0;
+        if (playerBet){
+            playerBetAmount = playerBet.amount;
+        }
+        totals.push(playerBetAmount);
     })
     return totals;
 }
@@ -92,8 +92,9 @@ function dealOne(players, deck, startIndex){
 
 function potTotal(pot){
     var total = 0;
-    pot["bets"].forEach(bet => {
-        total = total + bet.amount;
+    let keys = Object.keys(pot.playerAmounts);
+    keys.forEach(key => {
+        total = total + pot.playerAmounts[key].amount;
     })
     return total;
 }
@@ -104,23 +105,14 @@ function mainPotTotal(table){
 
 function potTotals(table){
     let totals = [];
-    table.pots.forEach( function(pot,index){
-        totals[index] = 0;
-        pot["bets"].forEach(bet => {
-            totals[index] = totals[index] + bet.amount;
-        })
+    table.pots.forEach(pot => {
+        totals.push(potTotal(pot))
     })
     return totals;
 }
 
 function allPotsTotal(table){
-    let total = 0;
-    table.pots.forEach(pot => {
-        pot["bets"].forEach(bet => {
-            total = total + bet.amount;
-        })
-    })
-    return total;
+    return potTotals(table).reduce((partialSum, a) => partialSum + a, 0);;
 }
 
 function potForPlayer(table, player){
@@ -254,12 +246,11 @@ function getCallAmounts(table, players, player){
 
 function playerBetForPot(pot, player){
     let playerBet = 0;
-    pot.bets.forEach(bet => {
-        if (bet.playerId == player.id){
-            playerBet = playerBet + bet.amount;
-        }
-    })
-    return playerBet;
+    let entry = pot.playerAmounts[player.id];
+    if (entry){
+        playerBet = entry.amount;
+    }
+    return entry;
 }
 
 function maxBetForPot(pot,players){

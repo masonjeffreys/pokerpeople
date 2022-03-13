@@ -189,20 +189,20 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
     console.log("**Player current bets are: ");
     console.log(JSON.stringify(playerCurrentBets));
 
-    newPots = [] // {limit: 10, playerAmounts: [{id: 1, amount: 10}]}
+    newPots = [] // {id: 0, highBet: 10, playerAmounts: [{id: 1, amount: 10}]}
 
     playerCurrentBets.forEach(function(pcb,index){
         // Go through objects like [{id: 2, amount: 10}, {id: 3, amount: 10}, {id: 8, amount: 40}]
         // if pot already exists for this amount, contribute to that pot
         let amountRemaining = pcb.amount;
         newPots.forEach(pot => {
-            if (amountRemaining >= pot.limit){
-                pot.playerAmounts.push({playerId: pcb.playerId, amount: pot.limit})
-                amountRemaining = amountRemaining - pot.limit;
+            if (amountRemaining >= pot.highBet){
+                pot.playerAmounts.push({playerId: pcb.playerId, amount: pot.highBet})
+                amountRemaining = amountRemaining - pot.highBet;
             }
         })
         if (amountRemaining > 0){
-            newPots.push({id: newPots.length, limit: amountRemaining, playerAmounts:[{id: pcb.playerId, amount: amountRemaining}]})
+            newPots.push({id: newPots.length, highBet: amountRemaining, playerAmounts:[{id: pcb.playerId, amount: amountRemaining}]})
         }
     })
     console.log("**New pots are: ");
