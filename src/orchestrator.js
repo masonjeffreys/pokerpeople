@@ -172,7 +172,7 @@ function receiveAction(game, action, amount = 0){
             // add logic here to check for minimum raise (if player has enough chips to make it)
             if (amount < callAmount + game.table.minRaise ){
                 // bet wasn't large enough
-                throw 'Not a big enough raise. Player could do more.'
+                throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
             }
             applyBet(game, game.table.activeIndex, amount);
             break
@@ -257,7 +257,7 @@ function winByFolding(game){
     // Imagine a situation with a side pot. To have a win by folding, 
     // all players involved in side pot (those have not already folded or gone all in)
     // have to have acted and only 1 is in a non-folded state
-    
+
     let playersLeft = 0;
     game.players.forEach(function(player){
         if (player.foldPotNumber || player.allInPotNumber){
