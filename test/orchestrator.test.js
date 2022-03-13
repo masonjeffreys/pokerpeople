@@ -87,7 +87,7 @@ describe('handles standard side pot creation with full raise in same betting rou
         expect(Utils.potTotal(game.table.pots[0])).to.equal(95);
     })
 
-    it('will allow a bet and create a side pot', () => {
+    it('will allow a bet and create a first side pot', () => {
         Orchestrator.receiveAction(game, 'all in'); // Small blind goes all in.
         // This is a raise above previous all-in
         // So we have a side pot:
@@ -96,12 +96,17 @@ describe('handles standard side pot creation with full raise in same betting rou
         expect(game.table.pots.length).to.equal(2);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(130);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(60);
+    })
+
+    it('will allow another, lower, all in and retroactively create a second side pot', () => {
         // BigBlind only has 75 chips left (already has 10 in pot).
-        // BigBlind goes all in. His first 30 call the first pot.
+        // BigBlind goes all in. His first 30 calls the first pot.
         // Other 45 go against side pot (60) but can't call it fully, so...
         // We need to pull 15 from SmallBlind out of pot 2 and create pot 3.
+        console.log('*** Here we go');
         Orchestrator.receiveAction(game, 'all in');
         expect(game.table.pots.length).to.equal(3);
+        console.log("*** Pots are", game.table.pots);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
         expect(Utils.potTotal(game.table.pots[2])).to.equal(15);

@@ -235,22 +235,57 @@ function playerMaxBet(table, players){
 }
 
 function getCallAmount(table, players, player){
-    return (playerMaxBet(table, players) - playerCurrentBetInt(table, player));
+    // sums over all pots for a given player
+    let callAmount = 0;
+    getCallAmounts(table, players, player).forEach(i => {
+        callAmount = callAmount + i;
+    })
+    return callAmount;
+}
+
+function getCallAmounts(table, players, player){
+    // needs to work for multiple pots
+    let callAmounts = [];
+    table.pots.forEach(function(pot,index){
+        callAmounts.push(maxBetForPot(pot,players) - playerBetForPot(pot, player));
+    })
+    return callAmounts;
+}
+
+function playerBetForPot(pot, player){
+    let playerBet = 0;
+    pot.bets.forEach(bet => {
+        if (bet.playerId == player.id){
+            playerBet = playerBet + bet.amount;
+        }
+    })
+    return playerBet;
+}
+
+function maxBetForPot(pot,players){
+    let potMaxBet = 0;
+    players.forEach(player => {
+        let playerMax = playerBetForPot(pot, player);
+        if (playerMax > potMaxBet){
+            potMaxBet = playerMax;
+        }
+    })
+    return potMaxBet;
 }
 
 function getOptions(players, player, table){
     var actionOpts = {fold: true, allIn: player.chips}; // can always fold or go all in
-    var callAmount = getCallAmount(table, players, player);
-    if (callAmount == 0){
+    var callAmounts = getCallAmounts(table, players, player);
+    if (Math.max(callAmounts) == 0){
         actionOpts.check = true;
-    } else if ( player.chips >= callAmount ){
+    } else if ( player.chips >= callAmounts[callAmounts.length - 1] ){
         // non-zero call amount
         // player can only call if they have enough chips
         // otherwise they will need to simply go all-in, not being able to call
-        actionOpts.call = callAmount;
+        actionOpts.call = callAmounts[callAmounts.length - 1];
     } 
     
-    actionOpts.bet = getBetRange(player.chips, callAmount, table.minRaise);
+    actionOpts.bet = getBetRange(player.chips, callAmounts[callAmounts.length - 1], table.minRaise);
     
     return actionOpts;
 }
@@ -285,6 +320,7 @@ module.exports.logState = logState;
 module.exports.nonFoldedPlayersCount = nonFoldedPlayersCount;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.getCallAmount = getCallAmount;
+module.exports.getCallAmounts = getCallAmounts;
 module.exports.playerMaxBet = playerMaxBet;
 module.exports.playerCurrentBet = playerCurrentBet;
 module.exports.getByAttributeValue = getByAttributeValue;
@@ -292,3 +328,4 @@ module.exports.isValidPlayer = isValidPlayer;
 module.exports.getBetRange = getBetRange;
 module.exports.playerCanBet = playerCanBet;
 module.exports.potTotal = potTotal;
+module.exports.playerCurrentBetInt = playerCurrentBetInt;

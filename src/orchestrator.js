@@ -123,45 +123,90 @@ function makeBlindBets(game){
 }
 
 function applyBet(game, playerIndex, amount){
+    // Assume bet amount is valid per the game state before this function is called.
+
     // Player makes bet
     // Remove chips from player
     // Add chips to correct pot on table
+    let callAmounts = Utils.getCallAmounts(game.table, game.players, game.players[playerIndex]); // array of callAmounts by Pot
+    console.log("call amounts are: ", callAmounts);
+    let amountRemaining = amount;
+    callAmounts.forEach(function(ca,index){
+        if (index == game.table.pots.length - 1 && amountRemaining > 0){
+            // last Pot. Drop all money here
+            game.table.addBet(game.players[playerIndex].id, amountRemaining, index);
+            amountRemaining = 0;
+        } else if (ca > 0 && amountRemaining >= ca){
+            // Need to call the pot and can make the call
+            game.table.addBet(game.players[playerIndex].id, ca, index);
+            amountRemaining = amountRemaining - ca;
+        } else if (amountRemaining > 0){
+            // not the last pot, but can't cover the call. Drop all money here
+            game.table.addBet(game.players[playerIndex].id, amountRemaining, index);
+            amountRemaining = 0;
+        } else if (amountRemaining == 0) {
+            // no amountRemaining is so we Do nothing.
+        } else {
+            throw new Error("Weird. Would not expect to hit this.")
+        }
+    })
+    game.players[playerIndex].makeBet(amount);
+
     let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]);
     let raiseAmount = amount - callAmount;
     if (raiseAmount > game.table.minRaise){
         game.table.minRaise = raiseAmount; 
     }
-    game.players[playerIndex].makeBet(amount);
-    game.table.addBet(game.players[playerIndex].id, amount)
+    
+    
 }
 
 function equalizeFundsAndCreateSidePot(game, allInTotal){
-    // Example: amount to call was $20. Last player can only call $15 by going all-in.
+    // Example: amount to call in main pot was $10 and side pot was $20. Last player can only add $15 by going all-in.
+    // $15 is the allInTotal in this case
+    // before this function, bet of $15 was placed at $10 in main pot, $5 in side pot
+
+    // Desired result: main pot is called with 10, side pot 1 is reduced to a $5 side pot, and a new side pot has $15 from high raiser
     // 1. Create new side pot
     // 2. Go back through all bets in current pot. Reduce down to $15. Extra gets put in new side pot.
-    let prevPotNumber = game.table.currentPotNumber();
-    game.table.addPot();
-    let newPotNumber = game.table.currentPotNumber();
-    game.players.forEach(function(player){
-        let playerTotalsArray = Utils.playerCurrentBet(game.table,player);
-        let prevPotTotal = playerTotalsArray[prevPotNumber];
-        
-        // Check to see if player did bet in previous pot.
-        if (prevPotTotal){
-            let amountToShift = prevPotTotal - allInTotal;
-            if (amountToShift > 0){
-                console.log("shifting funds from previous pot");
-                // Need to move some money to the new pot.
-                // Add a 'negative bet' to the prev pot and a positive bet to the new pot.
-                // This will help to maintain the log.
-                player.makeBet(amountToShift * -1);
-                game.table.addBet(player.id, amountToShift * -1, prevPotNumber);
-                player.makeBet(amountToShift);
-                game.table.addBet(player.id, amountToShift)
+
+    // We have list of people that are all in. Also lists of bets.
+    // Need a side pot for each different amount that is all-in and a final one for any extra bets
+
+    // Do we ever need to adjust more than the current pot and the new side pot? Yes -> The nth player may go all-in with only $1
+    // goal is to put player amounts in correct pots
+    pots = game.table.pots;
+    playerCurrentBets = []; // list of playerCurrentBets
+    game.players.forEach(player=>{
+        playerCurrentBets.push({playerId: player.id, amount: Utils.playerCurrentBetInt(game.table, player)});
+    })
+
+    // Sort in ascending order
+    playerCurrentBets.sort((a, b) => {
+        return a.amount - b.amount;
+    });
+
+    console.log("**Player current bets are: ");
+    console.log(JSON.stringify(playerCurrentBets));
+
+    newPots = [] // {limit: 10, playerAmounts: [{id: 1, amount: 10}]}
+
+    playerCurrentBets.forEach(function(pcb,index){
+        // Go through objects like [{id: 2, amount: 10}, {id: 3, amount: 10}, {id: 8, amount: 40}]
+        // if pot already exists for this amount, contribute to that pot
+        let amountRemaining = pcb.amount;
+        newPots.forEach(pot => {
+            if (amountRemaining >= pot.limit){
+                pot.playerAmounts.push({playerId: pcb.playerId, amount: pot.limit})
+                amountRemaining = amountRemaining - pot.limit;
             }
+        })
+        if (amountRemaining > 0){
+            newPots.push({id: newPots.length, limit: amountRemaining, playerAmounts:[{id: pcb.playerId, amount: amountRemaining}]})
         }
     })
-    
+    console.log("**New pots are: ");
+    console.log(JSON.stringify(newPots));
 }
 
 function isSomeoneAllIn(game){
@@ -174,12 +219,25 @@ function isSomeoneAllIn(game){
     return anyoneAlreadyAllIn;
 }
 
+function maxCallableBet(game, playerToExclude){
+    let max = 0;
+    game.players.forEach(player => {
+        if (player.id != playerToExclude.id){
+            max = Math.max(max, player.chips + Utils.playerCurrentBet(game.table, player));
+        }
+    })
+    return max;
+}
+
 function receiveAction(game, action, amountRaw = 0){
     // Get amount if needed
     let amount = parseInt(amountRaw);
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
+    
     // Get current player
-    let player = game.players[game.table.activeIndex]
+    let player = game.players[game.table.activeIndex];
+
+    // call amount is sum of amounts needed to call each pot
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
 
     // Record that player has acted in street (used for later determination of when the street is over)
@@ -215,9 +273,10 @@ function receiveAction(game, action, amountRaw = 0){
             if (amount < callAmount){
                 // siphon some funds off of the current pot and start a side pot
                 console.log("Equalizing funds for new side pot since amount bet was ", amount, " and call amount was ", callAmount);
-                equalizeFundsAndCreateSidePot(game);
+                applyBet(game, game.table.activeIndex, amount);
+                equalizeFundsAndCreateSidePot(game, Utils.playerCurrentBet(game.table, player));
             } else {
-                // We have a raise. If someone has already gone all in on this pot, we just created a side pot
+                // We have a raise. 
                 if (anyoneAlreadyAllIn){
                     applyBet(game, game.table.activeIndex, callAmount);
                     game.table.addPot();
@@ -229,24 +288,40 @@ function receiveAction(game, action, amountRaw = 0){
             }
             break;
         case "bet":
+            /// **** THIS IS NOT AN ALL IN BET -> That is handled above ****
+
             // this is essentially a raise action (range restricted to ensure this) but not an all-in
-            // add logic here to check for minimum raise (if player has enough chips to make it)
+            // add logic here to not let the player 
             if (amount == player.chips){
                 // should move this to be handled by the 'all-in' action for more clarity.
                 throw new Error("Player attempted to go all in, but the received action was 'bet' ");
             }
+            else if (amount == 0){
+                // should move this to be handled by the 'check' action for more clarity.
+                throw new Error("Player attempted to check, but the received action was 'bet' ");
+            }
+            else if (amount == callAmount){
+                // should move this to be handled by the 'call' action for more clarity.
+                throw new Error("Player attempted to check, but the received action was 'bet' ");
+            }
             else if (amount < callAmount + game.table.minRaise ){
                 // bet wasn't large enough
                 throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
-            }
-            if (amount > callAmount){
-                // We have a raise. If someone has already gone all in on this pot, we just created a side pot
+            } else if (amount > maxCallableBet(game,player)){
+                throw new Error("Bet is too big, no one can match it.");
+            } else {
+                // We now have a valid raise for sure!
+                // If someone has already gone all-in on this pot already, we must:
+                // 1. apply the call amount to the current pot
+                // 2. create a new pot.
+                // 3. bet the rest of the money in the new pot
                 if (anyoneAlreadyAllIn){
                     applyBet(game, game.table.activeIndex, callAmount);
                     game.table.addPot();
                     applyBet(game, game.table.activeIndex, amount - callAmount);
                 } else {
-                    applyBet(game, game.table.activeIndex, amount - callAmount);
+                    // Standard raise. Will not create side pot until it is called.
+                    applyBet(game, game.table.activeIndex, amount);
                 }
             }
             
