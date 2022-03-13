@@ -250,15 +250,15 @@ function playerBetForPot(pot, player){
     if (entry){
         playerBet = entry.amount;
     }
-    return entry;
+    return playerBet;
 }
 
 function maxBetForPot(pot,players){
     let potMaxBet = 0;
-    players.forEach(player => {
-        let playerMax = playerBetForPot(pot, player);
-        if (playerMax > potMaxBet){
-            potMaxBet = playerMax;
+    let keys = Object.keys(pot.playerAmounts);
+    keys.forEach(key => {
+        if (pot.playerAmounts[key].amount > potMaxBet){
+            potMaxBet = pot.playerAmounts[key].amount;
         }
     })
     return potMaxBet;
