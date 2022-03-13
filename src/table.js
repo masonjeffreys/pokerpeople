@@ -127,9 +127,13 @@ function Table() {
             _pots.push({bets: []});
             return this;
         },
-        addBet: function (playerId, amount){
+        addBet: function (playerId, amount, potIndex=null){
             // Reset value of last pot to be previous value plus the new bet
-            _pots[_pots.length - 1]["bets"].push({playerId: playerId, amount: amount});
+            if (potIndex){
+                _pots[potIndex]["bets"].push({playerId: playerId, amount: amount});
+            } else {
+                _pots[_pots.length - 1]["bets"].push({playerId: playerId, amount: amount});
+            }
             return this;
         },
         addBurnedCard: function(card){
