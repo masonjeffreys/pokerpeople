@@ -89,6 +89,7 @@ function setupHand(game){
     // Reset results
     game.lastAction = "new hand";
     game.results = [];
+    game.freeAdvance = false;
     // Set the min bet (or min raise on top of a bet)
     // for the betting round to be equal to the big blind
     game.table.minRaise = game.table.bigBlind;
@@ -227,6 +228,40 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
     game.table.pots = newPots;
 }
 
+function maybeReturnExtraMoney(game){
+    // A side pot has collapsed if there are 0 players who are not current with bet and still have chips and haven't folded.
+    // That person gets all chips in the last pot
+    let lastPot = game.table.pots[game.table.pots.length - 1];
+    let lastPotBet = Utils.maxBetForPot(lastPot);
+    let eligiblePlayerIds = [];
+    game.players.forEach(p => {
+        if (p.handState != "FOLD"){
+            let playerBetInPot = Utils.playerBetForPot(lastPot, p);
+            if (playerBetInPot < lastPotBet && p.chips > 0){
+                eligiblePlayerIds.push(p.id);
+            } else if (playerBetInPot == lastPotBet){
+                // This would be the potential winner
+                eligiblePlayerIds.push(p.id);
+            }
+        }
+    })
+    console.log("eligibleIds are ", eligiblePlayerIds);
+    if (eligiblePlayerIds.length == 1){
+        // return bet and destroy pot
+        let returnAmount = Utils.potTotal(lastPot);
+        let player = game.players.find(p => p.id == eligiblePlayerIds[0]);
+        console.log("Player ", player.id, " getting ", returnAmount, " back from collapsing a side pot!");
+        player.chips = player.chips + returnAmount;
+        game.table.pots.pop();
+    } else if (eligiblePlayerIds.length == 0) {
+        throw new Error('no eligible players? Bug!')
+    } else {
+        // No need to collapse the side pot yet
+        console.log("No need to collapse side pot");
+    }
+    return;
+}
+
 function isSomeoneAllIn(game){
     let anyoneAlreadyAllIn = false;
     game.players.forEach(player => {
@@ -354,8 +389,10 @@ function receiveAction(game, action, amountRaw = 0){
             break
         case "fold":
             // Change player state and advance to next position
-            player.allInPotNumber = game.table.currentPotNumber(); // track the pot that the player folded in
+            player.foldPotNumber = game.table.currentPotNumber(); // track the pot that the player folded in
             player.handState = "FOLD"
+            // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
+            maybeReturnExtraMoney(game);
             break
         case "call":
             applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
@@ -459,6 +496,13 @@ function advanceStreet(game){
     })
     // Set starting player to 'left-of-dealer'
     game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
+    if (typeof(game.table.activeIndex) == 'undefined'){
+        // no action needs to occur, just keep showing results
+        console.log("can freely advance");
+        game.freeAdvance = true;
+    } else {
+        game.freeAdvance = false;
+    }
     // Reset the minRaise
     game.table.minRaise = game.table.bigBlind;
     
@@ -511,8 +555,8 @@ function evalPot(table, pot, potIndex, players){
     players.forEach(function(player){
         if (player.allInPotNumber &&  player.allInPotNumber < potIndex) {
             // player went all in before this pot, so we skip them
-        } else if (player.allInPotNumber &&  player.allInPotNumber < potIndex){
-            // player went folded before this pot, so we skip them
+        } else if (player.handState == "FOLD"){
+            // player folded so they definitely can't win
         } else if (player.gameState == "ACTIVE"){
             // player is still in (i.e. hasn't left the table)
             playerIdsInPot.push(player.id);
@@ -550,7 +594,6 @@ function evalPot(table, pot, potIndex, players){
 
         let winningHands = Solver.winners(solutions);
         let winnersCount = winningHands.length;
-
         winningHands.forEach(function(winningHand,index){
             let winningPlayer = handsByPlayer[index].player
             winningPlayer.wins(potTotal/winnersCount);

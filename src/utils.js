@@ -332,3 +332,5 @@ module.exports.getBetRange = getBetRange;
 module.exports.playerCanBet = playerCanBet;
 module.exports.potTotal = potTotal;
 module.exports.playerCurrentBetInt = playerCurrentBetInt;
+module.exports.maxBetForPot = maxBetForPot;
+module.exports.playerBetForPot = playerBetForPot;

@@ -12,7 +12,6 @@ function Deck() {
 
     return Object.freeze({
         listCards: function(){
-            console.log(_cards);
             return _cards;
         },
         cardCount: function(){
@@ -20,10 +19,9 @@ function Deck() {
         },
         init: function init(){
             SUITS.forEach((suit) => {
-                for (var i=0; i<13; i++){
-                    // Index starts at 0. Card values start at 2.
-                    _cards.push(CARD_NAMES[i] + suit)
-                }
+                CARD_NAMES.forEach(card_name =>{
+                    _cards.push(card_name + suit)
+                })
             })
             return this;
         },

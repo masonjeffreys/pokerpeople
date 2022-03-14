@@ -46,7 +46,8 @@ function privateState(game, player, showHandsForPlayers=[]){
         game: {
             status: game.status,
             testMode: game.testMode,
-            gameCode: game.gameCode
+            gameCode: game.gameCode,
+            freeAdvance: game.freeAdvance
         },
         table: {
             id: game.table.id,
