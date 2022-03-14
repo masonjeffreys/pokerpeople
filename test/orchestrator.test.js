@@ -139,7 +139,7 @@ describe('handles min bets correctly',()=>{
 
     it('will reject bets below the min raise if they are not all-in bets', () => {
         // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
-        expect(Orchestrator.receiveAction(game, 'bet', 11)).to.throw();
+        expect(function(){Orchestrator.receiveAction(game, 'bet', 11)}).to.throw('Not a big enough raise. Min raise is 10 over 10 to call.');
     })
 })
 
@@ -201,50 +201,3 @@ describe('handles standard side pot creation with full raise in same betting rou
         expect(game.table.street).to.equal('flop');
     })
 })
-
-// describe('can handle side pots',()=>{
-    
-//     let game2 = newTestGame("d");
-//     // Remove chips from SmallBlind as if they have not been playing well
-//     game2.players[1].chips = 40;
-//     // Remove chips from player3 so they cannot make a full raise.
-//     game2.players[2].chips = 18;
-//     Orchestrator.startGame(game2);
-
-//     it('will allow bets below minimum if they are all-in bets', () => {
-//         // Player 3 calls
-//         Orchestrator.receiveAction(game2, 'call');
-//         // Dealer, SM blind call
-//         Orchestrator.receiveAction(game2, 'call');
-//         Orchestrator.receiveAction(game2, 'call');
-//         // BB goes all in, but for an amount less than a full bet
-//         Orchestrator.receiveAction(game2, 'all in');
-//         // Pot is currently 10 + 10 + 18 + 10 = 30
-//         expect(Utils.potTotal(game2.table.pots[0])).to.equal(48);
-//         // That completes the street - no additional action allowed since the bet wasn't full
-//         expect(game2.table.street).to.equal('flop');
-//     })
-
-//     // Resume here
-//     it('will allow a side pot to start on the next betting round', () => {
-//         expect(game2.table.street).to.equal('flop');
-//         // SB checks, BB is out, Player3 checks
-//         Orchestrator.receiveAction(game2, 'check');
-//         Orchestrator.receiveAction(game2, 'check')
-//         // Dealer goes all in - this creates a side pot
-//         Orchestrator.receiveAction(game2, 'all in');
-//         expect(game2.table.pots.length).to.equal(2)
-//         // SB can raise because it was a valid bet
-//         Orchestrator.receiveAction(game2, 'bet', 200);
-//         // Player 3 can only call part?
-
-//         // Dealer reraises
-//         Orchestrator.receiveAction(game2, 'bet', 20);
-//         // SB can't call, so we need a new side pot
-//         Orchestrator.receiveAction(game2, 'call');
-//         expect(game2.table.street).to.equal('turn');
-//         expect(Utils.potTotal(game2.table.pots[0])).to.equal('x');
-//         expect(Utils.potTotal(game2.table.pots[1])).to.equal('y');
-//         expect(Utils.potTotal(game2.table.pots[1])).to.equal('z');
-//     })
-// })
