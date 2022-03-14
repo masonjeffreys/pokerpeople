@@ -121,22 +121,20 @@ function potForPlayer(table, player){
     var total = 0;
     if (player.chips > 0){
         total = allPotsTotal(table);
-    }
-
-    // Player is out of chips
-    else {
+    } else {
         table.pots.forEach(pot => {
             // First determine if the player participated in the pot.        
             var participated = false;
-            pot["bets"].forEach(bet => {
-                if (bet.playerId == player.id){
+            let keys = Object.keys(pot.playerAmounts);
+            keys.forEach(key => {
+                if (pot.playerAmounts[key].playerId == player.id){
                     participated = true;
                 }
             })
             // If player participated, they can win that money
             if (participated == true) {
-                pot["bets"].forEach(bet => {
-                    total = total + bet.amount;
+                keys.forEach(key => {
+                    total = total + pot.playerAmounts[key].amount;
                 })
             }
         })
@@ -236,10 +234,9 @@ function getCallAmount(table, players, player){
 }
 
 function getCallAmounts(table, players, player){
-    // needs to work for multiple pots
     let callAmounts = [];
     table.pots.forEach(function(pot,index){
-        callAmounts.push(maxBetForPot(pot,players) - playerBetForPot(pot, player));
+        callAmounts.push(maxBetForPot(pot) - playerBetForPot(pot, player));
     })
     return callAmounts;
 }
@@ -253,12 +250,13 @@ function playerBetForPot(pot, player){
     return playerBet;
 }
 
-function maxBetForPot(pot,players){
+function maxBetForPot(pot){
     let potMaxBet = 0;
     let keys = Object.keys(pot.playerAmounts);
     keys.forEach(key => {
-        if (pot.playerAmounts[key].amount > potMaxBet){
-            potMaxBet = pot.playerAmounts[key].amount;
+        let playerBet = pot.playerAmounts[key].amount;
+        if (playerBet > potMaxBet){
+            potMaxBet = playerBet;
         }
     })
     return potMaxBet;

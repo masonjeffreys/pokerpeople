@@ -41,6 +41,10 @@ function Table() {
         get pots(){
             return _pots;
         },
+        set pots(value){
+            _pots = value;
+            return this;
+        },
         get dealerPosition(){
             return _dealerPosition;
         },
@@ -129,14 +133,16 @@ function Table() {
         },
         addBet: function (playerId, amount, potIndex = _pots.length - 1 ){
             // Reset value of last pot to be previous value plus the new bet
-            console.log("** looking for pot ", potIndex);
-            console.log("pot is ", _pots[potIndex]);
             let prevEntry = _pots[potIndex].playerAmounts[playerId];
             let prevAmount = 0;
             if (prevEntry){
                 prevAmount = prevEntry.amount;
             }
-            _pots[potIndex].playerAmounts[playerId] = {amount: prevAmount + amount}
+            let newAmount = prevAmount + amount;
+            if (newAmount > _pots[potIndex].highBet){
+                _pots[potIndex].highBet = newAmount;
+            }
+            _pots[potIndex].playerAmounts[playerId] = {amount: newAmount};
             return this;
         },
         addBurnedCard: function(card){

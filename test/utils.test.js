@@ -79,8 +79,10 @@ describe('potForPlayer',()=>{
     it('will be calculated with multiple pots', () => {
         table.addPot();
         table.addBet(1, 20);
+        expect(Utils.potTotals(table)).to.equal([15,20]);
         expect(Utils.potForPlayer(table, players[0])).to.equal(15);
         expect(Utils.potForPlayer(table, players[1])).to.equal(35);
+        expect(Utils.getCallAmounts(table, players, players[0])).to.equal([0,20]);
     })
     it('will calculate main pot', () =>{
         expect(Utils.mainPotTotal(table)).to.equal(15);
@@ -88,6 +90,12 @@ describe('potForPlayer',()=>{
 })
 
 describe('potTotals',()=>{
+    it('will return summary', () => {
+        expect(Utils.potTotals(table)).to.equal([15,20]);
+    })
+})
+
+describe('getCallAmounts',()=>{
     it('will return summary', () => {
         expect(Utils.potTotals(table)).to.equal([15,20]);
     })

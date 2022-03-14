@@ -93,6 +93,7 @@ describe('handles standard side pot creation with full raise in same betting rou
         // So we have a side pot:
         // Pot1 is currently 40 + 40 + 10 + 40 = 130
         // Pot2 is (100-40) = 60
+        console.log("*** Resulting pots are ", JSON.stringify(game.table.pots));
         expect(game.table.pots.length).to.equal(2);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(130);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(60);
@@ -103,10 +104,9 @@ describe('handles standard side pot creation with full raise in same betting rou
         // BigBlind goes all in. His first 30 calls the first pot.
         // Other 45 go against side pot (60) but can't call it fully, so...
         // We need to pull 15 from SmallBlind out of pot 2 and create pot 3.
-        console.log('*** Here we go');
         Orchestrator.receiveAction(game, 'all in');
-        expect(game.table.pots.length).to.equal(3);
         console.log("*** Pots are", game.table.pots);
+        expect(game.table.pots.length).to.equal(3);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
         expect(Utils.potTotal(game.table.pots[2])).to.equal(15);
@@ -115,16 +115,16 @@ describe('handles standard side pot creation with full raise in same betting rou
         expect(game.table.street).to.equal('flop');
     })
 
-    it('will allow a bet and create a side pot', () => {
-        Orchestrator.receiveAction(game, 'all in'); // Small blind goes all in
-        // Pot1 is currently 40 + 40 + 10 + 40 = 130
-        // Pot2 is (85-40) = 45
-        expect(Utils.potTotal(game.table.pots[0])).to.equal(130);
-        expect(Utils.potTotal(game.table.pots[1])).to.equal(45);
-        // That completes the street - no additional action allowed since the bet wasn't full
-        expect(game.table.street).to.equal('flop');
-        expect().to.equal('below min raise');
-    })
+    // it('will allow a bet and create a side pot', () => {
+    //     Orchestrator.receiveAction(game, 'all in'); // Small blind goes all in
+    //     // Pot1 is currently 40 + 40 + 10 + 40 = 130
+    //     // Pot2 is (85-40) = 45
+    //     expect(Utils.potTotal(game.table.pots[0])).to.equal(130);
+    //     expect(Utils.potTotal(game.table.pots[1])).to.equal(45);
+    //     // That completes the street - no additional action allowed since the bet wasn't full
+    //     expect(game.table.street).to.equal('flop');
+    //     expect().to.equal('below min raise');
+    // })
 })
 
 // describe('can handle side pots',()=>{
