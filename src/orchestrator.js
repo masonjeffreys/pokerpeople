@@ -245,7 +245,7 @@ function maybeReturnExtraMoney(game){
             }
         }
     })
-    console.log("eligibleIds are ", eligiblePlayerIds);
+   
     if (eligiblePlayerIds.length == 1){
         // return bet and destroy pot
         let returnAmount = Utils.potTotal(lastPot);

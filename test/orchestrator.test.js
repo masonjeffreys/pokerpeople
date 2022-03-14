@@ -117,10 +117,12 @@ describe('handles standard side pot creation with full raise in same betting rou
     })
 
     it('will allow a fold on the last side pot and return money to the lead', () => {
+        expect(game.players[1].chips).to.equal(0); // Small blind is all in
         Orchestrator.receiveAction(game, 'fold'); // Dealer folds
         // BigBlind's 15 cannot be matched, so it should immediately be returned.
         // Proceed with checks for the rest of the game
         console.log("*** Pots are", JSON.stringify(game.table.pots));
+        expect(game.players[1].chips).to.equal(15); // Small blind got chips back
         expect(game.table.pots.length).to.equal(2);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
