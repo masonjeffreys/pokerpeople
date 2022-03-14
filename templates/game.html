@@ -284,17 +284,20 @@
       }
     } 
 
-    function showPots(potsArray){
-      if (potsArray){
+    function showPots(potsObject){
+      if (potsObject){
         let potHolder = document.getElementById('potHolder');
+        let keys = Object.keys(potsObject);
         potHolder.innerHTML = "";
-        potsArray.forEach(function(pot, index){
+        keys.forEach(function(key, index){
+          let pot = potsObject[key];
+          let keys2 = Object.keys(pot.playerAmounts);
           let potDiv = document.createElement('div');
           potDiv.class = 'pot'
           potDiv.id = 'pot' + index;
           let total = 0;
-          pot.bets.forEach(function(bet){
-            total = total + bet.amount;
+          keys2.forEach(function(key2){
+            total = total + pot.playerAmounts[key2].amount;
           })
           potDiv.innerHTML = "Pot: " + total;
           potHolder.appendChild(potDiv);

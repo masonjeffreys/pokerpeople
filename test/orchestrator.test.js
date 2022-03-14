@@ -105,7 +105,7 @@ describe('handles standard side pot creation with full raise in same betting rou
         // Other 45 go against side pot (60) but can't call it fully, so...
         // We need to pull 15 from SmallBlind out of pot 2 and create pot 3.
         Orchestrator.receiveAction(game, 'all in');
-        console.log("*** Pots are", game.table.pots);
+        console.log("*** Pots are", JSON.stringify(game.table.pots));
         expect(game.table.pots.length).to.equal(3);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);

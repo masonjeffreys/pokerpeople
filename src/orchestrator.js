@@ -213,8 +213,6 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
             newPots.push({id: newPots.length, highBet: amountRemaining, playerAmounts:[{id: pcb.playerId, amount: amountRemaining}]})
         }
     })
-    console.log("**New pots are: ");
-    console.log(JSON.stringify(newPots));
     game.table.pots = newPots;
 }
 
