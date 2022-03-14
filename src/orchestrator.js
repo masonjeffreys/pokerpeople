@@ -130,8 +130,16 @@ function applyBet(game, playerIndex, amount){
     // Remove chips from player
     // Add chips to correct pots on table
     let callAmounts = Utils.getCallAmounts(game.table, game.players, game.players[playerIndex]); // array of callAmounts by Pot
+    let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]); // single call amount
     console.log("call amounts are: ", callAmounts);
-    console.log("placing ", amount);
+    console.log("placing bet of: ", amount);
+    
+    let raiseAmount = amount - callAmount;
+    if (raiseAmount > game.table.minRaise){
+        console.log("New min raise: ", raiseAmount);
+        game.table.minRaise = raiseAmount; 
+    }
+
     let amountRemaining = amount;
     callAmounts.forEach(function(ca,index){
         console.log("call amount is: ", ca)
@@ -146,10 +154,10 @@ function applyBet(game, playerIndex, amount){
             game.table.addBet(game.players[playerIndex].id, ca, index);
             amountRemaining = amountRemaining - ca;
         } else if (ca == 0){
-            // if call amount is 0, don't add anything. (excpet if it's the last pot which will be caught by option 1)
+            // if call amount is 0, don't add anything. (except if it's the last pot which will be caught by option 1)
             console.log("option 3");
         } else if (amountRemaining > 0){
-            console.log("option 5");
+            console.log("option 4");
             // not the last pot, but can't cover the call. Drop all money here
             // also triggered if call amount is 0
             game.table.addBet(game.players[playerIndex].id, amountRemaining, index);
@@ -163,14 +171,6 @@ function applyBet(game, playerIndex, amount){
         }
     })
     game.players[playerIndex].makeBet(amount);
-
-    let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]);
-    let raiseAmount = amount - callAmount;
-    if (raiseAmount > game.table.minRaise){
-        game.table.minRaise = raiseAmount; 
-    }
-    
-    
 }
 
 function equalizeFundsAndCreateSidePot(game, allInTotal){
@@ -392,7 +392,9 @@ function receiveAction(game, action, amountRaw = 0){
             player.foldPotNumber = game.table.currentPotNumber(); // track the pot that the player folded in
             player.handState = "FOLD"
             // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
-            maybeReturnExtraMoney(game);
+            if (game.table.pots.length > 1){
+                maybeReturnExtraMoney(game);
+            }
             break
         case "call":
             applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
@@ -472,9 +474,13 @@ function winByFolding(game){
     if (game.table.pots.length == 1){
         let playersLeft = 0;
         game.players.forEach(function(player){
-            if (player.foldPotNumber || player.allInPotNumber){
-                console.log("Player ", player.id, " is folded or all in.");
-            } else {
+            if (player.foldPotNumber){
+                console.log("Player ", player.id, " is folded.");
+            } else if (player.allInPotNumber){
+                console.log("Player ", player.id, " is all-in.");
+                playersLeft = playersLeft + 1;
+            }
+            else {
                 console.log("Player ", player.id, " is still active.");
                 playersLeft = playersLeft + 1;
             }

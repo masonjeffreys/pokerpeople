@@ -153,6 +153,10 @@ function Table() {
         get commonCards(){
             return _commonCards;
         },
+        set commonCards(value){
+            _commonCards = value;
+            return this;
+        },
         clearCommonCards: function(){
             _commonCards = [];
         },

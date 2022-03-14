@@ -144,10 +144,17 @@ function potForPlayer(table, player){
 }
 
 function isStreetComplete(table, players){
-    // add logic for whether street should be done
+    // Assume side pots are set before this function is called.
+    // Returns true if no more betting can occur, otherwise, false.
+
+    // Example if side pots exist (someone is all in):
+    // If player went all in and didn't meet minRaise, betting is not opened. Just have to call/fold
+    // If player went all in and met minRaise, players afterward have to meet 
+
+
+    // Logic for single pot:
     // All players have had a chance to act (blinds don't count)
     // All players who haven't folded have bet the same amount of money for the round.
-    // This will get more complicated with side pots
     // Street can also be complete if all players have 0 money left
 
     // Player doesn't have to be current with bet if they are all in.

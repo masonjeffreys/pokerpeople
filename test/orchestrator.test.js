@@ -34,43 +34,114 @@ function newTestGame(gameCode){
 }
 
 
-// describe('nextStreet',()=>{
-//     it('will advance street correctly', () => {
-//         let table = Table();
-//         table.street = 'preflop';
-//         expect(Orchestrator.nextStreet(table.street)).to.equal('flop')
-//     })
-// })
+describe('nextStreet',()=>{
+    it('will advance street correctly', () => {
+        let table = Table();
+        table.street = 'preflop';
+        expect(Orchestrator.nextStreet(table.street)).to.equal('flop')
+    })
+})
 
-// describe('can get new game ready',()=>{
-//     let game = newTestGame("a");
-//     it('will initialize with correct data', () => {
-//         expect(game.table.street).to.equal('preflop');
-//         expect(game.table.pots).to.equal([{bets: []}]);
-//         expect(game.players[0].prettyName()).to.equal("Dealer Man");
-//         expect(game.players[0].chips).to.equal(gameConfig["startingChips"]);
-//         expect(game.players[0].hand).to.equal([]);
-//     })
-//     it('will start with correct data', () => {
-//         Orchestrator.startGame(game);
-//         expect(game.table.dealerPosition).to.equal(0);
-//         expect(game.table.activeIndex).to.equal(3);
-//     })
-// })
+describe('can get new game ready',()=>{
+    let game = newTestGame("a");
+    it('will initialize with correct data', () => {
+        expect(game.table.street).to.equal('preflop');
+        expect(game.table.pots).to.equal([{id: 0, highBet: 0, playerAmounts: {}}]);
+        expect(game.players[0].prettyName()).to.equal("Dealer Man");
+        expect(game.players[0].chips).to.equal(gameConfig["startingChips"]);
+        expect(game.players[0].hand).to.equal([]);
+    })
+    it('will start with correct data', () => {
+        Orchestrator.startGame(game);
+        expect(game.table.dealerPosition).to.equal(0);
+        expect(game.table.activeIndex).to.equal(3);
+    })
+})
 
-// describe('handles min bets correctly',()=>{
-//     let game = newTestGame("b");
-//     // Remove chips from SmallBlind as if they have not been playing well
-//     game.players[1].chips = 40;
-//     // Remove chips from player3 so they cannot make a full raise.
-//     game.players[3].chips = 18;
-//     Orchestrator.startGame(game);
+describe('can handle a win',()=>{
+    let game = newTestGame("bb");
+    Orchestrator.startGame(game);
+    // Modify game state so we can predict winner
+    game.players[1].hand = ['Ac','As']; // Small blind has pocket rockets
+    game.players[2].hand = ['Ah', '2d']; // Bigblind has 1 ace and a 2
+    it('in a standard game', () => {
+        Orchestrator.receiveAction(game, 'call'); // Under the gun calls
+        Orchestrator.receiveAction(game, 'fold'); // Dealer folds
+        Orchestrator.receiveAction(game, 'bet', 30); // Small blind bets 30 (5 call, 25 raise).
+        Orchestrator.receiveAction(game, 'bet', 50); // Big blind raises another 25
+        Orchestrator.receiveAction(game, 'call'); // Under the gun calls.
+        expect(game.table.street).to.equal('preflop');
+        Orchestrator.receiveAction(game, 'call'); // Small blind calls. Street ends.
+        expect(game.table.street).to.equal('flop');
+        Orchestrator.receiveAction(game, 'bet', 10); // Small blind bets 10.
+        Orchestrator.receiveAction(game, 'call'); // Big blind calls 10.
+        expect(game.table.street).to.equal('flop');
+        Orchestrator.receiveAction(game, 'fold'); // Dealer folds, ending street. Big blind and small blind are in.
+        expect(game.table.street).to.equal('turn');
+        // Heads up for last two cards
+        Orchestrator.receiveAction(game, 'check');
+        Orchestrator.receiveAction(game, 'check');
+        expect(game.table.street).to.equal('river');
+        // Set common cards to ensure winner
+        game.table.commonCards = ['Ad','3d','6c','8h','Kc'];
+        Orchestrator.receiveAction(game, 'check');
+        Orchestrator.receiveAction(game, 'check');
+        expect(game.table.street).to.equal('showdown');
+        expect(game.status).to.equal('hand-complete');
+        expect(game.results[0]).to.equal([
+            {
+              winner_name: 'Small Blind',
+              winning_hand: "Three of a Kind, A's",
+              amount: 200
+            }
+        ]);
+    })
+})
 
-//     it('will reject bets below the min raise if they are not all-in bets', () => {
-//         // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
-//         expect(Orchestrator.receiveAction(game, 'bet', 11)).to.throw();
-//     })
-// })
+describe('can handle a win',()=>{
+    let game = newTestGame("ab");
+    Orchestrator.startGame(game);
+    it('by all but 1 player folding', () => {
+        Orchestrator.receiveAction(game, 'call'); // Under the gun calls
+        Orchestrator.receiveAction(game, 'fold'); // Dealer folds
+        Orchestrator.receiveAction(game, 'bet', 30); // Small blind raises 25
+        Orchestrator.receiveAction(game, 'bet', 50); // Big blind raises another 25
+        Orchestrator.receiveAction(game, 'call'); // Under the gun calls.
+        expect(game.table.street).to.equal('preflop');
+        Orchestrator.receiveAction(game, 'call'); // Small blind calls. Street ends.
+        expect(game.table.street).to.equal('flop');
+        Orchestrator.receiveAction(game, 'bet', 10); // Small blind bets 10.
+        Orchestrator.receiveAction(game, 'call'); // Big blind calls 10.
+        expect(game.table.street).to.equal('flop');
+        Orchestrator.receiveAction(game, 'fold'); // Dealer folds, ending street.
+        expect(game.table.street).to.equal('turn');
+        // Heads up for last two cards
+        Orchestrator.receiveAction(game, 'bet', 10); //Small blind bets 10 
+        Orchestrator.receiveAction(game, 'fold'); // Big blind folds. Hand is over
+        expect(game.status).to.equal('muck-check');
+        expect(game.results[0]).to.equal([
+            {
+              winner_name: 'Small Blind',
+              winning_hand: 'maybe muck?',
+              amount: 210
+            }
+        ]);
+    })
+})
+
+describe('handles min bets correctly',()=>{
+    let game = newTestGame("b");
+    // Remove chips from SmallBlind as if they have not been playing well
+    game.players[1].chips = 40;
+    // Remove chips from player3 so they cannot make a full raise.
+    game.players[3].chips = 18;
+    Orchestrator.startGame(game);
+
+    it('will reject bets below the min raise if they are not all-in bets', () => {
+        // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
+        expect(Orchestrator.receiveAction(game, 'bet', 11)).to.throw();
+    })
+})
 
 describe('handles standard side pot creation with full raise in same betting round',()=>{
     let game = newTestGame("c");

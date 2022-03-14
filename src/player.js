@@ -106,6 +106,11 @@ function Player(id, firstName, lastName) {
                   return _hand;
             },
 
+            set hand(value){
+                  _hand = value;
+                  return this;
+            },
+
             get chips(){
                   return _chips;
             },
