@@ -46,11 +46,11 @@ function correctIndex(arrayLen, givenIndex){
 
 function playerCurrentBet(table,player){
     let totals = [];
-    table.pots.forEach( function(pot,index) {
-        let playerBet = pot.playerAmounts[player.id];
+    table.pots.forEach( function(pot) {
+        let prevBet = pot.playerAmounts[player.id];
         let playerBetAmount = 0;
-        if (playerBet){
-            playerBetAmount = playerBet.amount;
+        if (prevBet){
+            playerBetAmount = prevBet.amount;
         }
         totals.push(playerBetAmount);
     })
@@ -149,26 +149,34 @@ function isStreetComplete(table, players){
     // All players who haven't folded have bet the same amount of money for the round.
     // This will get more complicated with side pots
     // Street can also be complete if all players have 0 money left
+
+    // Player doesn't have to be current with bet if they are all in.
+
     var currentMaxBet = 0;
     players.forEach(function(player){
         if (playerCurrentBetInt(table, player) > currentMaxBet){
             currentMaxBet = playerCurrentBetInt(table, player)
         }
     })
+
     console.log("currentMaxBet is ", currentMaxBet);
     var streetComplete = true;
+
+
     players.forEach(function(player){
         console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
         if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
             console.log(player.id, " is current with bet.")
         } else if (player.handState == "FOLD") {
             console.log(player.id, " has folded.")
-        }
-        else {
+        } else if (player.allInPotNumber){
+            console.log(player.id, " is all in.")
+        } else {
             console.log("Betting round not done. Player ", player.id, " needs to act.")
             streetComplete = false;
         }
     })
+
     return streetComplete;
 }
 
@@ -203,11 +211,17 @@ function nextValidPlayerIndex(players, prevIndex){
     let len = players.length;
     let index = correctIndex(len, prevIndex + 1); // makes sure the starting point is valid and loops if necessary
 
+    // there may not be a next valid player! I.e. betting is done but we need to just advance the cards
+    let counter = 0;
     while (i == null) {
         if ( isValidPlayer(players[index]) == true ){
             i = index;
         } else {
             index = correctIndex(len, index + 1)
+        }
+        counter = counter + 1;
+        if (counter > len * 2){
+            return null;
         }
     }
     return i;

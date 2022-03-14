@@ -187,30 +187,41 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
     // Do we ever need to adjust more than the current pot and the new side pot? Yes -> The nth player may go all-in with only $1
     // goal is to put player amounts in correct pots
     pots = game.table.pots;
-    playerCurrentBets = []; // list of playerCurrentBets
+    playerCurrentBets = {}; // object of playerCurrentBets
+
+    let sortableList = [];
     game.players.forEach(player=>{
-        playerCurrentBets.push({playerId: player.id, amount: Utils.playerCurrentBetInt(game.table, player)});
+        playerCurrentBets[player.id] = {amount: Utils.playerCurrentBetInt(game.table, player)};
+        sortableList.push({id: player.id, amount: Utils.playerCurrentBetInt(game.table, player)})
     })
 
     // Sort in ascending order
-    playerCurrentBets.sort((a, b) => {
+    sortableList.sort((a, b) => {
         return a.amount - b.amount;
     });
 
-    newPots = [] // {id: 0, highBet: 10, playerAmounts: [{id: 1, amount: 10}]}
+    newPots = [] // {id: 0, highBet: 10, playerAmounts: {1:{amount: 10}}}
 
-    playerCurrentBets.forEach(function(pcb,index){
-        // Go through objects like [{id: 2, amount: 10}, {id: 3, amount: 10}, {id: 8, amount: 40}]
+    sortableList.forEach(i => {
+        pcb = playerCurrentBets[i.id];
+        // Go through objects like  2: {amount: 10}, 3: {amount: 10}, 8: {amount: 40}
         // if pot already exists for this amount, contribute to that pot
         let amountRemaining = pcb.amount;
         newPots.forEach(pot => {
             if (amountRemaining >= pot.highBet){
-                pot.playerAmounts.push({playerId: pcb.playerId, amount: pot.highBet})
+                pot.playerAmounts[i.id] = {amount: pot.highBet}
                 amountRemaining = amountRemaining - pot.highBet;
             }
         })
         if (amountRemaining > 0){
-            newPots.push({id: newPots.length, highBet: amountRemaining, playerAmounts:[{id: pcb.playerId, amount: amountRemaining}]})
+            let playerId = i.id;
+            newPots.push({
+                id: newPots.length,
+                highBet: amountRemaining,
+                playerAmounts: {
+                    [playerId] : {amount: amountRemaining}
+                }
+            })
         }
     })
     game.table.pots = newPots;
@@ -416,20 +427,26 @@ function isHandComplete(game){
 }
 
 function winByFolding(game){
-    // Imagine a situation with a side pot. To have a win by folding, 
-    // all players involved in side pot (those have not already folded or gone all in)
-    // have to have acted and only 1 is in a non-folded state
+    // If there is only 1 pot, an outright win by folding
+    // occurs if allPlayersHaveActed and only 1 hasn't folded.
 
-    let playersLeft = 0;
-    game.players.forEach(function(player){
-        if (player.foldPotNumber || player.allInPotNumber){
-            console.log("Player ", player.id, " is folded or all in.");
-        } else {
-            console.log("Player ", player.id, " is still active.");
-            playersLeft = playersLeft + 1;
-        }
-    })
-    return (playersLeft == 1);
+    // If there are side pots:
+    // Folding can only collapse the last pot, not provide an outright win 
+    if (game.table.pots.length == 1){
+        let playersLeft = 0;
+        game.players.forEach(function(player){
+            if (player.foldPotNumber || player.allInPotNumber){
+                console.log("Player ", player.id, " is folded or all in.");
+            } else {
+                console.log("Player ", player.id, " is still active.");
+                playersLeft = playersLeft + 1;
+            }
+        })
+        return (playersLeft == 1);
+    } else {
+        return false;
+    }
+    
 }
 
 function advanceStreet(game){
