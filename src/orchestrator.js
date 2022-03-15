@@ -286,10 +286,10 @@ function receiveAction(game, action, amountRaw = 0){
     // Get amount if needed
     let amount = parseInt(amountRaw);
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
-    console.log("*** ACTION: ", action, " amount: ", amount);
 
     // Get current player
     let player = game.players[game.table.activeIndex];
+    console.log("*** ACTION *** Player ", player.id, " ", action, ". Amount: ", amount, ".");
 
     // call amount is sum of amounts needed to call each pot
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
@@ -555,19 +555,18 @@ function evalPot(table, pot, potIndex, players){
     let potTotal = Utils.potTotal(pot);
     let resultsList = [];
 
-    // Get list of Ids who could win the pot (i.e. they didn't )
+    // Get list of Ids who could win the pot (i.e. they didn't fold and they contributed money to the pot)
     let playerIdsInPot = [];
 
     players.forEach(function(player){
-        if (player.allInPotNumber &&  player.allInPotNumber < potIndex) {
-            // player went all in before this pot, so we skip them
-        } else if (player.handState == "FOLD"){
+        if (player.handState == "FOLD"){
             // player folded so they definitely can't win
-        } else if (player.gameState == "ACTIVE"){
+        } else if (player.gameState == "ACTIVE" && Utils.playerInPot(pot, player)){
             // player is still in (i.e. hasn't left the table)
             playerIdsInPot.push(player.id);
         } else {
-            throw 'No players can win this pot? Bug!!'
+            // player didn't contribute to pot or player is not active (has left table/paused)
+            // they can't win the pot.
         }
     })
 
@@ -586,6 +585,7 @@ function evalPot(table, pot, potIndex, players){
         })
     } else {
         // Need to evaluate who wins. Could still be multiple winners if there is a tie.
+        // Need to round down final answer to next whole number in case of a 0.5 chip.
         let handsByPlayer = [];
         let solutions = [];
         playerIdsInPot.forEach(pId => {
@@ -600,18 +600,20 @@ function evalPot(table, pot, potIndex, players){
 
         let winningHands = Solver.winners(solutions);
         let winnersCount = winningHands.length;
-        winningHands.forEach(function(winningHand,index){
-            let winningPlayer = handsByPlayer[index].player
-            winningPlayer.wins(potTotal/winnersCount);
+        console.log("*** handsByPlayer are ", handsByPlayer);
+        console.log("*** winningHands are ", winningHands);
+        winningHands.forEach(function(winningHand){
+            let winningPlayer = handsByPlayer[winningHand.index].player
+            let winningAmount = potTotal/winnersCount;
+            winningPlayer.wins(winningAmount);
             resultsList.push({
                 winner_name: winningPlayer.prettyName(),
                 winning_hand: winningHand.descr,
-                amount: potTotal/winnersCount
+                amount: winningAmount
             })
             console.log("winner is ", winningPlayer.prettyName());
             console.log("with hand ", winningHand.descr);
-            console.log("amount: ", potTotal/winnersCount);
-            console.log("winning hand is: ", winningHand);
+            console.log("amount: ", winningAmount);
         })
     }
     return resultsList;

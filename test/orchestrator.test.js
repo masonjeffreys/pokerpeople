@@ -204,22 +204,21 @@ describe('handles standard side craziness',()=>{
         // Side pot is: 45 for smallBlind and 45 for bigBlind (BigBlind and SmallBlind can win it)
 
         console.log("******* Start test *******")
-        Orchestrator.receiveAction(game, 'check'); // SmBnd checks
-        Orchestrator.receiveAction(game, 'check'); // BgBnd checks
-        Orchestrator.receiveAction(game, 'check'); // Player3 checks
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks. No other play can happen.
         expect(game.table.street).to.equal('turn');
-        Orchestrator.receiveAction(game, 'check'); // SmBnd checks
-        Orchestrator.receiveAction(game, 'check'); // BgBnd checks
-        Orchestrator.receiveAction(game, 'check'); // Player3 checks
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks. No other play can happen.
         expect(game.table.street).to.equal('river');
-        Orchestrator.receiveAction(game, 'check'); // SmBnd checks
-        Orchestrator.receiveAction(game, 'check'); // BgBnd checks
-        Orchestrator.receiveAction(game, 'check'); // Player3 checks
-        expect(game.table.street).to.equal('showndown');
+        /// Need to assign cards so we have a predictable result
 
+        game.players[1].hand = ["Th","Td"]; // SmBlind has pocket 10s
+        game.players[2].hand = ["Tc","Ts"]; // BgBLind has pocket 10s
+        game.players[3].hand = ["Ah","Ad"]; // Player3 has best hand overall
+        game.table.commonCards = ["2c","3s","5d","7h","7d"]; // Common cards don't help anyone
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks. No other play can happen.
+        expect(game.table.street).to.equal('showdown');
         console.log("*** Results are: ", JSON.stringify(game.results));
-        
-        // That completes the street - no additional action allowed since the bet wasn't full
-        expect(game.table.street).to.equal('a');
+        expect(game.players[1].chips).to.equal(60); // SmBlind wins half of top pot: 45. Plus starting chips (15) = 60
+        expect(game.players[2].chips).to.equal(45); // BgBlind wins half of top pot: 45. Plus remaining chips (0) = 45
+        expect(game.players[3].chips).to.equal(160); // Player3 wins lower pot: 160. Plus remaining chips (0) = 160;
     })
 })

@@ -12,6 +12,16 @@ function isNonFoldedPlayer(player){
     return (player.handState != "FOLD")
 }
 
+function playerInPot(pot, player){
+    let playerInPot = false;
+    let playerAmount = pot.playerAmounts[player.id];
+    if(playerAmount && playerAmount.amount > 0){
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function playerCanBet(player){
     // To be eligible to bet, player must be valid
     // Note that tricky rules apply when the player has less chips than the minBet.
@@ -341,3 +351,4 @@ module.exports.potTotal = potTotal;
 module.exports.playerCurrentBetInt = playerCurrentBetInt;
 module.exports.maxBetForPot = maxBetForPot;
 module.exports.playerBetForPot = playerBetForPot;
+module.exports.playerInPot = playerInPot;
