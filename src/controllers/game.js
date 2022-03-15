@@ -28,7 +28,7 @@ exports.joinGame = async (req, h) => {
 
   let game = Repo.getGame(gameCode, req.server.app.games);
   if(!game){
-    game = Repo.createGame(Deck(), Table(), gameConfig, gameCode, req.server.app.games);
+    game = Repo.createGame(Deck().init(), Table(), gameConfig, gameCode, req.server.app.games);
   }
 
   req.cookieAuth.set({user: {id: user.id}});

@@ -21,7 +21,7 @@ let games = [];
 let players = [];
 
 function newTestGame(gameCode){
-    let game = Repo.createGame(Deck(), Table(), gameConfig, gameCode, games);
+    let game = Repo.createGame(Deck().init(), Table(), gameConfig, gameCode, games);
     let dealer = Repo.getOrCreateUser({firstName: "Dealer", lastName: "Man"}, players);
     let smallBlind = Repo.getOrCreateUser({firstName: "Small", lastName: "Blind"}, players);
     let bigBlind = Repo.getOrCreateUser({firstName: "Big", lastName: "Blind"}, players); 

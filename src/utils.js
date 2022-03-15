@@ -8,12 +8,7 @@ function isValidPlayer(player){
     return (player.handState == "IN" && player.chips > 0);
 }
 
-function isNonFoldedPlayer(player){
-    return (player.handState != "FOLD")
-}
-
 function playerInPot(pot, player){
-    let playerInPot = false;
     let playerAmount = pot.playerAmounts[player.id];
     if(playerAmount && playerAmount.amount > 0){
         return true;
