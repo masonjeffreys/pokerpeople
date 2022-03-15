@@ -102,7 +102,6 @@ function setupHand(game){
     game.deck.init().shuffle();
     Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
     Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
-    Utils.logState(game)
 }
 
 function makeBlindBets(game){
