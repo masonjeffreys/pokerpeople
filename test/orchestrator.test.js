@@ -143,11 +143,11 @@ describe('handles min bets correctly',()=>{
     })
 })
 
-describe('handles standard side pot creation with full raise in same betting round',()=>{
+describe('handles standard side craziness',()=>{
     let game = newTestGame("c");
-    // Remove chips from BB, player3
-    game.players[2].chips = 85;
-    game.players[3].chips = 40;
+    // Dealer and SB have 100 chips
+    game.players[2].chips = 85; // BB has 15 less
+    game.players[3].chips = 40; // Player3 (under gun) has short stack: 40.
     Orchestrator.startGame(game);
     Orchestrator.receiveAction(game, 'all in'); // Player 3 is all in. D, SB, BB haven't acted
 
@@ -164,7 +164,6 @@ describe('handles standard side pot creation with full raise in same betting rou
         // So we have a side pot:
         // Pot1 is currently 40 + 40 + 10 + 40 = 130
         // Pot2 is (100-40) = 60
-        console.log("*** Resulting pots are ", JSON.stringify(game.table.pots));
         expect(game.table.pots.length).to.equal(2);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(130);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(60);
@@ -176,7 +175,6 @@ describe('handles standard side pot creation with full raise in same betting rou
         // Other 45 go against side pot (60) but can't call it fully, so...
         // We need to pull 15 from SmallBlind out of pot 2 and create pot 3.
         Orchestrator.receiveAction(game, 'all in');
-        console.log("*** Pots are", JSON.stringify(game.table.pots));
         expect(game.table.pots.length).to.equal(3);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
@@ -190,14 +188,38 @@ describe('handles standard side pot creation with full raise in same betting rou
     it('will allow a fold on the last side pot and return money to the lead', () => {
         expect(game.players[1].chips).to.equal(0); // Small blind is all in
         Orchestrator.receiveAction(game, 'fold'); // Dealer folds
-        // BigBlind's 15 cannot be matched, so it should immediately be returned.
-        // Proceed with checks for the rest of the game
-        console.log("*** Pots are", JSON.stringify(game.table.pots));
+        // SmallBlind's 15 cannot be matched, so it should immediately be returned.
+        // That completes the street - no additional action allowed
+        expect(game.table.street).to.equal('flop');
         expect(game.players[1].chips).to.equal(15); // Small blind got chips back
         expect(game.table.pots.length).to.equal(2);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
+    })
+
+    it('will allow a winner on both remaining pots', () => {
+        // starting state is Dealer folded. BigBlind and Player 3 all in. Small Blind has 15 chips left that no one can match.
+        // So no more action should be allowed. Proceed with checks for the rest of the game
+        // Main pot is: 40 for every player (BigBlind, Player 3, and Small Blind can win it)
+        // Side pot is: 45 for smallBlind and 45 for bigBlind (BigBlind and SmallBlind can win it)
+
+        console.log("******* Start test *******")
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks
+        Orchestrator.receiveAction(game, 'check'); // BgBnd checks
+        Orchestrator.receiveAction(game, 'check'); // Player3 checks
+        expect(game.table.street).to.equal('turn');
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks
+        Orchestrator.receiveAction(game, 'check'); // BgBnd checks
+        Orchestrator.receiveAction(game, 'check'); // Player3 checks
+        expect(game.table.street).to.equal('river');
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks
+        Orchestrator.receiveAction(game, 'check'); // BgBnd checks
+        Orchestrator.receiveAction(game, 'check'); // Player3 checks
+        expect(game.table.street).to.equal('showndown');
+
+        console.log("*** Results are: ", JSON.stringify(game.results));
+        
         // That completes the street - no additional action allowed since the bet wasn't full
-        expect(game.table.street).to.equal('flop');
+        expect(game.table.street).to.equal('a');
     })
 })
