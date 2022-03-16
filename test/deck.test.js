@@ -12,7 +12,7 @@ const Deck = require('../src/deck');
 const deck = Deck();
 
 describe('Deck',()=>{
-    it('has 52 cards', () => {
+    it('has 52 unique cards', () => {
         expect(deck.init().cardCount()).to.equal(52);
         expect(new Set(deck.cards).size).to.equal(52);
     })

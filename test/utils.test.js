@@ -14,6 +14,8 @@ const Table = require('../src/table');
 const Repo = require('../src/repo');
 const Orchestrator = require('../src/orchestrator');
 
+const deck = Deck().init();
+const table = Table();
 const gameConfig = {
     startingChips: 100,
     smallBlindAmount: 5
@@ -35,9 +37,6 @@ function newTestGame(gameCode){
     Orchestrator.addPlayerToGame(game,underGun);
     return game;
 }
-
-const deck = Deck().init();
-const table = Table();
 
 describe('correctIndex',()=>{
     let game = newTestGame("a");
