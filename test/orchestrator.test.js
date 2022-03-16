@@ -43,7 +43,7 @@ describe('nextStreet',()=>{
 })
 
 describe('can get new game ready',()=>{
-    let game = newTestGame("a");
+    let game = newTestGame(Date.now());
     it('will initialize with correct data', () => {
         expect(game.table.street).to.equal('preflop');
         expect(game.table.pots).to.equal([{id: 0, highBet: 0, playerAmounts: {}}]);
@@ -58,8 +58,20 @@ describe('can get new game ready',()=>{
     })
 })
 
+describe('will track minRaise correctly',()=>{
+    let game = newTestGame(Date.now());
+    it('will start with correct data', () => {
+        Orchestrator.startGame(game);
+        expect(game.table.minRaise).to.equal(10);
+        expect(Utils.playerMaxBet(game.table, game.players)).to.equal(10);
+        Orchestrator.receiveAction(game, 'bet', 10 + 11 ); // UnderGun player bets 10 (call) + 11 (1 above min raise);
+        expect(Utils.playerMaxBet(game.table, game.players)).to.equal(21);
+        expect(game.table.minRaise).to.equal(11);
+    })
+})
+
 describe('can handle a win',()=>{
-    let game = newTestGame("bb");
+    let game = newTestGame(Date.now());
     Orchestrator.startGame(game);
     // Modify game state so we can predict winner
     game.players[1].hand = ['Ac','As']; // Small blind has pocket rockets
@@ -99,7 +111,7 @@ describe('can handle a win',()=>{
 })
 
 describe('can handle a win',()=>{
-    let game = newTestGame("ab");
+    let game = newTestGame(Date.now());
     Orchestrator.startGame(game);
     it('by all but 1 player folding', () => {
         Orchestrator.receiveAction(game, 'call'); // Under the gun calls
@@ -130,7 +142,7 @@ describe('can handle a win',()=>{
 })
 
 describe('handles min bets correctly',()=>{
-    let game = newTestGame("b");
+    let game = newTestGame(Date.now());
     // Remove chips from SmallBlind as if they have not been playing well
     game.players[1].chips = 40;
     // Remove chips from player3 so they cannot make a full raise.
@@ -144,7 +156,7 @@ describe('handles min bets correctly',()=>{
 })
 
 describe('handles standard side craziness',()=>{
-    let game = newTestGame("c");
+    let game = newTestGame(Date.now());
     // Dealer and SB have 100 chips
     game.players[2].chips = 85; // BB has 15 less
     game.players[3].chips = 40; // Player3 (under gun) has short stack: 40.

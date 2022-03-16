@@ -78,7 +78,6 @@ function setupHand(game){
         player.publicHand = false;
     })
     game.table.street = STREETS[0]; // Sets to 'preflop'
-    game.table.currentHighBet = game.table.bigBlind;
     game.table.dealerPosition = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
     // Not sure whether to set button on player or table or both?
     // Depends how people are allowed to join/leave the game?

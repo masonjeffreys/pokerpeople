@@ -3,7 +3,6 @@ function Table() {
     var _numSeats = 10;
     var _startingChips = 0;
     var _dealerPosition = -1; // First player to join will deal after this advances 1 position at a time
-    var _currentHighBet = 0;
     var _activeIndex = null;
     var _commonCards = [];
     var _burnedCards = [];
@@ -50,13 +49,6 @@ function Table() {
         },
         set dealerPosition(value){
             _dealerPosition = value;
-            return this;
-        },
-        get currentHighBet(){
-            return _currentHighBet;
-        },
-        set currentHighBet(value){
-            _currentHighBet = value;
             return this;
         },
         get startingChips(){

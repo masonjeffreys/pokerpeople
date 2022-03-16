@@ -10,7 +10,7 @@
       <div id="commonCards" class="bg-gray-200 w-full h-16 flex items-center justify-center gap-1">
       </div>
       <div class="bg-gray-100">
-        <div id="highBet" class="inline-block text-left text-sm italic text-gray-700"></div>
+        <div id="minRaise" class="inline-block text-left text-sm italic text-gray-700"></div>
         <div id="street" class="inline-block float-right text-right text-sm italic text-gray-700"></div>
       </div>
       <div id="results" class="text-center mx-auto">
@@ -277,7 +277,7 @@
     function updateTable(table){
       if (table){
         document.getElementById("street").innerHTML = table["street"];
-        document.getElementById("highBet").innerHTML = "High Bet: " + table["highBet"];
+        document.getElementById("minRaise").innerHTML = "Min raise: " + table["minRaise"];
         // table can and will have multiple pots
         showPots(table["pots"]);
         showCommonCards(table["commonCards"]);
