@@ -155,7 +155,7 @@ describe('handles min bets correctly',()=>{
     })
 })
 
-describe('handles standard side craziness',()=>{
+describe('handles side pot craziness',()=>{
     let game = newTestGame(Date.now());
     // Dealer and SB have 100 chips
     game.players[2].chips = 85; // BB has 15 less
