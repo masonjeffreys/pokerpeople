@@ -35,11 +35,10 @@ function Deck() {
             return this;
         },
         take: function take(){
-            let card = _cards[0];
-            let remaining = _cards.slice(1);
-            _cards = remaining;
+            let selected = _cards[0];
+            _cards = _cards.slice(1);
             return {
-                card: card,
+                card: selected,
                 deck: this
             }
         }
