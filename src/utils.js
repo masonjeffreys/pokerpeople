@@ -59,7 +59,8 @@ function dealOne(players, deck, startIndex){
     let index = correctIndex(len, startIndex);
     while (iteration < len){
         if (isValidPlayer(players[index])){
-            players[index].addCard(deck.take());
+            let card = deck.cards.shift();
+            players[index].addCard(card);
         }
         index = correctIndex(len, index + 1);
         iteration = iteration + 1;

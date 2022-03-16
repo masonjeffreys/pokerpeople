@@ -83,7 +83,7 @@ describe('dealOne',()=>{
                 expect(player.hand.length).to.equal(0);
             }
         });
-        expect(deck.listCards().length).to.equal(50);
+        expect(deck.cards.length).to.equal(50);
     })
 })
 

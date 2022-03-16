@@ -11,7 +11,7 @@ function Deck() {
     var _cards = [];
 
     return Object.freeze({
-        listCards: function(){
+        get cards(){
             return _cards;
         },
         cardCount: function(){

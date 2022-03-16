@@ -14,7 +14,7 @@ const deck = Deck();
 describe('Deck',()=>{
     it('has 52 cards', () => {
         expect(deck.init().cardCount()).to.equal(52);
-        expect(new Set(deck.listCards()).size).to.equal(52);
+        expect(new Set(deck.cards).size).to.equal(52);
     })
 })
 
@@ -22,8 +22,8 @@ describe('Can remove card',()=>{
     it('using take', () => {
         let card = [deck.take()];
         expect(deck.cardCount()).to.equal(51);
-        expect(new Set(deck.listCards()).size).to.equal(51);
-        expect(deck.listCards().includes(card)).to.equal(false);
+        expect(new Set(deck.cards).size).to.equal(51);
+        expect(deck.cards.includes(card)).to.equal(false);
     })
 })
 
@@ -31,6 +31,6 @@ describe('Can be shuffled', ()=>{
     it('using shuffle', () => {
         let shuffledDeck = deck.shuffle();
         expect(shuffledDeck.cardCount()).to.equal(51);
-        expect(new Set(deck.listCards()).size).to.equal(51);
+        expect(new Set(deck.cards).size).to.equal(51);
     })
 })

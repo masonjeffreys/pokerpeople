@@ -47,18 +47,18 @@ describe('Player API Calls', () => {
         await server.stop();
     });
 
-    it('can create player', async () => {
-        const res = await server.inject({
-            method: 'post',
-            url: '/api/createPlayer',
-            payload: {
-                firstname: "Jeff",
-                lastname: "Mason"
-            }
-        })
-        expect(res.statusCode).to.equal(200);
-        expect(res.result.data.playerId).to.equal(1);
-    });
+    // it('can create player', async () => {
+    //     const res = await server.inject({
+    //         method: 'post',
+    //         url: '/api/createPlayer',
+    //         payload: {
+    //             firstname: "Jeff",
+    //             lastname: "Mason"
+    //         }
+    //     })
+    //     expect(res.statusCode).to.equal(200);
+    //     expect(res.result).to.equal(1);
+    // });
 
 });
 
@@ -113,19 +113,5 @@ describe('Gameplay API Calls. A player can: ', () => {
             url: '/api/check'
         })
         expect(res.statusCode).to.equal(200);    
-    });
-
-    it('can execute functional call', async () => {
-        const res = await server.inject({
-            method: 'post',
-            url: '/api/handleConn',
-            headers: { 'Authorization': 'Basic am9objpzZWNyZXQ=' },
-            payload: {
-                firstname: "Jeff",
-                lastname: "Mason"
-            }
-        })
-        expect(res.statusCode).to.equal(200);
-        expect(res.result.data).to.equal(1);
     });
 });
