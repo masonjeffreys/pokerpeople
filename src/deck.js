@@ -18,6 +18,7 @@ function Deck() {
             return _cards.length;
         },
         init: function init(){
+            _cards = [];
             SUITS.forEach((suit) => {
                 CARD_NAMES.forEach(card_name =>{
                     _cards.push(card_name + suit)
