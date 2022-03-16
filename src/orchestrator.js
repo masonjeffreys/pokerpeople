@@ -514,21 +514,14 @@ function advanceStreet(game){
 
     switch(game.table.street){
         case 'flop':
-            ret = null;
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addBurnedCard(ret.card);
             for (i = 0; i < 3; i++){
                 ret = game.deck.take();
                 game.deck = ret.deck;
-                game.table.addBurnedCard(ret.card);
+                game.table.addCommonCard(ret.card);
             }
-            ret = game.deck.take();
-            game.deck = ret.deck;
-            game.table.addCommonCard(ret.card);
-            ret = game.deck.take();
-            game.deck = ret.deck;
-            game.table.addCommonCard(ret.card);
-            ret = game.deck.take();
-            game.deck = ret.deck;
-            game.table.addCommonCard(ret.card);
             break;
         case 'turn':
             ret = game.deck.take();
