@@ -56,6 +56,10 @@ function nextHand() {
   socket.emit('next hand');
 }
 
+function nextStreet(){
+  socket.emit('advance');
+}
+
 function check() {
   socket.emit('check')
 }
@@ -86,6 +90,9 @@ socket.on('private', function(state){
   if (state){
     if (state.playersInfo){
       updateAllPlayers(state.playersInfo, state.playerId);
+    }
+    if (state.game && state.game.status){
+      toggleAdvanceButton(state.game.status);
     }
     if (state.table){
       updateTable(state.table);

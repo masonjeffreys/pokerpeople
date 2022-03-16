@@ -20,6 +20,7 @@ function startGame(game){
     }
 
     // Game state should advance to in-progress (from 'unstarted', 'in-progress', 'hand-complete', 'complete')
+    // Maybe also 'muck-check' and 'auto-advance'
     game.status = 'in-progress';
     setupHand(game);
 }
@@ -127,8 +128,8 @@ function applyBet(game, playerIndex, amount){
     // Add chips to correct pots on table
     let callAmounts = Utils.getCallAmounts(game.table, game.players, game.players[playerIndex]); // array of callAmounts by Pot
     let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]); // single call amount
-    console.log("call amounts are: ", callAmounts);
-    console.log("placing bet of: ", amount);
+    console.log("Call amounts by pot are: ", callAmounts);
+    console.log("Placing bet of: ", amount);
     
     let raiseAmount = amount - callAmount;
     if (raiseAmount > game.table.minRaise){
@@ -138,7 +139,6 @@ function applyBet(game, playerIndex, amount){
 
     let amountRemaining = amount;
     callAmounts.forEach(function(ca,index){
-        console.log("call amount is: ", ca)
         if (index == game.table.pots.length - 1 && amountRemaining > 0){
             // last Pot. Drop all money here
             console.log("option 1");
@@ -278,6 +278,17 @@ function maxCallableBet(game, playerToExclude){
     return max;
 }
 
+function receiveNonPlayerAction(game, action){
+    // Handle player's desired action
+    switch (action){
+        case "advance":
+            advanceStreet(game);
+            break;
+        default: 
+            throw new Error(`Invalid player action: ${action}, ${amount}`)
+    }
+}
+
 function receiveAction(game, action, amountRaw = 0){
     // Get amount if needed
     let amount = parseInt(amountRaw);
@@ -309,18 +320,6 @@ function receiveAction(game, action, amountRaw = 0){
             game.table.playerAllIn = player.playerId;
             console.log("call amouont is ", callAmount, ", all-in pushed in ", amount);
 
-            // First tell the table whether we should re-open action or not.
-            if (amount < callAmount + game.table.minRaise){
-                // not a full bet - remaining players can either fold or call, but can't raise
-                // no side pot can be started here, but could be started on next betting rounds
-                game.table.allInFullBet = false;
-            } else {
-                // full bet - remaining players can fold, call, raise which can lead to side pot.
-                // reset 'actedInStreet to reflect this.
-                // Use this to calculate options for next player and control game flow
-                game.table.allInFullBet = true;
-            }
-
             // Now decide if we need to immediately create a side pot or not
             if (amount < callAmount){
                 // siphon some funds off of the current pot and start a side pot
@@ -332,7 +331,9 @@ function receiveAction(game, action, amountRaw = 0){
                 if (anyoneAlreadyAllIn){
                     console.log(" --- someones already all in");
                     applyBet(game, game.table.activeIndex, callAmount);
-                    game.table.addPot();
+                    if (amount - callAmount > 0 ){
+                        game.table.addPot();
+                    }
                     applyBet(game, game.table.activeIndex, amount - callAmount);
                 } else {
                     console.log(" --- no one all in");
@@ -414,10 +415,14 @@ function advanceGame(game){
         game.status = 'complete';
         throw 'game is complete!';
     } else if (isHandComplete(game)){
-        game.status = 'muck-check'
+        game.status = 'muck-check';
         console.log("Completed Hand: ", game.status);
         distributeWinnings(game);
         // muck-check
+    } else if (Utils.isBettingComplete(game.table, game.players)){
+        game.status = 'auto-advance';
+        console.log("Betting complete");
+        advanceStreet(game);
     } else if (Utils.isStreetComplete(game.table, game.players)){
         console.log("Completed street: ", game.table.street);
         advanceStreet(game);
@@ -428,10 +433,9 @@ function advanceGame(game){
     }
 }
 
-
 function isGameComplete(game){
-    // Game is complete if game status is between-hands
-    // AND only 1 player is active and still has chips
+    // Game is complete if game status is between-hands AND
+    // only 1 player is active and still has chips
     if (game.status == 'hand-complete'){
         let remainingPlayers = 0;
         game.players.forEach(function(player){
@@ -509,18 +513,18 @@ function advanceStreet(game){
     
     switch(game.table.street){
         case 'flop':
-            game.table.addBurnedCard(game.deck.take());
-            game.table.addCommonCard(game.deck.take());
-            game.table.addCommonCard(game.deck.take());
-            game.table.addCommonCard(game.deck.take());
+            game.table.addBurnedCard(game.deck.cards.shift());
+            game.table.addCommonCard(game.deck.cards.shift());
+            game.table.addCommonCard(game.deck.cards.shift());
+            game.table.addCommonCard(game.deck.cards.shift());
             break;
         case 'turn':
-            game.table.addBurnedCard(game.deck.take());
-            game.table.addCommonCard(game.deck.take());
+            game.table.addBurnedCard(game.deck.cards.shift());
+            game.table.addCommonCard(game.deck.cards.shift());
             break;
         case 'river':
-            game.table.addBurnedCard(game.deck.take());
-            game.table.addCommonCard(game.deck.take());
+            game.table.addBurnedCard(game.deck.cards.shift());
+            game.table.addCommonCard(game.deck.cards.shift());
             break;
         case 'showdown':
             // Showdown means that the hand is over, time to evaulate
@@ -554,6 +558,7 @@ function evalPot(table, pot, potIndex, players){
     let playerIdsInPot = [];
 
     players.forEach(function(player){
+        console.log("checking player: ", JSON.stringify(player));
         if (player.handState == "FOLD"){
             // player folded so they definitely can't win
         } else if (player.gameState == "ACTIVE" && Utils.playerInPot(pot, player)){
@@ -620,4 +625,5 @@ module.exports.startGame = startGame;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;
+module.exports.receiveNonPlayerAction = receiveNonPlayerAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this

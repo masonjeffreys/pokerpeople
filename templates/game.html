@@ -2,6 +2,7 @@
   <div id="playersContainer" class="h-20">
   </div>
   <div id="table" class="p-2 pt-6 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-10 relative">
+      <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Advance</button>
       <div class="flex justify-center">
         <div id="potHolder" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
         </div>
@@ -98,6 +99,15 @@
         betInput.classList.add("invisible")
         betLabel.classList.remove("invisible");
         betLabel.classList.add("invisible");
+      }
+    }
+    function toggleAdvanceButton(status){
+      let advanceButton = document.getElementById('nextStreetBtn');
+      if (status == "auto-advance"){
+        advanceButton.classList.remove('hidden');
+      } else {
+        advanceButton.classList.remove('hidden');
+        advanceButton.classList.add('hidden');
       }
     }
 

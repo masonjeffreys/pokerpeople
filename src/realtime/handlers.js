@@ -89,6 +89,12 @@ exports.fold = () => {
     emitPrivateStateToEachPlayer(game);
 };
 
+exports.advance = () =>{
+    let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    Orchestrator.receiveNonPlayerAction(game, 'advance')
+    emitPrivateStateToEachPlayer(game);
+}
+
 exports.goodbye = function () {
 
     this.emit('Take it easy, pal');

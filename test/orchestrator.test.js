@@ -161,11 +161,14 @@ describe('handles everyone going all in',()=>{
     Orchestrator.receiveAction(game, 'all in');
     Orchestrator.receiveAction(game, 'all in');
     Orchestrator.receiveAction(game, 'all in');
-    Orchestrator.receiveAction(game, 'all in'); // Everyone is now all in
+    Orchestrator.receiveAction(game, 'all in'); // Everyone is now all in. Betting is complete and game should advance to end
     expect(game.table.street).to.equal('flop');
-    Orchestrator.receiveAction(game, 'check');
-    expect(game.table.street).to.equal('turn');
-    expect(game.table.activeIndex).to.equal('5');
+    Orchestrator.receiveNonPlayerAction(game, 'advance');
+    Orchestrator.receiveNonPlayerAction(game, 'advance');
+    Orchestrator.receiveNonPlayerAction(game, 'advance');
+    expect(game.table.street).to.equal('showdown');
+    console.log(JSON.stringify(game.table.pots));
+    expect(game.results).to.equal('a');
 })
 
 

@@ -3,14 +3,19 @@ function getByAttributeValue(array, attrName, attrValue){
 }
 
 function isValidPlayer(player){
-    // Player must be "IN" and have chips to play
-    // Note that tricky rules apply when the player has less chips than the minBet.
-    return (player.handState == "IN" && player.chips > 0);
+    // Player must have game state = "ACTIVE"
+    // Player must have hand state = "IN" (i.e. not "FOLD" or "ALLIN")
+    // Player must have chips to play
+    // Not sure how player could be "IN" AND not have chips left, so this third check may be redundant
+
+    // This will return a player with chips even if he/she is the only one with chips left.
+    // In this case, the player should just be able to check or the game should auto-advance.
+    return (player.gameState == "ACTIVE" && player.handState == "IN" && player.chips > 0);
 }
 
 function playerInPot(pot, player){
     let playerAmount = pot.playerAmounts[player.id];
-    if(playerAmount && playerAmount.amount > 0){
+    if( playerAmount && playerAmount.amount > 0 ){
         return true;
     } else {
         return false;
@@ -77,6 +82,10 @@ function potTotal(pot){
     return total;
 }
 
+function isBettingComplete(table, players){ // boolean
+    return nextValidPlayerIndex(players, table.activeIndex) == null;
+}
+
 function isStreetComplete(table, players){
     // Assume side pots are set before this function is called.
     // Returns true if no more betting can occur, otherwise, false.
@@ -121,26 +130,25 @@ function isStreetComplete(table, players){
     return streetComplete;
 }
 
-function nextValidPlayerIndex(players, prevIndex){
-    // Valid means that they are active in the hand, haven't folded, and capable of meeting the minimum bet
-    let i;
+function nextValidPlayerIndex(players, prevIndex){ // int/null;
+    // Valid means that they are active in the game, haven't folded, and have some chips left.
+    let nextIndex = null;
     let len = players.length;
     let index = correctIndex(len, prevIndex + 1); // makes sure the starting point is valid and loops if necessary
 
-    // there may not be a next valid player! I.e. betting is done but we need to just advance the cards
-    let counter = 0;
-    while (i == null) {
+    // there may not be a next valid player! I.e. betting is done but we need to just advance the cards.
+    // in this case return null;
+
+    // Max attempts at finding an active player should be equal to number of players.
+    // i counts the attempts while index loops the actual query
+    for (let i = 0; i < len; i++) {
         if ( isValidPlayer(players[index]) == true ){
-            i = index;
+            nextIndex = index;
         } else {
             index = correctIndex(len, index + 1)
         }
-        counter = counter + 1;
-        if (counter > len * 2){
-            return null;
-        }
     }
-    return i;
+    return nextIndex;
 }
 
 function playerMaxBet(table, players){
@@ -233,6 +241,7 @@ module.exports.getOptions = getOptions;
 module.exports.getCallAmount = getCallAmount;
 module.exports.getCallAmounts = getCallAmounts;
 module.exports.getByAttributeValue = getByAttributeValue;
+module.exports.isBettingComplete = isBettingComplete;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.maxBetForPot = maxBetForPot;
 module.exports.nextValidPlayerIndex = nextValidPlayerIndex;

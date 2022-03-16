@@ -35,6 +35,7 @@ exports.plugin = {
             socket.on('all in', Handlers.allIn);
             socket.on('fold', Handlers.fold);
             socket.on('bet', Handlers.bet);
+            socket.on('advance', Handlers.advance);
 
             // Add chat functionality
             socket.on('newMessage', Handlers.newMessage);
