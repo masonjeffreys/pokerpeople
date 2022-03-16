@@ -523,6 +523,12 @@ function advanceStreet(game){
             ret = game.deck.take();
             game.deck = ret.deck;
             game.table.addCommonCard(ret.card);
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addCommonCard(ret.card);
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addCommonCard(ret.card);
             break;
         case 'turn':
             ret = game.deck.take();
