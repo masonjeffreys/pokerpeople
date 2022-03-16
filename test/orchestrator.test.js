@@ -155,6 +155,20 @@ describe('handles min bets correctly',()=>{
     })
 })
 
+describe('handles everyone going all in',()=>{
+    let game = newTestGame(Date.now());
+    Orchestrator.startGame(game);
+    Orchestrator.receiveAction(game, 'all in');
+    Orchestrator.receiveAction(game, 'all in');
+    Orchestrator.receiveAction(game, 'all in');
+    Orchestrator.receiveAction(game, 'all in'); // Everyone is now all in
+    expect(game.table.street).to.equal('flop');
+    Orchestrator.receiveAction(game, 'check');
+    expect(game.table.street).to.equal('turn');
+    expect(game.table.activeIndex).to.equal('5');
+})
+
+
 describe('handles side pot craziness',()=>{
     let game = newTestGame(Date.now());
     // Dealer and SB have 100 chips
@@ -216,7 +230,7 @@ describe('handles side pot craziness',()=>{
         // Side pot is: 45 for smallBlind and 45 for bigBlind (BigBlind and SmallBlind can win it)
 
         console.log("******* Start test *******")
-        Orchestrator.receiveAction(game, 'check'); // SmBnd checks. No other play can happen.
+        Orchestrator.receiveAction(game, 'check'); // SmBnd checks. No other play can happen at this point.
         expect(game.table.street).to.equal('turn');
         Orchestrator.receiveAction(game, 'check'); // SmBnd checks. No other play can happen.
         expect(game.table.street).to.equal('river');

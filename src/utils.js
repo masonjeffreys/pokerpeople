@@ -110,7 +110,7 @@ function isStreetComplete(table, players){
             console.log(player.id, " is current with bet.")
         } else if (player.handState == "FOLD") {
             console.log(player.id, " has folded.")
-        } else if (player.allInPotNumber){
+        } else if (player.handState == "ALLIN"){
             console.log(player.id, " is all in.")
         } else {
             console.log("Betting round not done. Player ", player.id, " needs to act.")

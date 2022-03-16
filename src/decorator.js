@@ -24,9 +24,7 @@ function privateState(game, player, showHandsForPlayers=[]){
             bigBlind: p.bigBlind,
             gameState: p.gameState,
             handState: p.handState,
-            hand: hand,
-            allInPotNumber: p.allInPotNumber,
-            foldPotNumber: p.foldPotNumber
+            hand: hand
         })
     })
 

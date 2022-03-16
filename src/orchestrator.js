@@ -73,8 +73,6 @@ function setupHand(game){
         player.smallBlind = false;
         player.bigBlind = false;
         player.handState = "IN";
-        player.allInPotNumber = null;
-        player.foldPotNumber = null;
         player.publicHand = false;
     })
     game.table.street = STREETS[0]; // Sets to 'preflop'
@@ -89,11 +87,11 @@ function setupHand(game){
     game.lastAction = "new hand";
     game.results = [];
     game.freeAdvance = false;
+    
     // Set the min bet (or min raise on top of a bet)
     // for the betting round to be equal to the big blind
     game.table.minRaise = game.table.bigBlind;
-    game.table.sidePotPending = false;
-    game.table.playerAllIn = null;
+
     // BetTheBlinds
     makeBlindBets(game);
 
@@ -263,7 +261,7 @@ function maybeReturnExtraMoney(game){
 function isSomeoneAllIn(game){
     let anyoneAlreadyAllIn = false;
     game.players.forEach(player => {
-        if (player.allInPotNumber == game.table.currentPotNumber()){
+        if (player.handState == "ALLIN"){
             anyoneAlreadyAllIn = true;
         }
     })
@@ -307,7 +305,7 @@ function receiveAction(game, action, amountRaw = 0){
             // Player is all in. Any bet amount is legal here.
             
             amount = player.chips;
-            player.allInPotNumber = game.table.currentPotNumber();
+            player.handState = "ALLIN";
             game.table.playerAllIn = player.playerId;
             console.log("call amouont is ", callAmount, ", all-in pushed in ", amount);
 
@@ -387,7 +385,6 @@ function receiveAction(game, action, amountRaw = 0){
             break
         case "fold":
             // Change player state and advance to next position
-            player.foldPotNumber = game.table.currentPotNumber(); // track the pot that the player folded in
             player.handState = "FOLD"
             // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
             if (game.table.pots.length > 1){
@@ -472,9 +469,9 @@ function winByFolding(game){
     if (game.table.pots.length == 1){
         let playersLeft = 0;
         game.players.forEach(function(player){
-            if (player.foldPotNumber){
+            if (player.handState == "FOLD"){
                 console.log("Player ", player.id, " is folded.");
-            } else if (player.allInPotNumber){
+            } else if (player.handState == "ALLIN"){
                 console.log("Player ", player.id, " is all-in.");
                 playersLeft = playersLeft + 1;
             }

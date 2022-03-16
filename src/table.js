@@ -1,5 +1,4 @@
 function Table() {
-    var _status = 'initial';
     var _numSeats = 10;
     var _startingChips = 0;
     var _dealerPosition = -1; // First player to join will deal after this advances 1 position at a time
@@ -11,9 +10,6 @@ function Table() {
     var _pots = [{id: 0, playerAmounts: {}, highBet: 0}]; // will have a main pot, then each time only 1 player can go all-in, we'd need to start tracking side pots.
     var _street = 'preflop';
 
-    /// Relating to sidepots and stuff
-    var _sidePotPending = false;
-    var _playerAllIn = false;
     var _minRaise = null; // A raise must be at least equal to the largest prior full bet or raise of the current betting round.
     // A player who raises 50% or more of the largest prior bet but less than a minimum raise must make a full minimum raise.
     // If less than 50% it is a call unless 'raise' is first declared or the player is all-in (Rule 45-B).
@@ -28,13 +24,6 @@ function Table() {
         },
         set numSeats(value){
             _numSeats = value;
-            return this;
-        },
-        get status(){
-            return _status;
-        },
-        set status(value){
-            _status = value;
             return this;
         },
         get pots(){
@@ -101,13 +90,6 @@ function Table() {
         },
         set allInFullBet(value){
             _allInFullBet = value;
-            return this;
-        },
-        get playerAllIn(){
-            return _playerAllIn;
-        },
-        set playerAllIn(value){
-            _playerAllIn = value;
             return this;
         },
         currentPotNumber: function(){
