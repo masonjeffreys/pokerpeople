@@ -6,7 +6,6 @@ const Lab = require('@hapi/lab'); // Load Lab (test runner that is produced by H
 const { expect } = Code; // Use this instead of Assert
 const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // Defines several constants that are useful for test followup, and notation
 
-const Deck = require('../src/deck');
 const Table = require('../src/table');
 const Repo = require('../src/repo');
 const Orchestrator = require('../src/orchestrator');
@@ -21,7 +20,7 @@ let games = [];
 let players = [];
 
 function newTestGame(gameCode){
-    let game = Repo.createGame(Deck().init(), Table(), gameConfig, gameCode, games);
+    let game = Repo.createGame(Table(), gameConfig, gameCode, games);
     let dealer = Repo.getOrCreateUser({firstName: "Dealer", lastName: "Man"}, players);
     let smallBlind = Repo.getOrCreateUser({firstName: "Small", lastName: "Blind"}, players);
     let bigBlind = Repo.getOrCreateUser({firstName: "Big", lastName: "Blind"}, players); 

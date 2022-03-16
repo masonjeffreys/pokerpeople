@@ -35,7 +35,13 @@ function Deck() {
             return this;
         },
         take: function take(){
-            return _cards.shift();
+            let card = _cards[0];
+            let remaining = _cards.slice(1);
+            _cards = remaining;
+            return {
+                card: card,
+                deck: this
+            }
         }
 
     })

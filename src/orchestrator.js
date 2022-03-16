@@ -510,21 +510,35 @@ function advanceStreet(game){
     }
     // Reset the minRaise
     game.table.minRaise = game.table.bigBlind;
-    
+    let ret = null;
+
     switch(game.table.street){
         case 'flop':
-            game.table.addBurnedCard(game.deck.cards.shift());
-            game.table.addCommonCard(game.deck.cards.shift());
-            game.table.addCommonCard(game.deck.cards.shift());
-            game.table.addCommonCard(game.deck.cards.shift());
+            ret = null;
+            for (i = 0; i < 3; i++){
+                ret = game.deck.take();
+                game.deck = ret.deck;
+                game.table.addBurnedCard(ret.card);
+            }
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addCommonCard(ret.card);
             break;
         case 'turn':
-            game.table.addBurnedCard(game.deck.cards.shift());
-            game.table.addCommonCard(game.deck.cards.shift());
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addBurnedCard(ret.card);
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addCommonCard(ret.card);
             break;
         case 'river':
-            game.table.addBurnedCard(game.deck.cards.shift());
-            game.table.addCommonCard(game.deck.cards.shift());
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addBurnedCard(ret.card);
+            ret = game.deck.take();
+            game.deck = ret.deck;
+            game.table.addCommonCard(ret.card);
             break;
         case 'showdown':
             // Showdown means that the hand is over, time to evaulate
@@ -558,7 +572,6 @@ function evalPot(table, pot, potIndex, players){
     let playerIdsInPot = [];
 
     players.forEach(function(player){
-        console.log("checking player: ", JSON.stringify(player));
         if (player.handState == "FOLD"){
             // player folded so they definitely can't win
         } else if (player.gameState == "ACTIVE" && Utils.playerInPot(pot, player)){

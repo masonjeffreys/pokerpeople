@@ -1,5 +1,6 @@
 const Utils = require('./utils');
 const Player = require('./player');
+const Deck = require('./deck');
 
 function createUser(userData, repo){
     let newId = repo.length + 1;
@@ -31,7 +32,7 @@ function createUser(userData, repo){
     return game;
   }
   
-  function createGame(deck, table, gameConfig, gameCode, repo){
+  function createGame(table, gameConfig, gameCode, repo){
     // Create a deck and table
     // Set up 'initial start' params (things that aren't done on every hand) for table
     // Set table blind levels
@@ -51,7 +52,7 @@ function createUser(userData, repo){
         status: 'unstarted',
         players: [],
         table: table,
-        deck: deck,
+        deck: Deck().init(),
         testMode: testMode
     }
   

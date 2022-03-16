@@ -1,7 +1,6 @@
 const Orchestrator = require('../orchestrator');
 const Utils = require('../utils');
 const Table = require('../table');
-const Deck = require('../deck');
 const Repo = require('../repo');
 
 // Things that might be different from Game to Game
@@ -28,7 +27,7 @@ exports.joinGame = async (req, h) => {
 
   let game = Repo.getGame(gameCode, req.server.app.games);
   if(!game){
-    game = Repo.createGame(Deck().init(), Table(), gameConfig, gameCode, req.server.app.games);
+    game = Repo.createGame(Table(), gameConfig, gameCode, req.server.app.games);
   }
 
   req.cookieAuth.set({user: {id: user.id}});
