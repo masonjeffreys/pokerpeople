@@ -73,7 +73,7 @@ describe('dealOne',()=>{
     game.players[3].chips = 50;
     it('each player will recieve one card', () => {
         expect(game.players.length).to.equal(4);
-        Utils.dealOne(game.players, deck, 0);
+        Utils.dealOne(game.players, game.deck, 0);
         game.players.forEach(player => {
             if (player.handState == "IN" && player.chips > 0){
                 expect(player.hand.length).to.equal(1);
@@ -81,7 +81,7 @@ describe('dealOne',()=>{
                 expect(player.hand.length).to.equal(0);
             }
         });
-        expect(deck.cards.length).to.equal(50);
+        expect(game.deck.cards.length).to.equal(50);
     })
 })
 

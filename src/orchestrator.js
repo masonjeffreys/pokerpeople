@@ -183,8 +183,8 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
 
     // Do we ever need to adjust more than the current pot and the new side pot? Yes -> The nth player may go all-in with only $1
     // goal is to put player amounts in correct pots
-    pots = game.table.pots;
-    playerCurrentBets = {}; // object of playerCurrentBets
+    let pots = game.table.pots;
+    let playerCurrentBets = {}; // object of playerCurrentBets
 
     let sortableList = [];
     game.players.forEach(player=>{
@@ -197,10 +197,10 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
         return a.amount - b.amount;
     });
 
-    newPots = [] // {id: 0, highBet: 10, playerAmounts: {1:{amount: 10}}}
+    let newPots = [] // {id: 0, highBet: 10, playerAmounts: {1:{amount: 10}}}
 
     sortableList.forEach(i => {
-        pcb = playerCurrentBets[i.id];
+        let pcb = playerCurrentBets[i.id];
         // Go through objects like  2: {amount: 10}, 3: {amount: 10}, 8: {amount: 40}
         // if pot already exists for this amount, contribute to that pot
         let amountRemaining = pcb.amount;
@@ -278,20 +278,28 @@ function maxCallableBet(game, playerToExclude){
     return max;
 }
 
-function receiveNonPlayerAction(game, action){
-    // Handle player's desired action
-    switch (action){
-        case "advance":
-            advanceStreet(game);
-            break;
-        default: 
-            throw new Error(`Invalid player action: ${action}, ${amount}`)
-    }
+function isValidAction(game, action, amountRaw = 0){
+    // precheck to make sure player is allowed to take this action
+    return true;
 }
 
 function receiveAction(game, action, amountRaw = 0){
-    // Get amount if needed
+     // Get amount if needed
     let amount = parseInt(amountRaw);
+    if (isValidAction(game, action, amount) == true ) {
+        executeAction(game, action, amount)
+        return;
+    } else {
+        return;
+    }
+}
+
+function callAction(game, player){
+    applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
+    return;
+}
+
+function executeAction(game, action, amount){
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
 
     // Get current player
@@ -364,7 +372,10 @@ function receiveAction(game, action, amountRaw = 0){
                 throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
             } else if (amount > maxCallableBet(game,player)){
                 throw new Error("Bet is too big, no one can match it.");
-            } else {
+            } else if (amount > player.chips){
+                player.error = "You only have ", player.chips, " left."
+            }
+            else {
                 // We now have a valid raise for sure!
                 // If someone has already gone all-in on this pot already, we must:
                 // 1. apply the call amount to the current pot
@@ -398,8 +409,8 @@ function receiveAction(game, action, amountRaw = 0){
         default:
             throw new Error(`Invalid player action: ${action}, ${amount}`)
     }
-    
     advanceGame(game);
+    
 
 }
 
@@ -517,7 +528,7 @@ function advanceStreet(game){
             ret = game.deck.take();
             game.deck = ret.deck;
             game.table.addBurnedCard(ret.card);
-            for (i = 0; i < 3; i++){
+            for (let i = 0; i < 3; i++){
                 ret = game.deck.take();
                 game.deck = ret.deck;
                 game.table.addCommonCard(ret.card);
@@ -633,9 +644,10 @@ function evalPot(table, pot, potIndex, players){
 
 
 module.exports.addPlayerToGame = addPlayerToGame;
+module.exports.advanceGame = advanceGame;
 module.exports.startGame = startGame;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
 module.exports.receiveAction = receiveAction;
-module.exports.receiveNonPlayerAction = receiveNonPlayerAction;
+module.exports.callAction = callAction;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this

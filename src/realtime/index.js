@@ -10,6 +10,7 @@ exports.plugin = {
         let userIdString = options.userIdString;
 
         module.server = server;
+        module.options = options;
 
         var io = require('socket.io')(server.listener);
         
@@ -67,11 +68,6 @@ exports.plugin = {
                     return next(new Error("Cookie not found"));
                 }
 
-                if (!state.states[cookieName][userString]) {
-                    console.log("No user data found! We do not proceed with ws connection.");
-                    return next(new Error("Cookie not found"));
-                }
-
                 // we have a userId, so let's get the user
                 // Then maybe we can add to server.auth?
                 let userId = state.states[cookieName][userString][userIdString];
@@ -111,7 +107,7 @@ exports.plugin = {
                 //connection
 
                 // Can assign data to the socket like:
-                // socket.data = {user: user, game: game};
+                socket.data = {userId: user.id};
                 // Not sure how long this lives.
                 // Would rather access server to modify data..
                 

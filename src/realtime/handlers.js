@@ -9,6 +9,25 @@ function emitPrivateStateToEachPlayer(game){
     })
 }
 
+function getPlayer(game){
+    let desiredPlayerId = game.players[game.table.activeIndex].id;
+    let player;
+    if (game.testMode){
+        // In test mode, each action happens for the appropriate player. No validation
+        player = game.players.find(p => p.id == desiredPlayerId)
+        return player;
+    } else {
+        // Pull player from connection information and make sure it matches the activeIndex on the table.
+        player = game.players.find(p => p.id == parseInt(module.parent.socket.data.userId));
+        if (player.id == desiredPlayerId){
+            return player;
+        } else {
+            let errString = "Player " + player.id + " tried to act. But it was player " + desiredPlayerId + " turn."
+            throw new Error(errString);
+        }
+    }
+}
+
 exports.hello = function () {
     this.emit('Hi back at you');
 };
@@ -43,7 +62,7 @@ exports.getState = () => {
 
 exports.simulateAnotherPlayerJoining = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    let player = Repo.getOrCreateUser({firstName: "syx", lastName: "afdsn"}, module.parent.server.app.users)
+    let player = Repo.getOrCreateUser({firstName: "User", lastName: module.parent.server.app.users.length + 1}, module.parent.server.app.users)
     Orchestrator.addPlayerToGame(game, player);
     emitPrivateStateToEachPlayer(game);
 };
@@ -73,7 +92,8 @@ exports.allIn = () => {
 
 exports.call = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveAction(game, 'call')
+    let player = getPlayer(game);
+    Orchestrator.callAction(game, player);
     emitPrivateStateToEachPlayer(game);
 };
 
@@ -91,7 +111,7 @@ exports.fold = () => {
 
 exports.advance = () =>{
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveNonPlayerAction(game, 'advance')
+    Orchestrator.advanceGame(game);
     emitPrivateStateToEachPlayer(game);
 }
 

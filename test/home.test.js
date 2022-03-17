@@ -5,6 +5,8 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script();
 const { init } = require('../server');
 
 describe('GET /', () => {
+
+    let server;
     
     beforeEach(async () => {
         server = await init();
