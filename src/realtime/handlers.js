@@ -69,14 +69,24 @@ exports.simulateAnotherPlayerJoining = () => {
 
 exports.nextHand = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    let player = getPlayer(game, player);
+    game.lastAction = player.prettyName() + " requested a new deal.";
     Orchestrator.nextHand(game);
     emitPrivateStateToEachPlayer(game);
 }
 
 exports.bet = (msg) => {
+    // Validate 'data-level' stuff in handlers
+    // (like making sure we have an integer, the correct player, a game that exists, etc)
+    // Validate 'business-logic' in the orchestrator. I.e. bet is too high, too low, etc.
+    // Think of business logic as anything that depends on the game state.
+    // Not sure how to send business-logic errors back to user.
     if (msg && msg.amount && typeof(parseInt(msg.amount)) == "number"){
         let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-        Orchestrator.receiveAction(game, 'bet', parseInt(msg.amount))
+        let player = getPlayer(game);
+        // Store the last action on the game state for display
+        game.lastAction = player.prettyName() + " bet " + amount;
+        Orchestrator.actionBet(game, player, parseInt(msg.amount))
         emitPrivateStateToEachPlayer(game);
     }
     else {
@@ -86,31 +96,40 @@ exports.bet = (msg) => {
 
 exports.allIn = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveAction(game, 'all in')
+    let player = getPlayer(game);
+    game.lastAction = player.prettyName() + " all in. Adding " + player.chips;
+    Orchestrator.actionAllIn(game, player);
     emitPrivateStateToEachPlayer(game);
 };
 
 exports.call = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
     let player = getPlayer(game);
-    Orchestrator.callAction(game, player);
+    game.lastAction = player.prettyName() + " calls."
+    Orchestrator.actionCall(game, player);
     emitPrivateStateToEachPlayer(game);
 };
 
 exports.check = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveAction(game, 'check')
+    let player = getPlayer(game);
+    game.lastAction = player.prettyName() + " checks."
+    Orchestrator.actionCheck(game, player)
     emitPrivateStateToEachPlayer(game);
 };
 
 exports.fold = () => {
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
-    Orchestrator.receiveAction(game, 'fold')
+    let player = getPlayer(game, player);
+    game.lastAction = player.prettyName() + " folds."
+    Orchestrator.actionFold(game)
     emitPrivateStateToEachPlayer(game);
 };
 
 exports.advance = () =>{
     let game = Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
+    let player = getPlayer(game, player);
+    game.lastAction = player.prettyName() + " advanced game."
     Orchestrator.advanceGame(game);
     emitPrivateStateToEachPlayer(game);
 }

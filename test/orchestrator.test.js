@@ -19,6 +19,12 @@ const gameConfig = {
 let games = [];
 let players = [];
 
+function getPlayer(game){
+    // This is usually done in the Handlers.js file, with authorization included
+    // Here we get the active player without auth.
+    return game.players[game.table.activeIndex];
+}
+
 function newTestGame(gameCode){
     let game = Repo.createGame(Table(), gameConfig, gameCode, games);
     let dealer = Repo.getOrCreateUser({firstName: "Dealer", lastName: "Man"}, players);
@@ -63,7 +69,7 @@ describe('will track minRaise correctly',()=>{
         Orchestrator.startGame(game);
         expect(game.table.minRaise).to.equal(10);
         expect(Utils.playerMaxBet(game.table, game.players)).to.equal(10);
-        Orchestrator.receiveAction(game, 'bet', 10 + 11 ); // UnderGun player bets 10 (call) + 11 (1 above min raise);
+        Orchestrator.actionBet(game, getPlayer(game), 10 + 11 ); // UnderGun player bets 10 (call) + 11 (1 above min raise);
         expect(Utils.playerMaxBet(game.table, game.players)).to.equal(21);
         expect(game.table.minRaise).to.equal(11);
     })
@@ -76,27 +82,27 @@ describe('can handle a win',()=>{
     game.players[1].hand = ['Ac','As']; // Small blind has pocket rockets
     game.players[2].hand = ['Ah', '2d']; // Bigblind has 1 ace and a 2
     it('in a standard game', () => {
-        Orchestrator.receiveAction(game, 'call'); // Under the gun calls
-        Orchestrator.receiveAction(game, 'fold'); // Dealer folds
-        Orchestrator.receiveAction(game, 'bet', 30); // Small blind bets 30 (5 call, 25 raise).
-        Orchestrator.receiveAction(game, 'bet', 50); // Big blind raises another 25
-        Orchestrator.receiveAction(game, 'call'); // Under the gun calls.
+        Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
+        Orchestrator.actionBet(game, getPlayer(game), 30); // Small blind bets 30 (5 call, 25 raise).
+        Orchestrator.actionBet(game, getPlayer(game), 50); // Big blind raises another 25
+        Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls.
         expect(game.table.street).to.equal('preflop');
-        Orchestrator.receiveAction(game, 'call'); // Small blind calls. Street ends.
+        Orchestrator.actionCall(game, getPlayer(game)); // Small blind calls. Street ends.
         expect(game.table.street).to.equal('flop');
-        Orchestrator.receiveAction(game, 'bet', 10); // Small blind bets 10.
-        Orchestrator.receiveAction(game, 'call'); // Big blind calls 10.
+        Orchestrator.actionBet(game, getPlayer(game), 10); // Small blind bets 10.
+        Orchestrator.actionCall(game, getPlayer(game)); // Big blind calls 10.
         expect(game.table.street).to.equal('flop');
-        Orchestrator.receiveAction(game, 'fold'); // Dealer folds, ending street. Big blind and small blind are in.
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds, ending street. Big blind and small blind are in.
         expect(game.table.street).to.equal('turn');
         // Heads up for last two cards
-        Orchestrator.receiveAction(game, 'check');
-        Orchestrator.receiveAction(game, 'check');
+        Orchestrator.actionCheck(game, getPlayer(game));
+        Orchestrator.actionCheck(game, getPlayer(game));
         expect(game.table.street).to.equal('river');
         // Set common cards to ensure winner
         game.table.commonCards = ['Ad','3d','6c','8h','Kc'];
-        Orchestrator.receiveAction(game, 'check');
-        Orchestrator.receiveAction(game, 'check');
+        Orchestrator.actionCheck(game, getPlayer(game));
+        Orchestrator.actionCheck(game, getPlayer(game));
         expect(game.table.street).to.equal('showdown');
         expect(game.status).to.equal('hand-complete');
         expect(game.results[0]).to.equal([
@@ -113,22 +119,22 @@ describe('can handle a win',()=>{
     let game = newTestGame(Date.now());
     Orchestrator.startGame(game);
     it('by all but 1 player folding', () => {
-        Orchestrator.receiveAction(game, 'call'); // Under the gun calls
-        Orchestrator.receiveAction(game, 'fold'); // Dealer folds
-        Orchestrator.receiveAction(game, 'bet', 30); // Small blind raises 25
-        Orchestrator.receiveAction(game, 'bet', 50); // Big blind raises another 25
-        Orchestrator.receiveAction(game, 'call'); // Under the gun calls.
+        Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
+        Orchestrator.actionBet(game, getPlayer(game), 30); // Small blind raises 25
+        Orchestrator.actionBet(game, getPlayer(game), 50); // Big blind raises another 25
+        Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls.
         expect(game.table.street).to.equal('preflop');
-        Orchestrator.receiveAction(game, 'call'); // Small blind calls. Street ends.
+        Orchestrator.actionCall(game, getPlayer(game)); // Small blind calls. Street ends.
         expect(game.table.street).to.equal('flop');
-        Orchestrator.receiveAction(game, 'bet', 10); // Small blind bets 10.
-        Orchestrator.receiveAction(game, 'call'); // Big blind calls 10.
+        Orchestrator.actionBet(game, getPlayer(game), 10); // Small blind bets 10.
+        Orchestrator.actionCall(game, getPlayer(game)); // Big blind calls 10.
         expect(game.table.street).to.equal('flop');
-        Orchestrator.receiveAction(game, 'fold'); // Dealer folds, ending street.
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds, ending street.
         expect(game.table.street).to.equal('turn');
         // Heads up for last two cards
-        Orchestrator.receiveAction(game, 'bet', 10); //Small blind bets 10 
-        Orchestrator.receiveAction(game, 'fold'); // Big blind folds. Hand is over
+        Orchestrator.actionBet(game, getPlayer(game), 10); //Small blind bets 10 
+        Orchestrator.actionFold(game, getPlayer(game)); // Big blind folds. Hand is over
         expect(game.status).to.equal('muck-check');
         expect(game.results[0]).to.equal([
             {
@@ -150,17 +156,17 @@ describe('handles min bets correctly',()=>{
 
     it('will reject bets below the min raise if they are not all-in bets', () => {
         // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
-        expect(function(){Orchestrator.receiveAction(game, 'bet', 11)}).to.throw('Not a big enough raise. Min raise is 10 over 10 to call.');
+        expect(function(){Orchestrator.actionBet(game, getPlayer(game), 11)}).to.throw('Not a big enough raise. Min raise is 10 over 10 to call.');
     })
 })
 
 describe('handles everyone going all in',()=>{
     let game = newTestGame(Date.now());
     Orchestrator.startGame(game);
-    Orchestrator.receiveAction(game, 'all in');
-    Orchestrator.receiveAction(game, 'all in');
-    Orchestrator.receiveAction(game, 'all in');
-    Orchestrator.receiveAction(game, 'all in'); // Everyone is now all in. Betting is complete and game should advance to end
+    Orchestrator.actionAllIn(game, getPlayer(game));
+    Orchestrator.actionAllIn(game, getPlayer(game));
+    Orchestrator.actionAllIn(game, getPlayer(game));
+    Orchestrator.actionAllIn(game, getPlayer(game)); // Everyone is now all in. Betting is complete and game should advance to end
     expect(game.table.street).to.equal('flop');
     Orchestrator.advanceGame(game);
     Orchestrator.advanceGame(game);
@@ -191,17 +197,17 @@ describe('handles side pot craziness',()=>{
     game.players[2].chips = 85; // BB has 15 less
     game.players[3].chips = 40; // Player3 (under gun) has short stack: 40.
     Orchestrator.startGame(game);
-    Orchestrator.receiveAction(game, 'all in'); // Player 3 is all in. D, SB, BB haven't acted
+    Orchestrator.actionAllIn(game, getPlayer(game)); // Player 3 is all in. D, SB, BB haven't acted
 
     it('will allow a call - no side pot', () => {
-        Orchestrator.receiveAction(game, 'call'); // Dealer calls - in for 40.
+        Orchestrator.actionCall(game, getPlayer(game)); // Dealer calls - in for 40.
         // Total is 40 + 5 + 10 + 40
         expect(game.table.pots.length).to.equal(1);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(95);
     })
 
     it('will allow a bet and create a first side pot', () => {
-        Orchestrator.receiveAction(game, 'all in'); // Small blind goes all in - 100 in.
+        Orchestrator.actionAllIn(game, getPlayer(game)); // Small blind goes all in - 100 in.
         // This is a raise above previous all-in
         // So we have a side pot:
         // Pot1 is currently 40 + 40 + 10 + 40 = 130
@@ -216,7 +222,7 @@ describe('handles side pot craziness',()=>{
         // BigBlind goes all in. His first 30 calls the first pot.
         // Other 45 go against side pot (60) but can't call it fully, so...
         // We need to pull 15 from SmallBlind out of pot 2 and create pot 3.
-        Orchestrator.receiveAction(game, 'all in');
+        Orchestrator.actionAllIn(game, getPlayer(game));
         expect(game.table.pots.length).to.equal(3);
         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
@@ -229,7 +235,7 @@ describe('handles side pot craziness',()=>{
 
     it('will allow a fold on the last side pot and return money to the lead', () => {
         expect(game.players[1].chips).to.equal(0); // Small blind is all in
-        Orchestrator.receiveAction(game, 'fold'); // Dealer folds
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
         // SmallBlind's 15 cannot be matched, so it should immediately be returned.
         // That completes the street - no additional action allowed
         expect(game.table.street).to.equal('flop');

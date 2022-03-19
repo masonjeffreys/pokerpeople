@@ -278,140 +278,119 @@ function maxCallableBet(game, playerToExclude){
     return max;
 }
 
-function isValidAction(game, action, amountRaw = 0){
-    // precheck to make sure player is allowed to take this action
-    return true;
-}
-
-function receiveAction(game, action, amountRaw = 0){
-     // Get amount if needed
-    let amount = parseInt(amountRaw);
-    if (isValidAction(game, action, amount) == true ) {
-        executeAction(game, action, amount)
-        return;
-    } else {
-        return;
+function  actionBet(game, player, amount){
+    /// **** THIS IS NOT AN ALL IN BET -> That is handled in another function ****
+    let anyoneAlreadyAllIn = isSomeoneAllIn(game);
+    let callAmount = Utils.getCallAmount(game.table, game.players, player);
+    // this is essentially a raise action (range restricted to ensure this) but not an all-in
+    // add logic here to not let the player 
+    if (amount == player.chips){
+        // should move this to be handled by the 'all-in' action for more clarity.
+        throw new Error("Player attempted to go all in, but the received action was 'bet' ");
     }
-}
-
-function callAction(game, player){
-    applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
+    else if (amount == 0){
+        // should move this to be handled by the 'check' action for more clarity.
+        throw new Error("Player attempted to check, but the received action was 'bet' ");
+    }
+    else if (amount == callAmount){
+        // should move this to be handled by the 'call' action for more clarity.
+        throw new Error("Player attempted to check, but the received action was 'bet' ");
+    }
+    else if (amount < callAmount + game.table.minRaise ){
+        // bet wasn't large enough
+        throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
+    } else if (amount > maxCallableBet(game,player)){
+        throw new Error("Bet is too big, no one can match it.");
+    } else if (amount > player.chips){
+        player.error = "You only have ", player.chips, " left."
+    }
+    else {
+        // We now have a valid raise for sure!
+        // If someone has already gone all-in on this pot already, we must:
+        // 1. apply the call amount to the current pot
+        // 2. create a new pot.
+        // 3. bet the rest of the money in the new pot
+        // Record that player has acted in street (used for later determination of when the street is over)
+        player.actedInStreet = true;
+        if (anyoneAlreadyAllIn){
+            applyBet(game, game.table.activeIndex, callAmount);
+            game.table.addPot();
+            applyBet(game, game.table.activeIndex, amount - callAmount);
+        } else {
+            // Standard raise. Will not create side pot until it is called.
+            applyBet(game, game.table.activeIndex, amount);
+        }
+        advanceGame(game);
+    }
     return;
 }
 
-function executeAction(game, action, amount){
+function actionCall(game, player){
+    // Record that player has acted in street (used for later determination of when the street is over)
+    player.actedInStreet = true;
+    applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
+    advanceGame(game);
+    return;
+}
+
+function actionCheck(game, player){
+    // Essentially no change. Just move to next position
+    // Record that player has acted in street (used for later determination of when the street is over)
+    player.actedInStreet = true;
+    advanceGame(game);
+    return;
+}
+
+function actionFold(game, player){
+    // Change player state and advance to next position
+    player.handState = "FOLD"
+    // Record that player has acted in street (used for later determination of when the street is over)
+    player.actedInStreet = true;
+    // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
+    if (game.table.pots.length > 1){
+        maybeReturnExtraMoney(game);
+    }
+    advanceGame(game);
+    return;
+}
+
+function actionAllIn(game, player){
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
-
-    // Get current player
-    let player = game.players[game.table.activeIndex];
-    console.log("*** ACTION *** Player ", player.id, " ", action, ". Amount: ", amount, ".");
-
     // call amount is sum of amounts needed to call each pot
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
     
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
 
-    // Store the last action on the game state for display
-    game.lastAction = player.prettyName() + ": " + action;
-    if (amount && amount > 0){
-        game.lastAction = game.lastAction + " " + amount;
-    }
+    // Player is all in. Any bet amount is legal here.
+    
+    let amount = player.chips;
+    player.handState = "ALLIN";
+    game.table.playerAllIn = player.playerId;
+    console.log("call amouont is ", callAmount, ", all-in pushed in ", amount);
 
-    // Handle player's desired action
-    switch (action){
-        case "all in":
-            // Player is all in. Any bet amount is legal here.
-            
-            amount = player.chips;
-            player.handState = "ALLIN";
-            game.table.playerAllIn = player.playerId;
-            console.log("call amouont is ", callAmount, ", all-in pushed in ", amount);
-
-            // Now decide if we need to immediately create a side pot or not
-            if (amount < callAmount){
-                // siphon some funds off of the current pot and start a side pot
-                console.log("Equalizing funds for new side pot since amount bet was ", amount, " and call amount was ", callAmount);
-                applyBet(game, game.table.activeIndex, amount);
-                equalizeFundsAndCreateSidePot(game);
-            } else {
-                // We have a raise.  Definitely have a side pot
-                if (anyoneAlreadyAllIn){
-                    console.log(" --- someones already all in");
-                    applyBet(game, game.table.activeIndex, callAmount);
-                    if (amount - callAmount > 0 ){
-                        game.table.addPot();
-                    }
-                    applyBet(game, game.table.activeIndex, amount - callAmount);
-                } else {
-                    console.log(" --- no one all in");
-                    // Standard all-in bet. Will not create side pot until it is called.
-                    applyBet(game, game.table.activeIndex, amount);
-                }
+    // Now decide if we need to immediately create a side pot or not
+    if (amount < callAmount){
+        // siphon some funds off of the current pot and start a side pot
+        console.log("Equalizing funds for new side pot since amount bet was ", amount, " and call amount was ", callAmount);
+        applyBet(game, game.table.activeIndex, amount);
+        equalizeFundsAndCreateSidePot(game);
+    } else {
+        // We have a raise.  Definitely have a side pot
+        if (anyoneAlreadyAllIn){
+            console.log(" --- someones already all in");
+            applyBet(game, game.table.activeIndex, callAmount);
+            if (amount - callAmount > 0 ){
+                game.table.addPot();
             }
-            break;
-        case "bet":
-            /// **** THIS IS NOT AN ALL IN BET -> That is handled above ****
-
-            // this is essentially a raise action (range restricted to ensure this) but not an all-in
-            // add logic here to not let the player 
-            if (amount == player.chips){
-                // should move this to be handled by the 'all-in' action for more clarity.
-                throw new Error("Player attempted to go all in, but the received action was 'bet' ");
-            }
-            else if (amount == 0){
-                // should move this to be handled by the 'check' action for more clarity.
-                throw new Error("Player attempted to check, but the received action was 'bet' ");
-            }
-            else if (amount == callAmount){
-                // should move this to be handled by the 'call' action for more clarity.
-                throw new Error("Player attempted to check, but the received action was 'bet' ");
-            }
-            else if (amount < callAmount + game.table.minRaise ){
-                // bet wasn't large enough
-                throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
-            } else if (amount > maxCallableBet(game,player)){
-                throw new Error("Bet is too big, no one can match it.");
-            } else if (amount > player.chips){
-                player.error = "You only have ", player.chips, " left."
-            }
-            else {
-                // We now have a valid raise for sure!
-                // If someone has already gone all-in on this pot already, we must:
-                // 1. apply the call amount to the current pot
-                // 2. create a new pot.
-                // 3. bet the rest of the money in the new pot
-                if (anyoneAlreadyAllIn){
-                    applyBet(game, game.table.activeIndex, callAmount);
-                    game.table.addPot();
-                    applyBet(game, game.table.activeIndex, amount - callAmount);
-                } else {
-                    // Standard raise. Will not create side pot until it is called.
-                    applyBet(game, game.table.activeIndex, amount);
-                }
-            }
-            
-            break
-        case "check":
-            // Essentially no change. Just move to next position
-            break
-        case "fold":
-            // Change player state and advance to next position
-            player.handState = "FOLD"
-            // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
-            if (game.table.pots.length > 1){
-                maybeReturnExtraMoney(game);
-            }
-            break
-        case "call":
-            applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
-            break
-        default:
-            throw new Error(`Invalid player action: ${action}, ${amount}`)
+            applyBet(game, game.table.activeIndex, amount - callAmount);
+        } else {
+            console.log(" --- no one all in");
+            // Standard all-in bet. Will not create side pot until it is called.
+            applyBet(game, game.table.activeIndex, amount);
+        }
     }
     advanceGame(game);
-    
-
 }
 
 function advanceGame(game){
@@ -648,6 +627,9 @@ module.exports.advanceGame = advanceGame;
 module.exports.startGame = startGame;
 module.exports.nextHand = nextHand;
 module.exports.setupHand = setupHand;
-module.exports.receiveAction = receiveAction;
-module.exports.callAction = callAction;
+module.exports.actionBet = actionBet;
+module.exports.actionCall = actionCall;
+module.exports.actionFold = actionFold;
+module.exports.actionAllIn = actionAllIn;
+module.exports.actionCheck = actionCheck;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
