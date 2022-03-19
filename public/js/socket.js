@@ -93,6 +93,10 @@ socket.on('private', function(state){
     }
     if (state.game && state.game.status){
       toggleAdvanceButton(state.game.status);
+      renderGameStatus(state.game.status);
+    }
+    if (state.game && state.game.errors){
+      renderErrors(state.game.errors);
     }
     if (state.table){
       updateTable(state.table);
@@ -100,7 +104,7 @@ socket.on('private', function(state){
     if (state.table && state.playersInfo){
       activatePlayer(state.playersInfo, state.table);
     }
-    if (typeof(state.results) !== 'undefined'){
+    if (state.results){
       updateResults(state.results);
     }
     if (state.actionOpts){

@@ -118,6 +118,7 @@ function makeBlindBets(game){
     // Advance betting round one more time to get to active player
     // This player is 'under the gun'
     game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, bigBlindIndex);
+    console.log("*** after blinds, active index is ", game.table.activeIndex);
 }
 
 function applyBet(game, playerIndex, amount){
@@ -183,7 +184,7 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
 
     // Do we ever need to adjust more than the current pot and the new side pot? Yes -> The nth player may go all-in with only $1
     // goal is to put player amounts in correct pots
-    let pots = game.table.pots;
+    
     let playerCurrentBets = {}; // object of playerCurrentBets
 
     let sortableList = [];

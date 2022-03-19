@@ -53,7 +53,8 @@ function createUser(userData, repo){
         players: [],
         table: table,
         deck: Deck().init(),
-        testMode: testMode
+        testMode: testMode,
+        errors: []
     }
   
     repo.push(game);

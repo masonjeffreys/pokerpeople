@@ -5,9 +5,9 @@ exports.plugin = {
     name: 'hapi-realtime',
     version: '1.0.0',
     register: async function (server, options, next) {
-        let cookieName = options.cookieName;
-        let userString = options.userString;
-        let userIdString = options.userIdString;
+        let cookieName = options.cookieName; // The name of the cookie to look at
+        let userString = options.userString; // the user string ('user')
+        let userIdString = options.userIdString; // the userId ('id')
 
         module.server = server;
         module.options = options;
@@ -18,6 +18,22 @@ exports.plugin = {
         io.on('connection', function (socket) {
             // Expose socket for use in Handlers
             module.socket = socket;
+            
+            socket.use(([event, ...args], next) => {
+                // Socket middleware runs on every request.
+                // do something with the packet (logging, authorization, rate limiting...)
+                // do not forget to call next() at the end
+                // let userId = state.states[cookieName][userString][userIdString];
+                console.log("**** Socket middleware");
+
+                module.server.states.parse(socket.request.headers.cookie).then(function(state){
+                    let userId = state.states[cookieName][userString][userIdString];
+                    module.userId = userId;
+                    console.log("Request from user id ", userId);
+                    next();
+                });
+
+            });
 
             // As soon as someone joins, broadcast new game state to everyone
             // Everyone needs new state since we have a new player
@@ -54,8 +70,12 @@ exports.plugin = {
         });
 
         ///////
-        // Middleware for authentication
-        // Executed on every websocket request and ping.
+        // Middleware for initial authentication
+        //
+        // this function will be executed only once per connection
+        // (even if the connection consists in multiple HTTP requests).
+        // Thus is cannot be used to do authorization on every request
+        // 
         //////
 
         io.use(function (socket, next) {
@@ -101,13 +121,15 @@ exports.plugin = {
                 console.log("Authorized websocket connection user ", userId, " to game ", gameCode);
 
                 // Store socket ID with user for private events later
+                // This does prevent a user from playing multiple games at once.
                 user.socketId = socket.id;
 
                 //everything is fine, session is authenticated and we accept the
                 //connection
 
                 // Can assign data to the socket like:
-                socket.data = {userId: user.id};
+                console.log("***** Middleware: setting user data on socket to ", user.id);
+                
                 // Not sure how long this lives.
                 // Would rather access server to modify data..
                 

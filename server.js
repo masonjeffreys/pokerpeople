@@ -102,6 +102,15 @@ exports.init = async function () {
     });
 
     server.route({
+        method: 'GET',
+        path: '/logout',
+        options: {
+            auth: false
+        },
+        handler: AuthController.logout
+    });
+
+    server.route({
         method: 'POST',
         path: '/joinGame',
         handler: GameController.joinGame,

@@ -30,6 +30,11 @@ exports.invalid = (req, h) => {
     return 'Cannot access this without logging in!<br><a href="/">Home</a>';
 }
 
+exports.logout = (req, h) => {
+    req.cookieAuth.clear();
+    return h.redirect('/');
+}
+
 exports.fillFormHomePage = (req, h) => {
     let user = {}
     if (req.auth.credentials && req.auth.credentials.user){
