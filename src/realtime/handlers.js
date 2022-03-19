@@ -93,7 +93,7 @@ exports.bet = (msg) => {
         let player = getPlayer(game);
         // Store the last action on the game state for display
         if (game.errors.length == 0){
-            game.lastAction = player.prettyName() + " bet " + amount;
+            game.lastAction = player.prettyName() + " bet " + msg.amount;
             Orchestrator.actionBet(game, player, parseInt(msg.amount))
         }
         emitPrivateStateToEachPlayer(game);
