@@ -11,7 +11,7 @@ function getPlayer(game){
     let idToAuth = module.parent.userId;
     let player;
 
-    if (!game.testMode){
+    if (game.testMode){
         // In test mode, each action happens for the appropriate player. No validation
         player = game.players.find(p => p.id == desiredPlayerId)
         return player;
@@ -21,9 +21,6 @@ function getPlayer(game){
         if (player.id == desiredPlayerId){
             return player;
         } else {
-            console.log("id to authorize is ", idToAuth);
-            console.log("game table active index is ", game.table.activeIndex);
-            console.log("players are: ", JSON.stringify(game.players));
             let errString = "Player " + player.id + " tried to act. But it was player " + desiredPlayerId + " turn."
             console.log(errString);
             game.errors.push(errString);

@@ -24,12 +24,11 @@ exports.plugin = {
                 // do something with the packet (logging, authorization, rate limiting...)
                 // do not forget to call next() at the end
                 // let userId = state.states[cookieName][userString][userIdString];
-                console.log("**** Socket middleware");
-
+                
                 module.server.states.parse(socket.request.headers.cookie).then(function(state){
                     let userId = state.states[cookieName][userString][userIdString];
                     module.userId = userId;
-                    console.log("Request from user id ", userId);
+                    console.log("*** Request from user id ", userId);
                     next();
                 });
 
