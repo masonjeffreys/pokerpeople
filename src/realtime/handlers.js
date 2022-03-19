@@ -76,7 +76,7 @@ exports.simulateAnotherPlayerJoining = () => {
 
 exports.nextHand = () => {
     let game = getGame();
-    let player = getPlayer(game, player);
+    let player = getPlayer(game);
     game.lastAction = player.prettyName() + " requested a new deal.";
     Orchestrator.nextHand(game);
     emitPrivateStateToEachPlayer(game);
@@ -135,7 +135,7 @@ exports.check = () => {
 
 exports.fold = () => {
     let game = getGame();
-    let player = getPlayer(game, player);
+    let player = getPlayer(game);
     if (game.errors.length == 0){
         game.lastAction = player.prettyName() + " folds.";
         Orchestrator.actionFold(game);
@@ -145,7 +145,7 @@ exports.fold = () => {
 
 exports.advance = () =>{
     let game = getGame();
-    let player = getPlayer(game, player);
+    let player = getPlayer(game);
     if (game.errors.length == 0){
         game.lastAction = player.prettyName() + " advanced game."
         Orchestrator.advanceGame(game);
