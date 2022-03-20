@@ -7,25 +7,31 @@ function getGame(){
 }
 
 function getPlayer(game){
-    let desiredPlayerId = game.players[game.table.activeIndex].id; // 1
     let idToAuth = module.parent.userId;
     let player;
 
-    if (game.testMode){
-        // In test mode, each action happens for the appropriate player. No validation
-        player = game.players.find(p => p.id == desiredPlayerId)
-        return player;
-    } else {
+    if (game.table.activeIndex != null) {
+        // If table requires a certain player to act, ensure that we have this player
         // Pull player from connection information and make sure it matches the activeIndex on the table.
+        let desiredPlayerId = game.players[game.table.activeIndex].id; // 1
         player = game.players.find(p => p.id == parseInt(idToAuth));
-        if (player.id == desiredPlayerId){
-            return player;
+        if (game.testMode){
+            player = game.players.find(p => p.id == desiredPlayerId);
         } else {
-            let errString = "Player " + player.id + " tried to act. But it was player " + desiredPlayerId + " turn."
-            console.log(errString);
-            game.errors.push(errString);
+            if (player.id == desiredPlayerId){
+                // Good!
+            } else {
+                let errString = "Player " + player.id + " tried to act. But it was player " + desiredPlayerId + " turn."
+                console.log(errString);
+                game.errors.push(errString);
+            }
         }
+    } else {
+        // Table doesn't require a specific player, so we return the player that took the action
+        // Applies for things like 'advancing' the round
+        player = game.players.find(p => p.id == parseInt(idToAuth));
     }
+    return player;
 }
 
 function emitPrivateStateToEachPlayer(game){

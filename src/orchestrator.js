@@ -404,7 +404,6 @@ function advanceGame(game){
     if (isGameComplete(game)){
         console.log("Game over!: ", game.status);
         game.status = 'complete';
-        throw 'game is complete!';
     } else if (isHandComplete(game)){
         game.status = 'muck-check';
         console.log("Completed Hand: ", game.status);

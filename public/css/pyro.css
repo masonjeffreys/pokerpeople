@@ -1,0 +1,23 @@
+.pyro {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 100%, #223, #000 40%);
+  margin: 0;
+}
+
+.pyro:after {  
+  content: url('https://t4.ftcdn.net/jpg/02/82/85/41/360_F_282854103_37oUj0bXJxBW6MOb5GnxuBmv4Vq83PKw.jpg');
+  mix-blend-mode: multiply;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 38.25%);
+  text-align: center;  
+}
+  
+.glowing {
+    color: white;
+    text-shadow: -1px -1px 1px var(--shadow-color-light), -1px 1px 1px var(--shadow-color-light), 1px -1px 1px var(--shadow-color-light), 1px 1px 1px var(--shadow-color-light),
+    0 0 3px var(--shadow-color-light), 0 0 10px var(--shadow-color-light), 0 0 20px var(--shadow-color-light),
+    0 0 30px var(--shadow-color), 0 0 40px var(--shadow-color), 0 0 50px var(--shadow-color), 0 0 70px var(--shadow-color), 0 0 100px var(--shadow-color), 0 0 200px var(--shadow-color);
+}
