@@ -1,4 +1,4 @@
-<div class="w-screen h-full relative">
+<div class="w-screen h-full relative bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-1">
 <!-- For felt background: add bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-1 --->
   <div id="gameEnd" class="w-screen h-full absolute bg-gray-900 z-10 flex flex-col justify-center hidden">
     <p id="winnerName" class="glowing text-white text-center font-extrabold logo-1 text-4xl">
@@ -12,54 +12,63 @@
       <button type="button" id="newGameBtn" onclick="startGame()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Play again!</button>
     </div>
   </div>
+
   <div id="errorsContainer" class="absolute top-0 right-0 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
-  </div> 
-  <div id="playersContainer" class="h-20">
   </div>
-  <div id="table" class="p-2 pt-6 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-10 relative">
-      <div class="flex justify-center">
-        <div id="potHolder" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
+
+  <div id="playersContainerTop" class="h-32 w-full absolute top-0 flex justify-center p-2 gap-8">
+  </div>
+  <div id="playersContainerLeft" class="w-32 h-full py-32 absolute left-0 flex flex-col justify-center px-2 gap-8">
+  </div>
+  <div id="playersContainerRight" class="w-32 h-full py-32 absolute right-0 flex flex-col justify-center px-2 gap-8">
+  </div>
+
+  <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-40 pt-8 flex-col flex justify-center">
+      <div class="flex flex-col justify-center align-middle">
+        <div id="potHolder" class="p-2 m-2 w-60 text-center text-white font-semibold bg-green-600 rounded mx-auto">
         </div>
-      </div>
-        <div class="flex justify-center">
-          <button type="button" id="startGameBtn" onclick="startGame()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Start Game</button>
+        <div id="commonCards" class="w-full h-16 flex items-center justify-center gap-1">
         </div>
-        <div id="commonCards" class="bg-gray-200 w-full h-16 flex items-center justify-center gap-1">
-      </div>
-      <div class="bg-gray-100">
-        <div id="status" class="inline-block text-left text-sm italic text-gray-700"></div>
-        <div id="minRaise" class="inline-block float-right text-right text-sm italic text-gray-700"></div>
       </div>
       <div id="results" class="text-center mx-auto">
       </div>
-      <div id="lastAction" class="text-small text-gray-400 italics text-center">
-      </div>
   </div>
-  <div id="self" class="mx-[25%]">
-    <!--JS will populate a player inside here with appropriate styling-->
+
+  <div class="flex w-screen justify-center absolute mb-40 bottom-0">
+    <div id="self" class="mx-auto">
+      <!--JS will populate a player inside here with appropriate styling-->
+    </div>
   </div>
+  
  
-  <div id="actions" class="py-2 px-2 w-full bg-white absolute left-0 bottom-0">
-    <div id="betLabel" class="text-center text-sm"></div>
-    <div class="flex justify-center items-end">
-      <div class="my-2 mx-2">
-        <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Advance</button>
-        <!-- can only call or check on a given turn, not both. So we put both in the same div-->
-        <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
-        <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
-      </div>
-      <div class="my-2 mx-2 text-center">
-        
-        <div class="relative text-gray-700">
-            <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="number" placeholder="Amount"/>
-            <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+  <div id="bottomBar"class="p-2 w-full bg-white absolute left-0 bottom-0 h-32">
+    <div id="info">
+      <div id="minRaise" class="inline-block text-right text-sm italic text-gray-700"></div>
+      <div id="lastAction" class="text-small text-gray-400 italics text-center"></div>
+      <div id="betLabel" class="text-center text-sm"></div>
+    </div>
+    <div id="actions">
+      <div class="flex justify-center items-end">
+        <div class="my-2 mx-2">
+          <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Advance</button>
+          <button type="button" id="startGameBtn" onclick="startGame()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Start Game</button>
+          <!-- can only call or check on a given turn, not both. So we put both in the same div-->
+          <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
+          <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
         </div>
-      </div>
-      <div class="my-2 mx-2">
-        <button type="button" id="allInBtn" onclick="allIn()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">All In</button>
-      </div>
-      <div class="my-2 mx-2">
-        <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+        <div class="my-2 mx-2 text-center">
+          
+          <div class="relative text-gray-700">
+              <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="number" placeholder="Amount"/>
+              <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+          </div>
+        </div>
+        <div class="my-2 mx-2">
+          <button type="button" id="allInBtn" onclick="allIn()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">All In</button>
+        </div>
+        <div class="my-2 mx-2">
+          <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+        </div>
       </div>
     </div>
   </div>
@@ -143,13 +152,11 @@
     }
 
     function renderGameStatus(status, players){
-      let statusDiv = document.getElementById('status');
       let winningScreen = document.getElementById('gameEnd');
       let startGameBtn = document.getElementById('startGameBtn');
       winningScreen.classList.remove("hidden");
       winningScreen.classList.add("hidden");
       if (typeof(status) != 'undefined'){
-        statusDiv.innerHTML = status;
         if (status == 'complete'){
           let winner = getLeader(players);
           winningScreen.classList.remove("hidden");
@@ -168,8 +175,6 @@
           startGameBtn.classList.remove("hidden");
           startGameBtn.classList.add("hidden");
         }
-      } else {
-        statusDiv.innerHTML = "";
       }
     }
 
@@ -207,27 +212,34 @@
     }
 
     function updateAllPlayers(playersInfo, currentPlayerId){
-      let containerDiv = document.getElementById('playersContainer');
-      containerDiv.innerHTML = "";
+      let containerTop = document.getElementById('playersContainerTop');
+      let containerLeft = document.getElementById('playersContainerLeft');
+      let containerRight = document.getElementById('playersContainerRight');
+      containerTop.innerHTML = "";
+      containerLeft.innerHTML = "";
+      containerRight.innerHTML = "";
       let selfContainer = document.getElementById('self');
       selfContainer.innerHTML = "";
       // cycle through each player, starting at self.
       let startArrayPosition = playersInfo.map(function(o) { return o.playerId; }).indexOf(currentPlayerId);
+      let otherPlayers = [];
       for (var i = startArrayPosition; i < playersInfo.length + startArrayPosition; i++) {
         let j = i % playersInfo.length;
         console.log("updating player at: ", j);
         if (playersInfo[j]["playerId"] == currentPlayerId){
-          addAPlayer(selfContainer, playersInfo[j]);
+          selfContainer.appendChild(renderPlayer(playersInfo[j]));
         } else {
-          addAPlayer(containerDiv, playersInfo[j]);
+          otherPlayers.push(renderPlayer(playersInfo[j]))
         }
       }
-      arrangePlayers(containerDiv);
+      arrangePlayers(containerTop,containerLeft,containerRight, otherPlayers);
+      for (var i = 0; i < playersInfo.length; i++) {
+        updatePlayer(playersInfo[i]);
+      }
     }
 
-    function addAPlayer(container, playerInfo) {
+    function updatePlayer(playerInfo) {
             let playerId = playerInfo["playerId"];
-            container.appendChild(renderPlayer(playerInfo));
             var playerBox = document.getElementById("player" + playerId);
             var chipLabel = document.getElementById("player" + playerId + "chips");
             var nameLabel = document.getElementById("player" + playerId + "name");
@@ -285,53 +297,49 @@
             }
     }
 
-    function arrangePlayers(container){
-      let players = container.getElementsByClassName("player-box");
-      let screenWidth = screen.width;
-      let screenHeight = screen.height;
-      let playersCount = players.length;
-      let playerBoxWidth = 133; //px width of box
-      let playerBoxHeight = 100;
+    function arrangePlayers(containerTop, containerLeft, containerRight, otherPlayersArray){
+      
+      let playersCount = otherPlayersArray.length;
 
       switch (playersCount){
         case 1:
           // put at top middle of screen
-          players[0].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:0px;";
+          containerTop.appendChild(otherPlayersArray[0]);
           break;
         case 2:
           // put at upper left and upper right
-          players[0].style="position:absolute; left:" + "0" + "px;" + "top:0px;";
-          players[1].style="position:absolute; right:" + "0" + "px;" + "top:0px;";
+          containerTop.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[1]);
           break;
         case 3:
           // put at mid left, upper middle, and mid right
-          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
-          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:0px;";
-          players[2].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[1]);
+          containerRight.appendChild(otherPlayersArray[2]);
           break;
         case 4:
           // put at mid left, two across top and mid right
-          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
-          players[1].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth) + "px;" + "top:0px;";
-          players[2].style="position:absolute; left:" + (screenWidth/2 + playerBoxWidth) + "px;" + "top:0px;";
-          players[3].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[1]);
+          containerTop.appendChild(otherPlayersArray[2]);
+          containerRight.appendChild(otherPlayersArray[3]);
           break;
         case 5:
           // put at mid left, three across top and mid right
-          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
-          players[1].style="position:absolute; left:" + (screenWidth/2 - 2*playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
-          players[2].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
-          players[3].style="position:absolute; left:" + (screenWidth/2 + 2*playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
-          players[4].style="position:absolute; right:" + "0" + "px;" + "top:" + (screenHeight/2 - playerBoxHeight) + "px;";
+          containerLeft.appendChild(otherPlayersArray[1]);
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[2]);
+          containerRight.appendChild(otherPlayersArray[3]);
+          containerRight.appendChild(otherPlayersArray[4]);
           break;
         case 6:
           // put at two left, two across top and two right
-          players[0].style="position:absolute; left:" + "0" + "px;" + "top:" + 2*playerBoxHeight + "px;";
-          players[1].style="position:absolute; left:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
-          players[2].style="position:absolute; left:" + (screenWidth/2 - playerBoxWidth/2) + "px;" + "top:" + playerBoxHeight + "px;";
-          players[3].style="position:absolute; left:" + (screenWidth/2 + 2*playerBoxWidth) + "px;" + "top:" + playerBoxHeight + "px;";
-          players[4].style="position:absolute; right:" + "0" + "px;" + "top:" + playerBoxHeight + "px;";
-          players[5].style="position:absolute; right:" + "0" + "px;" + "top:" + 2*playerBoxHeight + "px;";
+          containerLeft.appendChild(otherPlayersArray[1]);
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[2]);
+          containerTop.appendChild(otherPlayersArray[3]);
+          containerRight.appendChild(otherPlayersArray[4]);
+          containerRight.appendChild(otherPlayersArray[5]);
           break;
       }
     }
@@ -387,11 +395,13 @@
         cardDiv.innerHTML = ""; // clear list first
         for (let i = 0; i < 5; i++) {
             let newCard = document.createElement('div');
-            newCard.classList = "ring ring-red-300 rounded-lg p-2";
+            newCard.classList = "ring ring-red-600 rounded p-2 h-14 w-8 m-1";
             if (i < cardArray.length){
               newCard.innerHTML = renderCard(cardArray[i]);
+              
             } else {
-              newCard.innerHTML = "*";
+              newCard.innerHTML = "";
+              newCard.classList.add("checkered");
             }
             cardDiv.appendChild(newCard);
         }
