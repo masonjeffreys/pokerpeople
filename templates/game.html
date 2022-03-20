@@ -16,12 +16,10 @@
   <div id="playersContainer" class="h-20">
   </div>
   <div id="table" class="p-2 pt-6 max-w-[60%] mx-auto bg-white rounded-xl shadow-lg my-10 relative">
-      <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Advance</button>
       <div class="flex justify-center">
         <div id="potHolder" class="p-2 text-center bg-white font-semibold text-red-500 absolute top-[-20px] rounded-xl shadow-xl ring ring-4 ring-red-700">
         </div>
       </div>
-      
       <div id="commonCards" class="bg-gray-200 w-full h-16 flex items-center justify-center gap-1">
       </div>
       <div class="bg-gray-100">
@@ -37,24 +35,28 @@
     <!--JS will populate a player inside here with appropriate styling-->
   </div>
  
-  <div id="actions" class="py-2 px-2 flex justify-center w-full bg-white absolute left-0 bottom-0 items-end">
+  <div id="actions" class="py-2 px-2 w-full bg-white absolute left-0 bottom-0">
+    <div id="betLabel" class="text-center text-sm"></div>
+    <div class="flex justify-center items-end">
       <div class="my-2 mx-2">
+        <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Advance</button>
         <!-- can only call or check on a given turn, not both. So we put both in the same div-->
         <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
         <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
       </div>
       <div class="my-2 mx-2 text-center">
-        <label id="betLabel"></label>
+        
         <div class="relative text-gray-700">
             <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="number" placeholder="Amount"/>
             <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
         </div>
-    </div>
-    <div class="my-2 mx-2">
-      <button type="button" id="allInBtn" onclick="allIn()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">All In</button>
-    </div>
-    <div class="my-2 mx-2">
-      <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+      </div>
+      <div class="my-2 mx-2">
+        <button type="button" id="allInBtn" onclick="allIn()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">All In</button>
+      </div>
+      <div class="my-2 mx-2">
+        <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+      </div>
     </div>
   </div>
 </div>
@@ -241,32 +243,25 @@
             }
             if (buttonLabel){
               if (playerInfo["button"]){
-                buttonLabel.classList.remove("hidden");
-                buttonLabel.innerHTML = "D";
+                // Active look
+                buttonLabel.className = "rounded-xl font-bold px-2 ring-inset bg-gray-800 ring-black ring-offset-2 text-white";
               } else {
-                buttonLabel.classList.remove("hidden");
-                buttonLabel.classList.add("hidden");
-                buttonLabel.innerHTML = "";
+                // Inactive look
+                buttonLabel.className = "rounded-xl font-bold px-2 ring-inset bg-gray-100 ring-gray-300 ring-offset-2 text-gray-300";
               }  
             }
             if (smallBlindLabel){
               if (playerInfo["smallBlind"]){
-                smallBlindLabel.classList.remove("hidden");
-                smallBlindLabel.innerHTML = "SB";
+                smallBlindLabel.className = "rounded-xl font-bold px-2 ring-inset bg-blue-700 ring-blue-800 ring-offset-2 text-white";
               } else {
-                smallBlindLabel.classList.remove("hidden");
-                smallBlindLabel.classList.add("hidden");
-                smallBlindLabel.innerHTML = "";
+                smallBlindLabel.className = "rounded-xl font-bold px-2 ring-inset bg-gray-100 ring-gray-300 ring-offset-2 text-gray-300";
               }
             }
             if (bigBlindLabel){
               if (playerInfo["bigBlind"]){
-                bigBlindLabel.classList.remove("hidden");
-                bigBlindLabel.innerHTML = "BB";
+                bigBlindLabel.className = "rounded-xl font-bold px-2 ring-inset bg-yellow-500 ring-yellow-600 ring-offset-2";
               } else {
-                bigBlindLabel.classList.remove("hidden");
-                bigBlindLabel.classList.add("hidden");
-                bigBlindLabel.innerHTML = "";
+                bigBlindLabel.className = "rounded-xl font-bold px-2 ring-inset bg-gray-100 ring-gray-300 ring-offset-2 text-gray-300";
               }
             }
             if (handLabel){
@@ -445,13 +440,16 @@
       playerHand.id = 'player' + player.playerId + 'hand';
       playerHand.className = 'text-slate-500';
       playerPosition.id = 'player' + player.playerId + 'position';
-      playerPosition.className = 'flex gap-1 absolute bottom-[-8px]';
+      playerPosition.className = 'flex gap-1 absolute bottom-[-8px] left-0';
       playerButton.id = 'player' + player.playerId + 'button';
-      playerButton.className = 'bg-black rounded-xl ring-2 ring-gray-300 ring-inset text-white font-bold px-2';
+      playerButton.className = 'rounded-xl font-bold px-2 ring-2 ring-inset';
+      playerButton.innerHTML = "D";
       playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
-      playerSmallBlind.className = 'bg-blue-400 rounded-xl ring-2 ring-blue-500 ring-inset text-white font-bold px-2';
+      playerSmallBlind.className = 'rounded-xl font-bold px-2 ring-2 ring-inset';
+      playerSmallBlind.innerHTML = "b";
       playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
-      playerBigBlind.className = 'bg-green-400 rounded-xl ring-2 ring-green-500 ring-inset text-white font-bold px-2';
+      playerBigBlind.className = ' rounded-xl font-bold px-2 ring-2 ring-inset';
+      playerBigBlind.innerHTML = "B";
 
 
       // '<div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">'
