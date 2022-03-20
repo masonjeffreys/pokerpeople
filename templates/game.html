@@ -126,7 +126,17 @@
       }
     }
 
-    function renderGameStatus(status){
+    function getLeader(players){
+      let leader = players[0];
+      players.forEach(p => {
+        if (p.chips > leader.chips){
+          leader = p;
+        }
+      })
+      return leader;
+    }
+
+    function renderGameStatus(status, players){
       let statusDiv = document.getElementById('status');
       let winningScreen = document.getElementById('gameEnd');
       winningScreen.classList.remove("hidden");
@@ -134,11 +144,12 @@
       if (typeof(status) != 'undefined'){
         statusDiv.innerHTML = status;
         if (status == 'complete'){
+          let winner = getLeader(players);
           winningScreen.classList.remove("hidden");
           let winnerName = document.getElementById('winnerName');
           let chips = document.getElementById('chips');
-          winnerName.innerHTML = 'What?';
-          chips.innerHTML = '5000 chips!';
+          winnerName.innerHTML = winner.name;
+          chips.innerHTML = winner.chips +  " chips!";
           for (let i=0; i < 10; i++){
             setTimeout(createFirework, fw_launch_rate * i);
           }

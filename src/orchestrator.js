@@ -401,14 +401,17 @@ function advanceGame(game){
     // - hand needs to continue but betting is over? -> cover this through normal flow
     // - street could be over
     // - OR we just need to advance to the next player
-    if (isGameComplete(game)){
-        console.log("Game over!: ", game.status);
-        game.status = 'complete';
-    } else if (isHandComplete(game)){
-        game.status = 'muck-check';
-        console.log("Completed Hand: ", game.status);
+    
+    if (isHandComplete(game)){
         distributeWinnings(game);
         // muck-check
+        if (isGameComplete(game)){
+            console.log("Game over!: ", game.status);
+            game.status = 'complete';
+        } else {
+            game.status = 'muck-check';
+            console.log("Completed Hand: ", game.status);
+        }
     } else if (Utils.isBettingComplete(game.table, game.players)){
         game.status = 'auto-advance';
         console.log("Betting complete");
@@ -426,17 +429,13 @@ function advanceGame(game){
 function isGameComplete(game){
     // Game is complete if game status is between-hands AND
     // only 1 player is active and still has chips
-    if (game.status == 'hand-complete'){
-        let remainingPlayers = 0;
-        game.players.forEach(function(player){
-            if (player.gameState == 'ACTIVE' && player.chips > 0){
-                remainingPlayers = remainingPlayers + 1;
-            }
-        })
-        return (remainingPlayers <= 1);
-    } else {
-        return false;
-    }
+    let remainingPlayers = 0;
+    game.players.forEach(function(player){
+        if (player.gameState == 'ACTIVE' && player.chips > 0){
+            remainingPlayers = remainingPlayers + 1;
+        }
+    })
+    return (remainingPlayers <= 1);
 }
 
 function isHandComplete(game){
@@ -533,7 +532,11 @@ function advanceStreet(game){
             // Showdown means that the hand is over, time to evaulate
             // winners based on potentially multiple pots/side pots
             distributeWinnings(game); // modifies the results array
-            game.status = 'hand-complete';
+            if (isGameComplete(game)){
+                game.status = 'complete';
+            } else {
+                game.status = 'hand-complete';
+            }
             break;
         default:
             throw new Error("Invalid street could not be matched: ", game.table.street);

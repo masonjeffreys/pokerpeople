@@ -93,7 +93,7 @@ socket.on('private', function(state){
     }
     if (state.game && state.game.status){
       toggleAdvanceButton(state.game.status);
-      renderGameStatus(state.game.status);
+      renderGameStatus(state.game.status, state.playersInfo);
     }
     if (state.game && state.game.errors){
       renderErrors(state.game.errors);
