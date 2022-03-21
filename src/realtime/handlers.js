@@ -144,7 +144,7 @@ exports.fold = () => {
     let player = getPlayer(game);
     if (game.errors.length == 0){
         game.lastAction = player.prettyName() + " folds.";
-        Orchestrator.actionFold(game);
+        Orchestrator.actionFold(game, player);
     }
     emitPrivateStateToEachPlayer(game);
 };
