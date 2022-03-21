@@ -445,6 +445,7 @@ function isHandComplete(game){
     // ---- game flow at their own pace, so we don't need to consider that 'handComplete'
     if (winByFolding(game) == true){
         console.log("Winner due to folding ");
+        game.table.activeIndex = null; // not waiting on another player
         game.status = 'hand-complete';
         return true;
     } 
