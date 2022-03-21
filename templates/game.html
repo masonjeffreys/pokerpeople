@@ -18,9 +18,9 @@
 
   <div id="playersContainerTop" class="h-28 w-full absolute top-0 flex justify-center p-2 gap-8">
   </div>
-  <div id="playersContainerLeft" class="w-28 h-full py-28 absolute left-0 flex flex-col justify-center px-2 gap-8">
+  <div id="playersContainerLeft" class="w-28 h-full pb-40 pt-28 absolute left-0 flex flex-col justify-center px-2 gap-8">
   </div>
-  <div id="playersContainerRight" class="w-28 h-full py-28 absolute right-0 flex flex-col justify-center px-2 gap-8">
+  <div id="playersContainerRight" class="w-28 h-full pb-40 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8">
   </div>
 
   <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-40 pt-8 flex-col flex justify-center z-5">
@@ -338,6 +338,39 @@
           containerRight.appendChild(otherPlayersArray[4]);
           containerRight.appendChild(otherPlayersArray[5]);
           break;
+        case 7:
+          // put at two left, three across top and two right
+          containerLeft.appendChild(otherPlayersArray[1]);
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[2]);
+          containerTop.appendChild(otherPlayersArray[3]);
+          containerTop.appendChild(otherPlayersArray[4]);
+          containerRight.appendChild(otherPlayersArray[5]);
+          containerRight.appendChild(otherPlayersArray[6]);
+          break;
+        case 8:
+          // put at three left, two across top and three right
+          containerLeft.appendChild(otherPlayersArray[2]);
+          containerLeft.appendChild(otherPlayersArray[1]);
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[3]);
+          containerTop.appendChild(otherPlayersArray[4]);
+          containerRight.appendChild(otherPlayersArray[5]);
+          containerRight.appendChild(otherPlayersArray[6]);
+          containerRight.appendChild(otherPlayersArray[7]);
+          break;
+        case 9:
+          // put at three left, three across top and three right
+          containerLeft.appendChild(otherPlayersArray[2]);
+          containerLeft.appendChild(otherPlayersArray[1]);
+          containerLeft.appendChild(otherPlayersArray[0]);
+          containerTop.appendChild(otherPlayersArray[3]);
+          containerTop.appendChild(otherPlayersArray[4]);
+          containerTop.appendChild(otherPlayersArray[5]);
+          containerRight.appendChild(otherPlayersArray[6]);
+          containerRight.appendChild(otherPlayersArray[7]);
+          containerRight.appendChild(otherPlayersArray[8]);
+          break;
       }
     }
 
@@ -458,7 +491,7 @@
       let playerHand = document.createElement('p');
 
       playerDiv.id = 'player' + player.playerId;
-      playerDiv.className = 'player-box p-4 max-w-sm mx-auto bg-white rounded-xl shadow-lg text-center relative';
+      playerDiv.className = 'player-box p-4 max-w-sm mx-auto bg-white rounded shadow-lg text-center relative';
       playerName.id = 'player' + player.playerId + 'name';
       playerName.className = 'text-xl font-medium';
       playerChips.id = 'player' + player.playerId + 'chips';
