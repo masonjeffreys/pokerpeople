@@ -16,58 +16,55 @@
   <div id="errorsContainer" class="absolute top-0 right-0 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
   </div>
 
-  <div id="playersContainerTop" class="h-32 w-full absolute top-0 flex justify-center p-2 gap-8">
+  <div id="playersContainerTop" class="h-28 w-full absolute top-0 flex justify-center p-2 gap-8">
   </div>
-  <div id="playersContainerLeft" class="w-32 h-full py-32 absolute left-0 flex flex-col justify-center px-2 gap-8">
+  <div id="playersContainerLeft" class="w-28 h-full py-28 absolute left-0 flex flex-col justify-center px-2 gap-8">
   </div>
-  <div id="playersContainerRight" class="w-32 h-full py-32 absolute right-0 flex flex-col justify-center px-2 gap-8">
+  <div id="playersContainerRight" class="w-28 h-full py-28 absolute right-0 flex flex-col justify-center px-2 gap-8">
   </div>
 
-  <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-40 pt-8 flex-col flex justify-center">
+  <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-40 pt-8 flex-col flex justify-center z-5">
       <div class="flex flex-col justify-center align-middle">
         <div id="potHolder" class="p-2 m-2 w-60 text-center text-white font-semibold bg-green-600 rounded mx-auto">
         </div>
         <div id="commonCards" class="w-full h-16 flex items-center justify-center gap-1">
         </div>
       </div>
-      <div id="results" class="text-center mx-auto">
+      <div id="results" class="w-60 text-center mx-auto">
       </div>
   </div>
 
-  <div class="flex w-screen justify-center absolute mb-40 bottom-0">
-    <div id="self" class="mx-auto">
+  <div class="flex w-screen justify-center absolute mb-24 bottom-0">
+    <div id="self" class="mx-auto z-1">
       <!--JS will populate a player inside here with appropriate styling-->
     </div>
   </div>
   
  
-  <div id="bottomBar"class="p-2 w-full bg-white absolute left-0 bottom-0 h-32">
-    <div id="info">
-      <div id="minRaise" class="inline-block text-right text-sm italic text-gray-700"></div>
-      <div id="lastAction" class="text-small text-gray-400 italics text-center"></div>
-      <div id="betLabel" class="text-center text-sm"></div>
-    </div>
-    <div id="actions">
-      <div class="flex justify-center items-end">
-        <div class="my-2 mx-2">
-          <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Advance</button>
-          <button type="button" id="startGameBtn" onclick="startGame()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Start Game</button>
+  <div id="bottomBar"class="w-full absolute left-0 bottom-0">
+    <div id="lastAction" class="text-sm text-gray-400 italics text-center"></div>
+    <div id="betLabel" class="bg-white text-center text-sm"></div>
+    <div id="actions" class="bg-white border-t">
+      <div class="flex justify-center items-end text-center divide-x border-t">
+        <div class="w-3/12">
+          <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
+          <button type="button" id="startGameBtn" onclick="startGame()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start Game</button>
           <!-- can only call or check on a given turn, not both. So we put both in the same div-->
-          <button type="button" id="checkBtn" onclick="check()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Check</button>
-          <button type="button" id="callBtn" onclick="call()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
+          <button type="button" id="checkBtn" onclick="check()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
+          <button type="button" id="callBtn" onclick="call()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
         </div>
-        <div class="my-2 mx-2 text-center">
+        <div class="w-3/12">
           
-          <div class="relative text-gray-700">
-              <input id="betAmount" class="w-full min-w-[120px] h-10 pl-3 pr-8 text-base placeholder-gray-600 border rounded-lg focus:shadow-outline" type="number" placeholder="Amount"/>
-              <button id="betBtn" onclick="bet()" class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-indigo-600 rounded-r-lg hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+          <div class="text-gray-700 w-full h-16 text-center">
+              <input id="betAmount" class="w-full h-8 px-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/>
+              <button id="betBtn" onclick="bet()" class="w-full h-8 inset-y-0 px-4 font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
           </div>
         </div>
-        <div class="my-2 mx-2">
-          <button type="button" id="allInBtn" onclick="allIn()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">All In</button>
+        <div class="w-3/12">
+          <button type="button" id="allInBtn" onclick="allIn()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-inditext-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All In</button>
         </div>
-        <div class="my-2 mx-2">
-          <button type="button" id="foldBtn" onclick="fold()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+        <div class="w-3/12">
+          <button type="button" id="foldBtn" onclick="fold()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-inditext-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
         </div>
       </div>
     </div>
@@ -121,7 +118,7 @@
         betInput.classList.remove("invisible");
         betInput.min = actionsOpts.bet[0];
         betInput.max = actionsOpts.bet[1];
-        betLabel.innerHTML = actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
+        betLabel.innerHTML = "Your betting range: " + actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
       } else {
         betBtn.classList.remove("invisible");
         betBtn.classList.add("invisible");
@@ -184,9 +181,9 @@
       if (results.length > 0){
         let dealButton = document.createElement('button');
         let resultText = document.createElement('div');
-        resultText.className = "font-semibold text-gray-800 p-2 m-2 bg-green-200 rounded-xl shadow-lg"
+        resultText.className = "font-semibold text-gray-800 p-2 m-2 bg-gray-200 border shadow-lg"
         dealButton.id = "nextHandBtn";
-        dealButton.className = "mx-1 px-4 py-1 text-sm font-semibold rounded-full border border-purple-200 text-white bg-purple-600 border-transparent outline-none ring-2 ring-purple-600 ring-offset-2";
+        dealButton.className = "m-2 px-4 py-1 text-sm font-semibold rounded-full border border-purple-200 text-white bg-purple-600 border-transparent outline-none ring-2 ring-purple-600 ring-offset-2";
         dealButton.type = "button";
         dealButton.onclick = nextHand;
         dealButton.innerHTML = "Deal";
@@ -346,7 +343,6 @@
 
     function updateTable(table){
       if (table){
-        document.getElementById("minRaise").innerHTML = "Min raise: " + table["minRaise"];
         // table can and will have multiple pots
         showPots(table["pots"]);
         showCommonCards(table["commonCards"]);
