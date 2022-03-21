@@ -538,6 +538,7 @@ function advanceStreet(game){
             } else {
                 game.status = 'hand-complete';
             }
+            game.table.activeIndex = null;
             break;
         default:
             throw new Error("Invalid street could not be matched: ", game.table.street);
