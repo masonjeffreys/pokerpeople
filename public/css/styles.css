@@ -1001,11 +1001,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-bottom: 0.75rem;
 }
 
-.py-28 {
-  padding-top: 7rem;
-  padding-bottom: 7rem;
-}
-
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -1038,6 +1033,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pb-40 {
   padding-bottom: 10rem;
+}
+
+.pt-28 {
+  padding-top: 7rem;
 }
 
 .pt-8 {
@@ -1120,6 +1119,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .font-medium {
   font-weight: 500;
+}
+
+.italic {
+  font-style: italic;
 }
 
 .leading-tight {
