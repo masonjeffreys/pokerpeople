@@ -34,7 +34,7 @@
       </div>
   </div>
 
-  <div class="flex w-screen justify-center absolute mb-24 bottom-0">
+  <div class="flex w-screen justify-center absolute mb-28 bottom-0">
     <div id="self" class="mx-auto z-1">
       <!--JS will populate a player inside here with appropriate styling-->
     </div>
@@ -47,24 +47,24 @@
     <div id="actions" class="bg-white border-t">
       <div class="flex justify-center items-end text-center divide-x border-t">
         <div class="w-3/12">
-          <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
-          <button type="button" id="startGameBtn" onclick="startGame()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start Game</button>
+          <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
+          <button type="button" id="startGameBtn" onclick="startGame()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start Game</button>
           <!-- can only call or check on a given turn, not both. So we put both in the same div-->
-          <button type="button" id="checkBtn" onclick="check()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
-          <button type="button" id="callBtn" onclick="call()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
+          <button type="button" id="checkBtn" onclick="check()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
+          <button type="button" id="callBtn" onclick="call()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
         </div>
         <div class="w-3/12">
           
           <div class="text-gray-700 w-full h-16 text-center">
               <input id="betAmount" class="w-full h-8 px-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/>
-              <button id="betBtn" onclick="bet()" class="w-full h-8 inset-y-0 px-4 font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+              <button id="betBtn" onclick="bet()" class="w-full h-8 inset-y-0 px-4 text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
           </div>
         </div>
         <div class="w-3/12">
-          <button type="button" id="allInBtn" onclick="allIn()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-inditext-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All In</button>
+          <button type="button" id="allInBtn" onclick="allIn()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All In</button>
         </div>
         <div class="w-3/12">
-          <button type="button" id="foldBtn" onclick="fold()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-inditext-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
+          <button type="button" id="foldBtn" onclick="fold()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
         </div>
       </div>
     </div>
@@ -287,10 +287,10 @@
             }
             if (handLabel){
               var handString = ""
-              for (let j = 0; j < playerInfo["hand"].length; j++) {
-                handString = handString + renderCard(playerInfo["hand"][j]);
+              if (playerInfo["hand"] && playerInfo["hand"].length > 1){
+                handString = renderCard(playerInfo["hand"][0]) + " " + renderCard(playerInfo["hand"][1]);
+                handLabel.innerHTML = handString;
               }
-              handLabel.innerHTML = handString;
             }
     }
 
@@ -391,26 +391,34 @@
         cardDiv.innerHTML = ""; // clear list first
         for (let i = 0; i < 5; i++) {
             let newCard = document.createElement('div');
-            newCard.classList = "ring ring-red-600 rounded p-2 h-14 w-8 m-1";
+            newCard.classList = "ring ring-red-600 rounded p-2 h-14 w-8 m-1 text-center";
             if (i < cardArray.length){
-              newCard.innerHTML = renderCard(cardArray[i]);
-              
+              newCard.innerHTML = renderCard(cardArray[i], true);
+              newCard.classList.remove("bg-red");
+              newCard.classList.add("bg-white");
             } else {
               newCard.innerHTML = "";
+              newCard.classList.remove("bg-white");
+              newCard.classList.add("bg-red");
               newCard.classList.add("checkered");
             }
             cardDiv.appendChild(newCard);
         }
     }
 
-    function renderCard(cardString){
+    function renderCard(cardString, addBreak = false){
       var num = cardString.charAt(0);
       var suit = cardString.charAt(1);
       if (num == "T"){
         num = "10";
       }
-      return (num + htmlSuit(suit))
+      if (addBreak){
+        return (num + "</br>" + htmlSuit(suit))
+      } else {
+        return (num + htmlSuit(suit))
+      }
     } 
+
     function htmlSuit(suitString){
       switch (suitString) {
         case 'c':
