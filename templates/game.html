@@ -25,7 +25,7 @@
 
   <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-40 pt-8 flex-col flex justify-center z-5">
       <div class="flex flex-col justify-center align-middle">
-        <div id="potHolder" class="p-2 m-2 w-60 text-center text-white font-semibold bg-green-600 rounded mx-auto">
+        <div id="potHolder" class="p-2 m-2 w-60 text-center text-white font-semibold bg-red-600 bg-green-600 rounded mx-auto">
         </div>
         <div id="commonCards" class="w-full h-16 flex items-center justify-center gap-1">
         </div>
@@ -438,12 +438,12 @@
             newCard.classList = "ring ring-red-600 rounded p-2 h-14 w-8 m-1 text-center";
             if (i < cardArray.length){
               newCard.innerHTML = renderCard(cardArray[i], true);
-              newCard.classList.remove("bg-red");
+              newCard.classList.remove("bg-red-600");
               newCard.classList.add("bg-white");
             } else {
               newCard.innerHTML = "";
               newCard.classList.remove("bg-white");
-              newCard.classList.add("bg-red");
+              newCard.classList.add("bg-red-600");
               newCard.classList.add("checkered");
             }
             cardDiv.appendChild(newCard);

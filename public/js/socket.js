@@ -72,8 +72,29 @@ function check() {
   socket.emit('check')
 }
 function bet() {
-    var amount = document.getElementById("betAmount").value;
-    socket.emit('bet', {amount: amount});
+    let inputBox = document.getElementById("betAmount");
+    let betButton = document.getElementById("betBtn");
+    let amount = inputBox.value;
+    let min = inputBox.min;
+    let max = inputBox.max;
+    if (typeof parseInt(amount) == 'number' && amount >= min && amount <= max){
+      socket.emit('bet', {amount: amount});
+      inputBox.value = "";
+    } else {
+      betButton.innerHTML = "Out of range!"
+      betButton.classList.remove("hover:bg-indigo-500");
+      betButton.classList.remove("focus:bg-indigo-700");
+      betButton.classList.remove("bg-indigo-600");
+      betButton.classList.add("bg-red-600");
+      setTimeout(() => {
+        betButton.innerHTML = "Bet"
+        betButton.classList.remove("bg-red-600");
+        betButton.classList.add("hover:bg-indigo-500");
+        betButton.classList.add("focus:bg-indigo-700");
+        betButton.classList.add("bg-indigo-600");
+      }, 2000);
+    }
+    
 }
 function call() {
     socket.emit('call');
