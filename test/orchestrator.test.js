@@ -105,13 +105,9 @@ describe('can handle a win',()=>{
         Orchestrator.actionCheck(game, getPlayer(game));
         expect(game.table.street).to.equal('showdown');
         expect(game.status).to.equal('hand-complete');
-        expect(game.results[0]).to.equal([
-            {
-              winner_name: 'Small Blind',
-              winning_hand: "Three of a Kind, A's",
-              amount: 200
-            }
-        ]);
+        expect(game.results[0][0].winner_name).to.equal('Small Blind');
+        expect(game.results[0][0].winning_hand).to.equal("Three of a Kind, A's");
+        expect(game.results[0][0].amount).to.equal(200);
     })
 })
 
@@ -136,13 +132,10 @@ describe('can handle a win',()=>{
         Orchestrator.actionBet(game, getPlayer(game), 10); //Small blind bets 10 
         Orchestrator.actionFold(game, getPlayer(game)); // Big blind folds. Hand is over
         expect(game.status).to.equal('muck-check');
-        expect(game.results[0]).to.equal([
-            {
-              winner_name: 'Small Blind',
-              winning_hand: 'maybe muck?',
-              amount: 210
-            }
-        ]);
+        Orchestrator.actionMuck(game, getPlayer(game), true);
+        expect(game.results[0][0].winner_name).to.equal('Small Blind');
+        expect(game.results[0][0].winning_hand).to.equal("hidden");
+        expect(game.results[0][0].amount).to.equal(210);
     })
 })
 
@@ -181,13 +174,9 @@ describe('handles everyone going all in',()=>{
     // FinishGame
     Orchestrator.advanceGame(game);
     expect(game.table.street).to.equal('showdown');
-    expect(game.results[0]).to.equal([
-        {
-          winner_name: 'Dealer Man',
-          winning_hand: "Three of a Kind, A's",
-          amount: 400
-        }
-      ]);
+    expect(game.results[0][0].winner_name).to.equal('Dealer Man');
+    expect(game.results[0][0].winning_hand).to.equal("Three of a Kind, A's");
+    expect(game.results[0][0].amount).to.equal(400);
 })
 
 
