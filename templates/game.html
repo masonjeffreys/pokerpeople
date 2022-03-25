@@ -49,21 +49,21 @@
         <div class="w-3/12">
           <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
           <button type="button" id="startGameBtn" onclick="startGame()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start Game</button>
+          <button type="button" id="muckBtnTrue" onclick="muckTrue()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Hide cards</button>
           <!-- can only call or check on a given turn, not both. So we put both in the same div-->
           <button type="button" id="checkBtn" onclick="check()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
           <button type="button" id="callBtn" onclick="call()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
         </div>
         <div class="w-3/12">
-          
           <div class="text-gray-700 w-full h-16 text-center">
               <input id="betAmount" class="w-full h-8 px-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/>
-              <button id="betBtn" onclick="bet()" class="w-full h-8 inset-y-0 px-4 text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
-          </div>
+              <button id="betBtn" onclick="bet()" class="w-full h-8 inset-y-0 px-4 text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>          </div>
         </div>
         <div class="w-3/12">
           <button type="button" id="allInBtn" onclick="allIn()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All In</button>
         </div>
         <div class="w-3/12">
+          <button type="button" id="muckBtnFalse" onclick="muckFalse()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Show cards</button>
           <button type="button" id="foldBtn" onclick="fold()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
         </div>
       </div>
@@ -86,6 +86,8 @@
       var betInput = document.getElementById("betAmount");
       var betBtn = document.getElementById("betBtn");
       var allInBtn = document.getElementById("allInBtn");
+      var muckBtnTrue = document.getElementById("muckBtnTrue");
+      var muckBtnFalse = document.getElementById("muckBtnFalse");
       if (actionsOpts && actionsOpts.call){
         callBtn.classList.remove("hidden");
         callBtn.innerHTML = "Call: " + actionsOpts.call;
@@ -93,11 +95,20 @@
         callBtn.classList.remove("hidden");
         callBtn.classList.add("hidden");
       }
-      if (actionsOpts && actionsOpts.fold){
-        foldBtn.classList.remove("invisible");
+      if (actionsOpts && actionsOpts.muck){
+        muckBtnTrue.classList.remove("hidden");
+        muckBtnFalse.classList.remove("hidden");
       } else {
-        foldBtn.classList.remove("invisible");
-        foldBtn.classList.add("invisible");
+        muckBtnTrue.classList.remove("hidden");
+        muckBtnFalse.classList.remove("hidden");
+        muckBtnTrue.classList.add("hidden");
+        muckBtnFalse.classList.add("hidden");
+      }
+      if (actionsOpts && actionsOpts.fold){
+        foldBtn.classList.remove("hidden");
+      } else {
+        foldBtn.classList.remove("hidden");
+        foldBtn.classList.add("hidden");
       }
       if (actionsOpts && actionsOpts.check){
         checkBtn.classList.remove("hidden");

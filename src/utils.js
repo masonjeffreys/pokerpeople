@@ -200,19 +200,24 @@ function maxBetForPot(pot){
     return potMaxBet;
 }
 
-function getOptions(players, player, table){
-    var actionOpts = {fold: true, allIn: player.chips}; // can always fold or go all in
-    var callAmounts = getCallAmounts(table, players, player);
-    if (Math.max(callAmounts) == 0){
-        actionOpts.check = true;
-    } else if ( player.chips >= callAmounts[callAmounts.length - 1] ){
-        // non-zero call amount
-        // player can only call if they have enough chips
-        // otherwise they will need to simply go all-in, not being able to call
-        actionOpts.call = callAmounts[callAmounts.length - 1];
-    } 
-    
-    actionOpts.bet = getBetRange(player.chips, callAmounts[callAmounts.length - 1], table.minRaise);
+function getOptions(gameStatus, players, player, table){
+    let actionOpts = {};
+    if (gameStatus == 'muck-check'){
+        actionOpts = {muck: true}; // only action is to respond to muck request
+    } else {
+        actionOpts = {fold: true, allIn: player.chips}; // can always fold or go all in
+        let callAmounts = getCallAmounts(table, players, player);
+        if (Math.max(callAmounts) == 0){
+            actionOpts.check = true;
+        } else if ( player.chips >= callAmounts[callAmounts.length - 1] ){
+            // non-zero call amount
+            // player can only call if they have enough chips
+            // otherwise they will need to simply go all-in, not being able to call
+            actionOpts.call = callAmounts[callAmounts.length - 1];
+        } 
+        
+        actionOpts.bet = getBetRange(player.chips, callAmounts[callAmounts.length - 1], table.minRaise);
+    }
     
     return actionOpts;
 }

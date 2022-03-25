@@ -47,6 +47,14 @@ function startGame(){
   socket.emit('start game');
 }
 
+function muckTrue(){
+  socket.emit('muck', {muck: true});
+}
+
+function muckFalse(){
+  socket.emit('muck', {muck: false});
+}
+
 function startTestGame(){
   console.log("client requesting test game start");
   socket.emit('start test game');

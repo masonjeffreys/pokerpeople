@@ -31,11 +31,11 @@ function privateState(game, player, showHandsForPlayers=[]){
     if (activeIndex !== 'undefined' && activeIndex != null){
         if (game.testMode){
             // always send options in test mode (so that 1 machine can play for all)
-            actionOpts = Utils.getOptions(game.players, game.players[activeIndex], game.table);
+            actionOpts = Utils.getOptions(game.status, game.players, game.players[activeIndex], game.table);
         }
         else if ( game.players[activeIndex].id == player.id ){
             // This is the active player. Add in options for actions they can take
-            actionOpts = Utils.getOptions(game.players, player, game.table);
+            actionOpts = Utils.getOptions(game.status, game.players, player, game.table);
         }
     }
     

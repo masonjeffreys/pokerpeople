@@ -355,6 +355,23 @@ function actionFold(game, player){
     return;
 }
 
+function actionMuck(game, player, muck){
+    // Winnings have already been distributed?
+    // this will display results only and then move to next hand
+
+    // if muck is false, we want to show everyone the winning hand
+    // if muck is true, we only want to show the winning player the result
+    game.results = calculateWinners(game);
+
+    if (muck){
+        game.results[0][0].winning_hand = "hidden";
+    }
+
+    distributeWinnings(game, game.results)
+    game.status = 'hand-complete';
+    game.table.activeIndex = null;
+}
+
 function actionAllIn(game, player){
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     // call amount is sum of amounts needed to call each pot
@@ -396,22 +413,22 @@ function actionAllIn(game, player){
 
 function advanceGame(game){
     // After a player takes some action, need to evaluate game state:
-    // - game could be over (only 1 person is bettable or no one is bettable)
-    // - hand could be over (someone just folded)
+
+    // - hand could be over and we need to check for mucking (someone just folded)
     // - hand needs to continue but betting is over? -> cover this through normal flow
     // - street could be over
     // - OR we just need to advance to the next player
     
-    if (isHandComplete(game)){
-        distributeWinnings(game);
-        // muck-check
-        if (isGameComplete(game)){
-            console.log("Game over!: ", game.status);
-            game.status = 'complete';
-        } else {
-            game.status = 'muck-check';
-            console.log("Completed Hand: ", game.status);
-        }
+    if (winByFolding(game)){
+        game.status = 'muck-check';
+        // set active index to player who needs to say whether to muck or not
+        let activeId = getPlayerIdsLeft(game)[0];
+        game.players.forEach(function(player, index){
+            if (player.id == activeId){
+                game.table.activeIndex = index;
+            }
+        })
+        console.log("Time to check muck check: ", game.status);
     } else if (Utils.isBettingComplete(game.table, game.players)){
         game.status = 'auto-advance';
         console.log("Betting complete");
@@ -438,22 +455,6 @@ function isGameComplete(game){
     return (remainingPlayers <= 1);
 }
 
-function isHandComplete(game){
-    // Hand can be complete after a player action if:
-    // - only 1 player in the last pot hasn't folded
-    // - if all players are out of chips, we still let them advance through the
-    // ---- game flow at their own pace, so we don't need to consider that 'handComplete'
-    if (winByFolding(game) == true){
-        console.log("Winner due to folding ");
-        game.table.activeIndex = null; // not waiting on another player
-        game.status = 'hand-complete';
-        return true;
-    } 
-    else {
-        return false;
-    }
-}
-
 function winByFolding(game){
     // If there is only 1 pot, an outright win by folding
     // occurs if allPlayersHaveActed and only 1 hasn't folded.
@@ -461,24 +462,27 @@ function winByFolding(game){
     // If there are side pots:
     // Folding can only collapse the last pot, not provide an outright win 
     if (game.table.pots.length == 1){
-        let playersLeft = 0;
-        game.players.forEach(function(player){
-            if (player.handState == "FOLD"){
-                console.log("Player ", player.id, " is folded.");
-            } else if (player.handState == "ALLIN"){
-                console.log("Player ", player.id, " is all-in.");
-                playersLeft = playersLeft + 1;
-            }
-            else {
-                console.log("Player ", player.id, " is still active.");
-                playersLeft = playersLeft + 1;
-            }
-        })
-        return (playersLeft == 1);
+        return (getPlayerIdsLeft(game).length == 1);
     } else {
         return false;
     }
-    
+}
+
+function getPlayerIdsLeft(game){
+    let playersLeft = [];
+    game.players.forEach(function(player){
+        if (player.handState == "FOLD"){
+            console.log("Player ", player.id, " is folded.");
+        } else if (player.handState == "ALLIN"){
+            console.log("Player ", player.id, " is all-in.");
+            playersLeft.push(player.id);
+        }
+        else {
+            console.log("Player ", player.id, " is still active.");
+            playersLeft.push(player.id);
+        }
+    })
+    return playersLeft;
 }
 
 function advanceStreet(game){
@@ -532,7 +536,8 @@ function advanceStreet(game){
         case 'showdown':
             // Showdown means that the hand is over, time to evaulate
             // winners based on potentially multiple pots/side pots
-            distributeWinnings(game); // modifies the results array
+            game.results = calculateWinners(game);
+            distributeWinnings(game, game.results); // modifies the results array
             if (isGameComplete(game)){
                 game.status = 'complete';
             } else {
@@ -545,26 +550,8 @@ function advanceStreet(game){
     }
 }
 
-function distributeWinnings(game){
-    // cycle through pots since we may have to handle multiple pots
-    // game.results is an array matching with pots
-    game.table.pots.forEach(function(pot, index){
-        let potResults = evalPot(game.table, pot, index, game.players);
-        console.log("pot results are ", potResults);
-        game.results.push(potResults);
-    })
-}
-
-function evalPot(table, pot, potIndex, players){
-    // for a single pot, find winner (or winners for a tie)
-    // need to handle win by folding as well
-
-    let potTotal = Utils.potTotal(pot);
-    let resultsList = [];
-
-    // Get list of Ids who could win the pot (i.e. they didn't fold and they contributed money to the pot)
+function playerIdsInPot(pot, players){
     let playerIdsInPot = [];
-
     players.forEach(function(player){
         if (player.handState == "FOLD"){
             // player folded so they definitely can't win
@@ -576,54 +563,83 @@ function evalPot(table, pot, potIndex, players){
             // they can't win the pot.
         }
     })
+    return playerIdsInPot;
+}
 
-    console.log("Potential winners of pot index ", potIndex, " are ", playerIdsInPot);
+function calculateWinners(game){
+    // cycle through pots since we may have to handle multiple pots
+    // game.results is an array of arrays matching with pots
+    let resultsArray = [];
+    game.table.pots.forEach(function(pot, index){
+        resultsArray.push(calculatePotWinner(game.table, pot, index, game.players));
+    })
+    return resultsArray;
+}
+
+function calculatePotWinner(table, pot, potIndex, players){
+    // for a single pot, find winner (or multiple winners for a tie)
+    // need to handle win by folding as well
+
+    let potTotal = Utils.potTotal(pot);
+    let resultsList = [];
+
+    // Get list of Ids who could win the pot (i.e. they didn't fold and they contributed money to the pot)
+    let idsInPot = playerIdsInPot(pot, players);
+
+    console.log("Potential winners of pot index ", potIndex, " are ", idsInPot);
 
     // First check to see if there is only 1 potential winner for this pot (others have folded)
-    if (playerIdsInPot.length == 1){
-        // only 1 player can win, so we can get them directly
-        let winningPlayer = Utils.getByAttributeValue(players,"id", playerIdsInPot[0]);
-        winningPlayer.wins(potTotal);
-        console.log("Winner by : ", winningPlayer.prettyName());
-        resultsList.push({
-            winner_name: winningPlayer.prettyName(),
-            winning_hand: "maybe muck?",
-            amount: potTotal
-        })
-    } else {
-        // Need to evaluate who wins. Could still be multiple winners if there is a tie.
-        // Need to round down final answer to next whole number in case of a 0.5 chip.
-        let handsByPlayer = [];
-        let solutions = [];
-        playerIdsInPot.forEach(pId => {
-            let player = Utils.getByAttributeValue(players,"id", pId);
-            handsByPlayer.push({player: player, hand: player.hand.concat(table.commonCards)})
-        })
-        handsByPlayer.forEach(function(h, i){
-            let solution = Solver.solve(h.hand);
-            solution.index = i;
-            solutions.push(solution);
-        })
+    // Need to evaluate who wins. Could still be multiple winners if there is a tie.
+    // Need to round down final answer to next whole number in case of a 0.5 chip.
+    let handsByPlayer = [];
+    let solutions = [];
 
-        let winningHands = Solver.winners(solutions);
-        let winnersCount = winningHands.length;
-        console.log("*** handsByPlayer are ", handsByPlayer);
-        console.log("*** winningHands are ", winningHands);
-        winningHands.forEach(function(winningHand){
-            let winningPlayer = handsByPlayer[winningHand.index].player
-            let winningAmount = potTotal/winnersCount;
-            winningPlayer.wins(winningAmount);
-            resultsList.push({
-                winner_name: winningPlayer.prettyName(),
-                winning_hand: winningHand.descr,
-                amount: winningAmount
-            })
-            console.log("winner is ", winningPlayer.prettyName());
-            console.log("with hand ", winningHand.descr);
-            console.log("amount: ", winningAmount);
+    idsInPot.forEach(pId => {
+        let player = Utils.getByAttributeValue(players,"id", pId);
+        handsByPlayer.push({player: player, hand: player.hand.concat(table.commonCards)})
+    })
+
+    handsByPlayer.forEach(function(h, i){
+        let solution = Solver.solve(h.hand);
+        solution.index = i;
+        solutions.push(solution);
+    })
+
+    let winningHands = Solver.winners(solutions);
+    let winnersCount = winningHands.length;
+    console.log("*** handsByPlayer are ", handsByPlayer);
+    console.log("*** winningHands are ", winningHands);
+    winningHands.forEach(function(winningHand){
+        let winningPlayer = handsByPlayer[winningHand.index].player
+        let winningAmount = potTotal/winnersCount;
+        resultsList.push({
+            winner_id: winningPlayer.id,
+            winner_name: winningPlayer.prettyName(),
+            winning_hand: winningHand.descr,
+            amount: winningAmount
         })
-    }
+        console.log("winner is ", winningPlayer.prettyName());
+        console.log("winner id is ", winningPlayer.id);
+        console.log("with hand ", winningHand.descr);
+        console.log("amount: ", winningAmount);
+    })
+
     return resultsList;
+}
+
+function distributeWinnings(game, resultsArray){
+    //
+    resultsArray.forEach(function(potResult){
+        potResult.forEach(function(result){
+            let winningPlayer = game.players.find(p => p.id == result.winner_id);
+            if (winningPlayer){
+                winningPlayer.wins(result.amount);
+            } else {
+                console.log("winning player not found with id ", result.winner_id);
+                throw new Error('Should have had a winner!');
+            }
+        })
+    })
 }
 
 
@@ -637,4 +653,5 @@ module.exports.actionCall = actionCall;
 module.exports.actionFold = actionFold;
 module.exports.actionAllIn = actionAllIn;
 module.exports.actionCheck = actionCheck;
+module.exports.actionMuck = actionMuck;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this

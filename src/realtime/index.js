@@ -52,6 +52,7 @@ exports.plugin = {
             socket.on('fold', Handlers.fold);
             socket.on('bet', Handlers.bet);
             socket.on('advance', Handlers.advance);
+            socket.on('muck', Handlers.muckChoice);
 
             // Add chat functionality
             socket.on('newMessage', Handlers.newMessage);

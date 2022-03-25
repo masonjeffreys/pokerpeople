@@ -20,6 +20,7 @@ function Player(id, firstName, lastName) {
       var _smallBlind = false;
       var _bigBlind = false;
       var _publicHand = false;
+      var _muck = null;
 
 
       return Object.freeze({
@@ -29,6 +30,15 @@ function Player(id, firstName, lastName) {
 
             get id(){
                   return _id;
+            },
+
+            get muck(){
+                  return _muck;
+            },
+
+            set muck(value){
+                  _muck = value;
+                  return this;
             },
 
             get socketId(){

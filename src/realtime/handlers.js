@@ -105,9 +105,27 @@ exports.bet = (msg) => {
         emitPrivateStateToEachPlayer(game);
     }
     else {
-        console.log("Invalid bet. Msg was: ", msg);
+        console.log("Invalid bet. Msg provided was: ", msg);
     }
 };
+
+exports.muckChoice = (msg) => {
+    if (msg && typeof(msg.muck) == "boolean"){
+        let game = getGame();
+        let player = getPlayer(game); // only one player is allowed to muck, by definition.
+        if (game.errors.length == 0){
+            if (msg.muck) {
+                game.lastAction = player.prettyName() + " chose not to show their cards";
+            } else {
+                game.lastAction = player.prettyName() + " revealed their cards";
+            }
+            Orchestrator.actionMuck(game, player, msg.muck);
+        }
+        emitPrivateStateToEachPlayer(game);
+    } else {
+        console.log("Invalid selection for mucking. Msg provided was: ", msg);
+    }
+}
 
 exports.allIn = () => {
     let game = getGame();
