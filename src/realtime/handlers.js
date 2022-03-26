@@ -56,10 +56,14 @@ exports.startGame = () => {
     emitPrivateStateToEachPlayer(game);
 }
 
-exports.startTestGame = () => {
+exports.toggleTestMode = () => {
     // Only called after players have sat at table.
     let game = getGame();
-    game["testMode"] = true;
+    if (game["testMode"]){
+        game["testMode"] = false;
+    } else {
+        game["testMode"] = true;
+    }
     emitPrivateStateToEachPlayer(game);
 }
 

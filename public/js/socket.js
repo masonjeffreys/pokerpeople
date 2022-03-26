@@ -56,8 +56,7 @@ function muckFalse(){
 }
 
 function startTestGame(){
-  console.log("client requesting test game start");
-  socket.emit('start test game');
+  socket.emit('test mode');
 }
 
 function nextHand() {
