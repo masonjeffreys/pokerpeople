@@ -23,7 +23,8 @@
   <div id="playersContainerRight" class="w-28 h-full pb-36 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8">
   </div>
 
-  <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-32 pt-8 flex-col flex justify-center z-20">
+  <div id="table-holder" class="absolute w-full h-full flex flex-col justify-center align-middle pb-32 pt-8">
+    <div id="table" class="mx-auto z-20">
       <div class="flex flex-col justify-center align-middle">
         <div id="potHolder" class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
         </div>
@@ -33,7 +34,9 @@
       </div>
       <div id="results" class="w-60 text-center mx-auto">
       </div>
+    </div>
   </div>
+  
 
   <div class="flex w-screen justify-center absolute mb-28 bottom-0">
     <div id="self" class="mx-auto z-10">
@@ -189,10 +192,14 @@
     function updateResults(results){
       // results is an array of winners for each pot
       var resultsDiv = document.getElementById("results");
+      let tableDiv = document.getElementById('table');
       if (results.length > 0){
+        table.classList.add("bg-gray-200");
+        table.classList.add("shadow-xl");
+        table.classList.add("rounded");
         let dealButton = document.createElement('button');
         let resultText = document.createElement('div');
-        resultText.className = "font-semibold text-gray-800 p-2 m-2 bg-gray-200 border shadow-lg"
+        resultText.className = "font-semibold text-gray-800 p-2 m-2"
         dealButton.id = "nextHandBtn";
         dealButton.className = "m-2 px-4 py-1 text-sm font-semibold rounded-full border border-purple-200 text-white bg-purple-600 border-transparent outline-none ring-2 ring-purple-600 ring-offset-2";
         dealButton.type = "button";
@@ -209,6 +216,9 @@
         resultsDiv.appendChild(dealButton);
       } else {
         resultsDiv.innerHTML = "";
+        table.classList.remove("bg-white");
+        table.classList.remove("shadow-xl");
+        table.classList.remove("rounded");
       }
     }
 
