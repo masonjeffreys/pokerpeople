@@ -76,7 +76,7 @@ function bet() {
     let amount = inputBox.value;
     let min = inputBox.min;
     let max = inputBox.max;
-    if (typeof parseInt(amount) == 'number' && amount >= min && amount <= max){
+    if (typeof parseInt(amount) == 'number' && parseInt(amount) >= parseInt(min) && parseInt(amount) <= parseInt(max)){
       socket.emit('bet', {amount: amount});
       inputBox.value = "";
     } else {

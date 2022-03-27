@@ -17,7 +17,8 @@ function privateState(game, player, showHandsForPlayers=[]){
         }
         playersInfo.push({playerId: p.id,
             chips: p.chips,
-            name: p.prettyName(),
+            firstName: p.firstName,
+            lastName: p.lastName,
             actedInStreet: p.actedInStreet,
             button: p.button,
             smallBlind:  p.smallBlind,
