@@ -1,6 +1,6 @@
-<div class="w-screen h-full relative bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-1">
+<div class="w-screen h-full relative bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-0">
 <!-- For felt background: add bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-1 --->
-  <div id="gameEnd" class="w-screen h-full absolute bg-gray-900 z-10 flex flex-col justify-center hidden">
+  <div id="gameEnd" class="w-screen h-full absolute bg-gray-900 z-50 flex flex-col justify-center hidden">
     <p id="winnerName" class="glowing text-white text-center font-extrabold logo-1 text-4xl">
     </p>
     <p class="glowing text-white text-center font-extrabold text-2xl">
@@ -23,9 +23,9 @@
   <div id="playersContainerRight" class="w-28 h-full pb-36 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8">
   </div>
 
-  <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-32 pt-8 flex-col flex justify-center z-5">
+  <div id="table" class="h-full w-full mx-auto absolute bottom-0 pb-32 pt-8 flex-col flex justify-center z-20">
       <div class="flex flex-col justify-center align-middle">
-        <div id="potHolder" class="p-2 m-2 w-60 text-center text-white font-semibold bg-red-600 bg-green-600 rounded mx-auto">
+        <div id="potHolder" class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
         </div>
         <div id="commonCards" class="w-full h-16 flex items-center justify-center gap-1">
         </div>
@@ -36,13 +36,13 @@
   </div>
 
   <div class="flex w-screen justify-center absolute mb-28 bottom-0">
-    <div id="self" class="mx-auto z-1">
+    <div id="self" class="mx-auto z-10">
       <!--JS will populate a player inside here with appropriate styling-->
     </div>
   </div>
   
  
-  <div id="bottomBar"class="w-full absolute left-0 bottom-0">
+  <div id="bottomBar"class="w-full absolute left-0 bottom-0 z-30">
     <div id="betLabel" class="bg-white text-center text-sm"></div>
     <div id="actions" class="bg-white border-t">
       <div class="flex justify-center items-end text-center divide-x border-t">
@@ -449,16 +449,18 @@
         cardDiv.innerHTML = ""; // clear list first
         for (let i = 0; i < 5; i++) {
             let newCard = document.createElement('div');
-            newCard.classList = "ring ring-red-600 rounded p-2 h-14 w-8 m-1 text-center";
+            newCard.classList = "border border-red-600 rounded-small p-2 h-14 w-8 m-1 text-center";
             if (i < cardArray.length){
               newCard.innerHTML = renderCard(cardArray[i], true);
-              newCard.classList.remove("bg-red-600");
+              newCard.classList.remove("bg-red-500");
               newCard.classList.add("bg-white");
+              newCard.classList.add("shadow");
             } else {
               newCard.innerHTML = "";
               newCard.classList.remove("bg-white");
-              newCard.classList.add("bg-red-600");
+              newCard.classList.add("bg-red-500");
               newCard.classList.add("checkered");
+              newCard.classList.remove("shadow")
             }
             cardDiv.appendChild(newCard);
         }
@@ -520,7 +522,7 @@
       let playerChips = document.createElement('p');
   
       playerDiv.id = 'player' + player.playerId;
-      playerDiv.className = 'player-box p-2 w-28 h-28 mx-auto bg-white rounded-full text-center relative';
+      playerDiv.className = 'player-box p-2 w-28 h-28 mx-auto bg-white rounded-full text-center relative z-0';
       playerLastAction.id = 'player' + player.playerId + 'lastAction';
       playerLastAction.class = "rounded-full";
       playerHand.id = 'player' + player.playerId + 'hand';
@@ -528,9 +530,9 @@
       playerInPot.id = 'player' + player.playerId + 'inPot';
       playerInPot.class = 'absolute';
       playerFirstName.id = 'player' + player.playerId + 'firstname';
-      playerFirstName.className = 'text-lg relative font-semibold -top-1';
+      playerFirstName.className = 'text-lg relative font-semibold -top-1 text-center';
       playerLastName.id = 'player' + player.playerId + 'lastname';
-      playerLastName.className = 'text-xs uppercase relative -top-3';
+      playerLastName.className = 'text-xs uppercase relative -top-3 text-center';
       playerChips.id = 'player' + player.playerId + 'chips';
       playerChips.className = 'mx-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white relative -top-2';
       playerPosition.id = 'player' + player.playerId + 'position';
