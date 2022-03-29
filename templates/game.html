@@ -194,7 +194,7 @@
       var resultsDiv = document.getElementById("results");
       let tableDiv = document.getElementById('table');
       if (results.length > 0){
-        table.classList.add("bg-gray-200");
+        table.classList.add("bg-gray-300");
         table.classList.add("shadow-xl");
         table.classList.add("rounded");
         let dealButton = document.createElement('button');
@@ -216,7 +216,7 @@
         resultsDiv.appendChild(dealButton);
       } else {
         resultsDiv.innerHTML = "";
-        table.classList.remove("bg-white");
+        table.classList.remove("bg-gray-300");
         table.classList.remove("shadow-xl");
         table.classList.remove("rounded");
       }
@@ -404,6 +404,7 @@
         // table can and will have multiple pots
         showPots(table["pots"]);
         showCommonCards(table["commonCards"]);
+        updatePlayerContributions(table["pots"]);
       }
     } 
 
@@ -476,6 +477,24 @@
         }
     }
 
+    function updatePlayerContributions(pots){
+      let elsArray = document.getElementsByClassName('playerinPot');
+      [].forEach.call(elsArray, function (div) {
+        let playerId = parseInt(div.id.split("player")[1].split("inPot")[0]);
+        div.innerHTML = "";
+        pots.forEach(pot => {
+            let pA = pot.playerAmounts[playerId];
+            if (pA && pA.amount){
+              if (div.innerHTML == ""){
+                div.innerHTML = pA.amount;
+              } else {
+                div.innerHTML = div.innerHTML + ', ' + pA.amount;
+              }
+            }
+        })
+      })
+    }
+
     function renderCard(cardString, addBreak = false){
       var num = cardString.charAt(0);
       var suit = cardString.charAt(1);
@@ -538,7 +557,7 @@
       playerHand.id = 'player' + player.playerId + 'hand';
       playerHand.className = 'relative w-full flex h-6 justify-center';
       playerInPot.id = 'player' + player.playerId + 'inPot';
-      playerInPot.class = 'absolute';
+      playerInPot.className = 'playerinPot absolute -right-4 -top-4 h-12 w-12 bg-green-900 border-green-700 border-4 rounded-full text-white text-semibold pt-2 text-center';
       playerFirstName.id = 'player' + player.playerId + 'firstname';
       playerFirstName.className = 'text-lg relative font-semibold -top-1 text-center';
       playerLastName.id = 'player' + player.playerId + 'lastname';
