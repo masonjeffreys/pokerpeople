@@ -139,7 +139,7 @@ socket.on('private', function(state){
       updateLastAction(state.lastAction);
     }
     if (state.actionOpts){
-      let player = state.playersInfo.find(pI => pI.playerId == state.playerId);
+      let player = state.playersInfo[state.table.activeIndex];
       updateActions(state.actionOpts, player);
     }
   }

@@ -88,7 +88,7 @@ function setupHand(game){
     game.table.resetPots();
     game.table.clearCommonCards();
     // Reset results
-    game.lastAction = "new hand";
+    game.lastAction = "Dealt new hand.";
     game.results = [];
     game.freeAdvance = false;
     

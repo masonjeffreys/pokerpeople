@@ -84,8 +84,7 @@
 <script>
     // Eventually convert this to react probably. But iterating with pure JS is easy.
     function updateActions(actionsOpts, player){
-      let currentPlayerId = player.playerId;
-      console.log("actions are: ", actionsOpts, " for playerId: ", currentPlayerId);
+      let currentPlayerId;
       var callBtn = document.getElementById("callBtn");
       var checkBtn = document.getElementById("checkBtn");
       var foldBtn = document.getElementById("foldBtn");
@@ -96,7 +95,13 @@
       var muckBtnTrue = document.getElementById("muckBtnTrue");
       var muckBtnFalse = document.getElementById("muckBtnFalse");
       let nextUpDiv = document.getElementById('nextUp');
-      nextUpDiv.innerHTML = player.firstName + " " + player.lastName + " is up.";
+      if (typeof player !== 'undefined'){
+        currentPlayerId = player.playerId
+        nextUpDiv.innerHTML = player.firstName + " " + player.lastName + " is up.";
+      } else {
+        nextUpDiv.innerHTML = "";
+      }
+      console.log("actions are: ", actionsOpts, " for playerId: ", currentPlayerId);
       if (actionsOpts && actionsOpts.call){
         callBtn.classList.remove("hidden");
         callBtn.innerHTML = "Call: " + actionsOpts.call;
