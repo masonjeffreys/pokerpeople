@@ -123,16 +123,18 @@ function isStreetComplete(table, players){
     var streetComplete = true;
 
     players.forEach(function(player){
-        console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
-        if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
-            console.log(player.id, " is current with bet.")
-        } else if (player.handState == "FOLD") {
-            console.log(player.id, " has folded.")
-        } else if (player.handState == "ALLIN"){
-            console.log(player.id, " is all in.")
-        } else {
-            console.log("Betting round not done. Player ", player.id, " needs to act.")
-            streetComplete = false;
+        if (player.gameState == "ACTIVE"){
+            console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
+            if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
+                console.log(player.id, " is current with bet.")
+            } else if (player.handState == "FOLD") {
+                console.log(player.id, " has folded.")
+            } else if (player.handState == "ALLIN"){
+                console.log(player.id, " is all in.")
+            } else {
+                console.log("Betting round not done. Player ", player.id, " needs to act.")
+                streetComplete = false;
+            }
         }
     })
 
@@ -217,9 +219,9 @@ function getOptions(gameStatus, players, player, table){
     if (gameStatus == 'muck-check'){
         actionOpts.muck = true; // only action is to respond to muck request
     } else {
-        let upperLimit = Math.min(maxMatchByOtherPlayers(table, players, player), player.chips);
         let callAmounts = getCallAmounts(table, players, player);
         let callAmount = callAmounts[callAmounts.length - 1];
+        let upperLimit = Math.min(maxMatchByOtherPlayers(table, players, player) + callAmount, player.chips);
         if (canFold(player)){
             // Is player allowed to fold?
             actionOpts.fold = true;
@@ -230,9 +232,11 @@ function getOptions(gameStatus, players, player, table){
             // If player doesn't have enough chips to call, we'll have to disable this.
 
             // Is there a situation where a player can't call? If they are all in already.
+
             if (callAmount == 0) {
                 actionOpts.check = true;
             } else if (upperLimit >= callAmount) {
+                // call amount here would be 69. upper limit would be 
                 actionOpts.call = callAmount;
             } else {
                 // Player is allowed to call, but can't do it because they don't have enough chips.

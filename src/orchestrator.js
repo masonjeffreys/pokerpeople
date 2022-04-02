@@ -22,6 +22,9 @@ function startGame(game){
     // Game state should advance to in-progress (from 'unstarted', 'in-progress', 'hand-complete', 'complete')
     // Maybe also 'muck-check' and 'auto-advance'
     game.status = 'in-progress';
+    game.players.forEach(player => {
+        player.gameState = "ACTIVE";
+    })
     setupHand(game);
 }
 
@@ -367,7 +370,8 @@ function actionMuck(game, player, muck){
         game.results[0][0].winning_hand = "hidden";
     }
 
-    distributeWinnings(game, game.results)
+    distributeWinnings(game, game.results);
+    deactivatePlayersWithoutChips(game);
     game.status = 'hand-complete';
     game.table.activeIndex = null;
 }
@@ -448,7 +452,7 @@ function isGameComplete(game){
     // only 1 player is active and still has chips
     let remainingPlayers = 0;
     game.players.forEach(function(player){
-        if (player.gameState == 'ACTIVE' && player.chips > 0){
+        if (player.gameState == 'ACTIVE'){
             remainingPlayers = remainingPlayers + 1;
         }
     })
@@ -537,6 +541,7 @@ function advanceStreet(game){
             // winners based on potentially multiple pots/side pots
             game.results = calculateWinners(game);
             distributeWinnings(game, game.results); // modifies the results array
+            deactivatePlayersWithoutChips(game);
             if (isGameComplete(game)){
                 game.status = 'complete';
             } else {
@@ -624,6 +629,14 @@ function calculatePotWinner(table, pot, potIndex, players){
     })
 
     return resultsList;
+}
+
+function deactivatePlayersWithoutChips(game){
+    game.players.forEach(player => {
+        if (player.chips == 0){
+            player.gameState = "OUT";
+        }
+    })
 }
 
 function distributeWinnings(game, resultsArray){
