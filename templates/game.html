@@ -28,9 +28,12 @@
       <div class="flex flex-col justify-center align-middle">
         <div id="potHolder" class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
         </div>
-        <div id="commonCards" class="w-full h-16 flex items-center justify-center gap-1">
+        <div id="commonCards" class="w-52 h-16 flex items-center justify-center gap-1 border border-white rounded-lg mx-auto">
         </div>
-        <div id="lastAction" class="text-sm text-white italic text-center"></div>
+        <div id="lastAction" class="text-sm text-white italic text-center">
+        </div>
+        <div id="nextUp" class="text-sm text-white italic text-center">
+        </div>
       </div>
       <div id="results" class="w-60 text-center mx-auto">
       </div>
@@ -80,7 +83,8 @@
 <script src="/js/pyro.js"></script>
 <script>
     // Eventually convert this to react probably. But iterating with pure JS is easy.
-    function updateActions(actionsOpts, currentPlayerId){
+    function updateActions(actionsOpts, player){
+      let currentPlayerId = player.playerId;
       console.log("actions are: ", actionsOpts, " for playerId: ", currentPlayerId);
       var callBtn = document.getElementById("callBtn");
       var checkBtn = document.getElementById("checkBtn");
@@ -91,9 +95,12 @@
       var allInBtn = document.getElementById("allInBtn");
       var muckBtnTrue = document.getElementById("muckBtnTrue");
       var muckBtnFalse = document.getElementById("muckBtnFalse");
+      let nextUpDiv = document.getElementById('nextUp');
+      nextUpDiv.innerHTML = player.firstName + " " + player.lastName + " is up.";
       if (actionsOpts && actionsOpts.call){
         callBtn.classList.remove("hidden");
         callBtn.innerHTML = "Call: " + actionsOpts.call;
+        nextUpDiv.innerHTML =  nextUpDiv.innerHTML + " " + actionsOpts.call + " to call.";
       } else {
         callBtn.classList.remove("hidden");
         callBtn.classList.add("hidden");
@@ -460,7 +467,7 @@
         cardDiv.innerHTML = ""; // clear list first
         for (let i = 0; i < 5; i++) {
             let newCard = document.createElement('div');
-            newCard.classList = "border border-red-600 rounded-small p-2 h-14 w-8 m-1 text-center";
+            newCard.classList = "border border-red-600 rounded-small p-2 h-14 w-8 text-center";
             if (i < cardArray.length){
               newCard.innerHTML = renderCard(cardArray[i], true);
               newCard.classList.remove("bg-red-500");

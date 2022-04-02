@@ -52,18 +52,22 @@ exports.newMessage = function (newMessage) {
 exports.startGame = () => {
     // Only called after players have sat at table.
     let game = getGame();
+    let player = getPlayer(game);
     Orchestrator.startGame(game);
+    game.lastAction = player.prettyName() + " clicked Start. Begin!";
     emitPrivateStateToEachPlayer(game);
 }
 
 exports.toggleTestMode = () => {
     // Only called after players have sat at table.
     let game = getGame();
+    let player = getPlayer(game);
     if (game["testMode"]){
         game["testMode"] = false;
     } else {
         game["testMode"] = true;
     }
+    game.lastAction = player.prettyName() + " toggled test mode.";
     emitPrivateStateToEachPlayer(game);
 }
 
@@ -80,6 +84,7 @@ exports.getState = () => {
 exports.simulateAnotherPlayerJoining = () => {
     let game = getGame();
     let player = Repo.getOrCreateUser({firstName: "User", lastName: module.parent.server.app.users.length + 1}, module.parent.server.app.users)
+    game.lastAction = player.prettyName() + " added a player.";
     Orchestrator.addPlayerToGame(game, player);
     emitPrivateStateToEachPlayer(game);
 };
@@ -103,7 +108,7 @@ exports.bet = (msg) => {
         let player = getPlayer(game);
         // Store the last action on the game state for display
         if (game.errors.length == 0){
-            game.lastAction = player.prettyName() + " bet " + msg.amount;
+            game.lastAction = player.prettyName() + " bet " + msg.amount + ".";
             Orchestrator.actionBet(game, player, parseInt(msg.amount))
         }
         emitPrivateStateToEachPlayer(game);

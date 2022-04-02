@@ -135,11 +135,12 @@ socket.on('private', function(state){
     if (state.results){
       updateResults(state.results);
     }
-    if (state.actionOpts){
-      updateActions(state.actionOpts, state.playerId);
-    }
     if (state.lastAction){
       updateLastAction(state.lastAction);
+    }
+    if (state.actionOpts){
+      let player = state.playersInfo.find(pI => pI.playerId == state.playerId);
+      updateActions(state.actionOpts, player);
     }
   }
 })

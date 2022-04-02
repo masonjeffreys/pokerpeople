@@ -12,6 +12,7 @@ function Player(id, firstName, lastName) {
       var _gameState = 'ACTIVE';
       var _handState = 'IN';
       var _error = null;
+      var _lastAction = null;
 
       // The following vars seem like they might be outside of what a player should know
       var _actedInStreet = false; // how we track whether a betting round is done.
@@ -47,6 +48,15 @@ function Player(id, firstName, lastName) {
 
             set socketId(value){
                   _socketId = value;
+                  return this;
+            },
+
+            get lastAction(){
+                  return _lastAction;
+            },
+
+            set lastAction(value){
+                  _lastAction = value;
                   return this;
             },
 

@@ -25,7 +25,8 @@ function privateState(game, player, showHandsForPlayers=[]){
             bigBlind: p.bigBlind,
             gameState: p.gameState,
             handState: p.handState,
-            hand: hand
+            hand: hand,
+            lastAction: p.lastAction
         })
     })
 
@@ -61,7 +62,8 @@ function privateState(game, player, showHandsForPlayers=[]){
         playersInfo: playersInfo,
         actionOpts: actionOpts,
         results: game.results,
-        lastAction: game.lastAction
+        lastAction: game.lastAction,
+        callAmount: game.callAmount
     }
 }
 
