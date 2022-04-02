@@ -502,8 +502,7 @@ function advanceStreet(game){
     } else {
         game.freeAdvance = false;
     }
-    // Reset the minRaise
-    game.table.minRaise = game.table.bigBlind;
+
     let ret = null;
 
     switch(game.table.street){

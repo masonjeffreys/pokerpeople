@@ -1,6 +1,30 @@
+////////////////////////
+// Utilities that use no objects. Just regular data.
+// Would like to grow this file over time. These are very reusable.
+////////////////////////
+
 function getByAttributeValue(array, attrName, attrValue){
     return array.filter(x => x[attrName] === attrValue)[0]
 }
+
+function correctIndex(arrayLen, givenIndex){
+    // ensure that index is in array. If not, loop index back to beginning of array!
+    let index;
+    if (givenIndex > arrayLen - 1){
+        index = 0; // start at beginning of array
+    } else if (givenIndex < 0){
+        index = 0;
+    }
+    else {
+        index = givenIndex; // index is okay
+    }
+    return index;
+}
+
+////////////////////////
+///////// Utilities that DO use objects/references specific keys
+///////// These may be generalizable with some work
+//////////////////////
 
 function isValidPlayer(player){
     // Player must have game state = "ACTIVE"
@@ -20,20 +44,6 @@ function playerInPot(pot, player){
     } else {
         return false;
     }
-}
-
-function correctIndex(arrayLen, givenIndex){
-    // ensure that index is in array. If not, loop index back to beginning of array!
-    let index;
-    if (givenIndex > arrayLen - 1){
-        index = 0; // start at beginning of array
-    } else if (givenIndex < 0){
-        index = 0;
-    }
-    else {
-        index = givenIndex; // index is okay
-    }
-    return index;
 }
 
 function playerCurrentBet(table,player){
@@ -111,7 +121,6 @@ function isStreetComplete(table, players){
 
     console.log("currentMaxBet is ", currentMaxBet);
     var streetComplete = true;
-
 
     players.forEach(function(player){
         console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
@@ -201,40 +210,158 @@ function maxBetForPot(pot){
 }
 
 function getOptions(gameStatus, players, player, table){
+    // Only call this function for players that the game requests an action from.
+    // So we really shouldn't have to check for 'FOLD' state or 'ALLIN' state.
     let actionOpts = {};
+
     if (gameStatus == 'muck-check'){
-        actionOpts = {muck: true}; // only action is to respond to muck request
+        actionOpts.muck = true; // only action is to respond to muck request
     } else {
-        actionOpts = {fold: true, allIn: player.chips}; // can always fold or go all in
+        let upperLimit = Math.min(maxMatchByOtherPlayers(table, players, player), player.chips);
         let callAmounts = getCallAmounts(table, players, player);
-        if (Math.max(callAmounts) == 0){
-            actionOpts.check = true;
-        } else if ( player.chips >= callAmounts[callAmounts.length - 1] ){
-            // non-zero call amount
-            // player can only call if they have enough chips
-            // otherwise they will need to simply go all-in, not being able to call
-            actionOpts.call = callAmounts[callAmounts.length - 1];
-        } 
-        
-        actionOpts.bet = getBetRange(player.chips, callAmounts[callAmounts.length - 1], table.minRaise);
-    }
+        let callAmount = callAmounts[callAmounts.length - 1];
+        if (canFold(player)){
+            // Is player allowed to fold?
+            actionOpts.fold = true;
+        }
+        if (canCheckOrCall(player)){
+            // Player is allowed to check or call. Never can do both.
+            // Need this function because there are times where a call is allowed by not a raise!
+            // If player doesn't have enough chips to call, we'll have to disable this.
+
+            // Is there a situation where a player can't call? If they are all in already.
+            if (callAmount == 0) {
+                actionOpts.check = true;
+            } else if (upperLimit >= callAmount) {
+                actionOpts.call = callAmount;
+            } else {
+                // Player is allowed to call, but can't do it because they don't have enough chips.
+            }
+        }
+        if (canRaise(players, player, table)){
+            // "can raise" here means that they are allowed to do something other than call (raise or go all in)
+            // In other words, betting is not 'capped'
+            // we will factor in the player chips amount in the range determination.
+            // - the player has chips left
     
+            // Get full range that is allowed, factoring in the amount of chips the player has
+            let betRange = getBetRange(players, player, table, callAmounts);
+
+            // Based on the range, set options.
+            if (betRange != []){
+                actionOpts.bet = betRange;
+                if (actionOpts.bet[1] == player.chips){
+                    // if bet range max is equal to player chips, they can go all in.
+                    actionOpts.allIn = player.chips;
+                }
+            }
+        }
+    }
     return actionOpts;
 }
 
-function getBetRange(chips, callAmount, minRaise){
-    if (chips > 0){
-        if (chips < callAmount || chips < (callAmount + minRaise)){
-            // player has chips, but not enough to call. Only option is to go all-in.
-            return [chips, chips]
-        } else if (chips < (callAmount + minRaise)){
-            // player has chips enough to call, but not enough to raise. Min is call, max is all-in
-            return  [callAmount, chips]
+function canCheckOrCall(player){
+    // Player is allowed to at least try to check or call if they are active
+    // If outstanding callAmount is > 0, player can try to call!
+    if (player.handState !== "FOLD" && player.handState !== "ALLIN"){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function canFold(player){
+    // can always fold if they are still active in hand
+    if (player.handState !== "FOLD"){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function canRaise(players, playerOfInterest, table){
+    // Determine if, just based on game rules, playerOfInterest is allowed to raise (irredgardless of if they have chips)
+    // Player is allowed if:
+    // - the amounts in the active hand are not equal
+    // - the player is not already leading the betting round
+    // We will worry about the actual range later.
+
+    // Player doesn't have to be current with bet if they are all in.
+    let currentMaxBet = 0;
+
+    players.forEach(function(player){
+        if (playerCurrentBetInt(table, player) > currentMaxBet){
+            currentMaxBet = playerCurrentBetInt(table, player)
+        }
+    })
+
+    if (playerCurrentBetInt(table, playerOfInterest) == currentMaxBet && playerOfInterest.actedInStreet == true){
+        // Player has acted and is already the bet leader. Can't raise yourself
+        return false;
+    } else {
+        var raiseAllowed = false;
+
+        players.forEach(function(player){
+            console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
+            if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
+                console.log(player.id, " is current with bet.")
+            } else if (player.handState == "FOLD") {
+                console.log(player.id, " has folded.")
+            } else if (player.handState == "ALLIN"){
+                console.log(player.id, " is all in.")
+            } else {
+                console.log("Betting round not done. Player ", player.id, " needs to act.")
+                raiseAllowed = true;
+            }
+        })
+        return raiseAllowed;
+    }
+}
+
+function maxMatchByOtherPlayers(table, players, playerToExclude){
+    // The point of this function is to not let a player bet more than someone else at the table can match.
+    // Eg. the chip leader can't actually go all-in. They would only be able to put in as many chips
+    // as the next biggest stack could match.
+
+    let maxPossibleMatch = 0;
+    // Cycle through each player other than the playerToExclude
+    // If player is still in, we need to theoretically make a 'call' and then see how many chips
+    // they have left to match a possible raise.
+    players.forEach(player => {
+        if (player.id != playerToExclude.id && player.handState == "IN"){
+            let callAmount = getCallAmounts(table, players, player);
+            let possibleRaise = player.chips - callAmount;
+            if (possibleRaise > maxPossibleMatch){
+                maxPossibleMatch = possibleRaise;
+            }
+        }
+    })
+    return maxPossibleMatch;
+}
+
+function getBetRange(players, playerOfInterest, table, callAmounts){
+    // If we are calling this function, player is legally allowed to raise.
+    // Need to determine what the possible bet range is, considering existing pots and player chips.
+    // determine if another player can match or exceed this bet.
+    let callAmount = callAmounts[callAmounts.length - 1];
+    let maxPossibleMatch = maxMatchByOtherPlayers(table, players, playerOfInterest);
+    console.log("Max raise by another player is: ", maxPossibleMatch);
+
+    //set upper range to minimum of total chips or maxPossibleMatch
+    let upperLimit = Math.min(playerOfInterest.chips, maxPossibleMatch + callAmount);
+
+    if (upperLimit > 0){
+        // Player has chips and some bet can be matched. Proceed.
+        if (upperLimit < (callAmount + table.minRaise)){
+            // playerOfInterest doesn't have enough chips to raise. Calling is handled separately.
+            // Only 'raise'/bet is UpperLimit
+            return  [upperLimit, upperLimit]
         } else {
-            // player can raise, or go up to full amount of chips
-            return [minRaise + callAmount, chips]
+            // playerOfInterest can raise from the minimum up to their UpperLimit
+            return [callAmount + table.minRaise, upperLimit]
         }
     } else {
+        // If player is already all in.
         return [];
     }
 }
