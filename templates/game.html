@@ -28,7 +28,7 @@
       <div class="flex flex-col justify-center align-middle">
         <div id="potHolder" class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
         </div>
-        <div id="commonCards" class="w-52 h-16 flex items-center justify-center gap-1 border border-white rounded-lg mx-auto">
+        <div id="commonCards" class="w-52 h-16 flex items-center justify-center gap-4 border border-white rounded-lg mx-auto">
         </div>
         <div id="lastAction" class="text-sm text-white italic text-center">
         </div>
@@ -472,7 +472,7 @@
         cardDiv.innerHTML = ""; // clear list first
         for (let i = 0; i < 5; i++) {
             let newCard = document.createElement('div');
-            newCard.classList = "border border-red-600 rounded-small p-2 h-14 w-8 text-center";
+            newCard.classList = "border border-white-600 rounded-small p-2 h-14 w-8 text-center m-4";
             if (i < cardArray.length){
               newCard.innerHTML = renderCard(cardArray[i], true);
               newCard.classList.remove("bg-red-500");
@@ -483,6 +483,7 @@
               newCard.classList.remove("bg-white");
               newCard.classList.add("bg-red-500");
               newCard.classList.add("checkered");
+             
               newCard.classList.remove("shadow")
             }
             cardDiv.appendChild(newCard);
