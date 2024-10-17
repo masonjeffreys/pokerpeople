@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/@hapi/lab/bin/lab -v",
-    "start:dev": "./node_modules/nodemon/bin/nodemon.js index.js",
+    "start:dev": "pm run tailwind && npm run nodemon",
     "tailwind": "tailwindcss build -i ./public/css/input.css -o ./public/css/styles.css",
     "nodemon": "./node_modules/nodemon/bin/nodemon.js index.js",
-    "start": "npm run tailwind && npm run nodemon"
+    "start": "node index.js"
   },
   "author": "Jeff Mason",
   "license": "ISC",
