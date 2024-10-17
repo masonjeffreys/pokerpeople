@@ -20,7 +20,7 @@ exports.joinGame = async (req, h) => {
   let gameCode = req.payload.gameCode.toLowerCase().replace(/\s/g, '');
 
   if (req.auth.credentials && req.auth.credentials.user && req.auth.credentials.user.id){
-    user = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
+    user = Repo.getOrCreateUser({id: req.auth.credentials.user.id, firstName: req.auth.credentials.user.firstName, lastName: req.auth.credentials.user.lastName}, req.server.app.users);
   } else {
     user = Repo.getOrCreateUser({firstName: req.payload.firstName, lastName: req.payload.lastName},req.server.app.users);
   }
@@ -30,7 +30,9 @@ exports.joinGame = async (req, h) => {
     game = Repo.createGame(Table(), gameConfig, gameCode, req.server.app.games);
   }
 
-  req.cookieAuth.set({user: {id: user.id}});
+  req.cookieAuth.set({
+    user: {id: user.id},
+    prevDetails: {firstName: user.firstName, lastName: user.lastName, lastGameCode: game.gameCode}});
   return h.redirect('/game/' + game.gameCode);
 }
 
@@ -60,11 +62,11 @@ exports.testGame = (req, h) => {
 exports.viewGame = (req, h) => {
   // Retrieve player and game and add player to game
   // Render main game play view
-
+  
   let game = Utils.getByAttributeValue(req.server.app.games, "gameCode", req.params.gameCode);
   let player = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
 
-  console.log("UserId: ", player.id, " is joining gameId: ", game.id);
+  // console.log("UserId: ", player.id, " is joining gameId: ", game.id);
   Orchestrator.addPlayerToGame(game, player);
   return h.view('game', null, {layout: 'minimal'});
 }
