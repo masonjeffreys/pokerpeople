@@ -34,11 +34,36 @@ exports.joinGame = async (req, h) => {
   return h.redirect('/game/' + game.gameCode);
 }
 
+exports.testGame = (req, h) => {
+  // Retrieve player and game and add player to game
+  // Render main game play view
+
+  // The post request that creates a user and a game
+  let payload = {firstName: "Testy", lastName: "McTester"};
+  let gameCode = "abc";
+
+  user = Repo.getOrCreateUser({firstName: payload.firstName, lastName: payload.lastName},req.server.app.users);
+  let game = Repo.getGame(gameCode, req.server.app.games);
+  if(!game){
+    game = Repo.createGame(Table(), gameConfig, gameCode, req.server.app.games);
+  }
+  for (let i = 0; i < 3; i++) {
+    console.log("Iteration:", i);
+    let player = Repo.getOrCreateUser({firstName: "User", lastName: req.server.app.users.length + 1}, req.server.app.users)
+    game.lastAction = player.prettyName() + " added a player.";
+    Orchestrator.addPlayerToGame(game, player);
+  }
+  req.cookieAuth.set({user: {id: user.id}});
+  return h.redirect('/game/' + game.gameCode);
+}
+
 exports.viewGame = (req, h) => {
   // Retrieve player and game and add player to game
   // Render main game play view
+
   let game = Utils.getByAttributeValue(req.server.app.games, "gameCode", req.params.gameCode);
   let player = Repo.getOrCreateUser({id: req.auth.credentials.user.id}, req.server.app.users);
+
   console.log("UserId: ", player.id, " is joining gameId: ", game.id);
   Orchestrator.addPlayerToGame(game, player);
   return h.view('game', null, {layout: 'minimal'});

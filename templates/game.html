@@ -31,18 +31,22 @@
     class="w-28 pb-36 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8 bg-green-100">
   </div>
 
-    <div id="table-holder" class="w-full flex flex-col justify-center align-middle p-2">
+    <div id="table-holder" class="w-full flex flex-col justify-center align-middle p-4">
+      
       <div id="table" class="mx-auto z-20">
         <div class="flex flex-col justify-center align-middle">
           <div id="potHolder"
             class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
           </div>
+          <div id="startDiv" class="mx-auto hidden"><button type="button" id="startGameBtn" onclick="startGame()"
+            class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">Start
+            Game</button></div>
           <div id="commonCards"
       class="relative flex bg-white p-4 shadow-xl ring-1 ring-gray-900/5 mx-auto rounded-lg">
           </div>
-          <div id="lastAction" class="text-sm text-white italic text-center">
+          <div id="lastAction" class="text-sm italic text-center pt-2">
           </div>
-          <div id="nextUp" class="text-sm text-white italic text-center">
+          <div id="nextUp" class="text-sm italic text-center">
           </div>
         </div>
         <div id="results" class="w-60 text-center mx-auto">
@@ -87,9 +91,6 @@
           <div><button type="button" id="nextStreetBtn" onclick="nextStreet()"
               class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
           </div>
-          <div><button type="button" id="startGameBtn" onclick="startGame()"
-              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start
-              Game</button></div>
           <div></div><button type="button" id="muckBtnTrue" onclick="muckTrue()"
             class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Hide
             cards</button>

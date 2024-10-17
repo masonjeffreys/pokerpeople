@@ -90,6 +90,7 @@ exports.init = async function () {
         handler: AuthController.invalid
     });
     
+    // Set Handler to GameController.testGame for faster testing. Or AuthController.fillFormHomePage for login
     server.route({
         method: 'GET',
         path: '/',
@@ -98,8 +99,9 @@ exports.init = async function () {
                 mode: 'try' // We'll use the validateFunc to set user info if session/cookie data exists
             }
         },
-        handler: AuthController.fillFormHomePage
+        handler: GameController.testGame
     });
+
 
     server.route({
         method: 'GET',
