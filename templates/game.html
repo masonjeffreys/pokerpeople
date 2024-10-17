@@ -611,7 +611,7 @@
     playerDiv.id = 'player' + player.playerId;
     playerDiv.className = 'flex flex-columns mx-auto w-min relative';
     playerBox.id = 'player' + player.playerId + 'box';
-    if (displayCards){
+    if (displayCards == false){
       playerDiv.classList.add("mb-4"); //spaces other players out a bit
     }
     playerHand.id = 'player' + player.playerId + 'hand';
