@@ -31,7 +31,10 @@
     class="pt-28 absolute right-0 top-0 px-2 gap-8">
   </div>
 
-    <div id="table-holder" class="w-full flex flex-col absolute top-0 pt-60 p-4">
+    
+
+  <div id="controlCenter" class="absolute bottom-0 w-screen mx-auto">
+    <div id="table-holder" class="w-full flex flex-col p-4">
       
       <div id="table" class="mx-auto z-20">
         <div class="flex flex-col justify-center align-middle">
@@ -41,8 +44,7 @@
           <div id="startDiv" class="mx-auto"><button type="button" id="startGameBtn" onclick="startGame()"
             class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Start
             Game</button></div>
-          <div id="commonCards"
-      class="relative flex bg-white p-4 shadow-xl ring-1 ring-gray-900/5 mx-auto rounded-lg">
+          <div id="commonCards" class="relative flex p-4 mx-auto rounded-lg">
           </div>
           <div id="lastAction" class="text-sm italic text-center pt-2">
           </div>
@@ -60,15 +62,13 @@
     <div id="nextUp" class="text-sm text-white italic text-center">
     </div>
   </div>
-
-  <div id="controlCenter" class="absolute bottom-0 w-screen mx-auto">
     <div id="bottomBar" class="p-2 mx-auto">
       
         <div class="flex w-screen justify-center pb-2" id="buttonRow1">
           <div id="betLabel" class="text-center text-sm p-2"></div>
-          <div><input id="betAmount" class="w-full h-8 p-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/></div>
+          <div><input id="betAmount" class="w-20 h-10 p-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="bet"/></div>
           <div><button id="betBtn" onclick="bet()"
-              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
+              class="ml-2 bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
           </div>
         </div>
   
@@ -310,13 +310,13 @@
 
     if (playerBox) {
       if (playerInfo.handState == "FOLD" || playerInfo.gameState == "OUT") {
-        playerBox.classList.remove('bg-white');
-        playerBox.classList.remove('shadow-lg');
+        
+        
         playerBox.classList.add('bg-slate-300');
       } else {
         playerBox.classList.remove('bg-slate-300');
-        playerBox.classList.add('shadow-lg');
-        playerBox.classList.add('bg-white');
+        
+        
       }
     }
     if (chipLabel) {
@@ -355,10 +355,10 @@
       if (playerInfo["hand"] && playerInfo["hand"].length > 1) {
         card1Label.innerHTML = renderCard(playerInfo["hand"][0]);
         card1Label.classList.remove('bg-red-200');
-        card2Label.classList.add('bg-white');
+        card1Label.classList.add('bg-white');
         card2Label.innerHTML = renderCard(playerInfo["hand"][1]);
         card2Label.classList.remove('bg-red-200');
-        card2Label.classList.remove('bg-white');
+        card2Label.classList.add('bg-white');
       }
     }
   }
@@ -515,7 +515,7 @@
     cardDiv.innerHTML = ""; // clear list first
     for (let i = 0; i < 5; i++) {
       let newCard = document.createElement('div');
-      newCard.classList = "inset-0 -ml-4 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md";
+      newCard.classList = "inset-0 -ml-4 w-10 h-16 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md";
       if (i < cardArray.length) {
         newCard.innerHTML = renderCard(cardArray[i], true);
         newCard.classList.remove("bg-red-200");
@@ -563,13 +563,13 @@
   function htmlSuit(suitString) {
     switch (suitString) {
       case 'c':
-        return "♣";
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="18" cy="35" r="14" /><circle cx="30" cy="15" r="14" /><circle cx="42" cy="35" r="14" /><path d="M30,30 Q 30,50 20,60 H40 Q30,50 30,30" /></svg>';
       case 'd':
-        return "🔸";
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><rect x="10" y="10" width="40" height="40" style="fill:red" transform="rotate(45,30,30)" /></svg>';
       case 'h':
-        return "🧡";
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><g transform="rotate(45,300,300)" fill="red"><rect x="150" y="150" height="350" width="350" /><circle cx="150" cy="325" r="175" /><circle cx="325" cy="150" r="175" /></g></svg>';
       case 's':
-        return "♠";
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g transform="rotate(225,30,30)"><rect width="30" height="30" x="20" y="20" /><circle cx="20" cy="35" r="15" /><circle cx="35" cy="20" r="15" /></g><path d="M30,30 Q30,50 20,60 H40 Q30,50 30,30" /></svg>';
       default:
         console.log(`Sorry, no suit match for  ${suitString}.`);
         return suitString;
@@ -609,17 +609,17 @@
     let playerLastName = document.createElement('div');
 
     playerDiv.id = 'player' + player.playerId;
-    playerDiv.className = 'player-box flex flex-columns mx-auto w-min relative';
+    playerDiv.className = 'flex flex-columns mx-auto w-min relative';
     playerBox.id = 'player' + player.playerId + 'box';
     playerHand.id = 'player' + player.playerId + 'hand';
     playerHand.className = 'flex mr-4';
     playerCard1.id = 'player' + player.playerId + 'card1';
     playerCard2.id = 'player' + player.playerId + 'card2';
-    playerCard1.className = 'w-20 inset-0 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md z-0';
-    playerCard2.className = 'w-20 inset-0 -ml-4 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md z-10';
+    playerCard1.className = 'text-lg text-center text-bold w-16 inset-0 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md z-0';
+    playerCard2.className = 'text-lg text-center text-bold w-16 inset-0 -ml-2 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md z-10';
     playerBox.className = 'inset-0 rounded-md bg-gray-200 bg-[url(/img/grid.svg)] bg-center p-2 shadow-md'
     playerInPot.id = 'player' + player.playerId + 'inPot';
-    playerInPot.className = 'playerinPot absolute -right-2 -top-2 h-6 w-6 bg-green-900 border-green-700 border-2 rounded-full text-white text-center';
+    playerInPot.className = 'playerinPot absolute -right-2 -top-2 h-6 w-6 bg-slate-600 border-slate-900 border-1 rounded-full text-white text-sm text-center';
     playerFirstName.id = 'player' + player.playerId + 'firstname';
     playerFirstName.className = 'relative text-sm font-semibold -top-1 text-center';
     playerLastName.id = 'player' + player.playerId + 'lastname';
