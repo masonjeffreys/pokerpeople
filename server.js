@@ -99,7 +99,7 @@ exports.init = async function () {
                 mode: 'try' // We'll use the validateFunc to set user info if session/cookie data exists
             }
         },
-        handler: GameController.testGame
+        handler: AuthController.fillFormHomePage
     });
 
 
