@@ -20,26 +20,26 @@
   </div>
 
   <div id="playersContainerTop"
-    class="relative flex bg-white px-2 py-2 shadow-xl ring-1 ring-gray-900/5 sm:rounded-lg sm:px-10 bg-red-100">
+    class="relative flex px-2 py-2">
   </div>
 
   <div id="playersContainerLeft"
-    class="w-28 pb-36 pt-28 absolute left-0 flex flex-col justify-center px-2 gap-8 bg-green-100">
+    class="pt-28 absolute left-0 top-0 px-2 gap-8">
   </div>
 
   <div id="playersContainerRight"
-    class="w-28 pb-36 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8 bg-green-100">
+    class="pt-28 absolute right-0 top-0 px-2 gap-8">
   </div>
 
-    <div id="table-holder" class="w-full flex flex-col justify-center align-middle p-4">
+    <div id="table-holder" class="w-full flex flex-col absolute top-0 pt-60 p-4">
       
       <div id="table" class="mx-auto z-20">
         <div class="flex flex-col justify-center align-middle">
           <div id="potHolder"
             class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
           </div>
-          <div id="startDiv" class="mx-auto hidden"><button type="button" id="startGameBtn" onclick="startGame()"
-            class="bg-transparent hover:bg-blue-500 text-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">Start
+          <div id="startDiv" class="mx-auto"><button type="button" id="startGameBtn" onclick="startGame()"
+            class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Start
             Game</button></div>
           <div id="commonCards"
       class="relative flex bg-white p-4 shadow-xl ring-1 ring-gray-900/5 mx-auto rounded-lg">
@@ -62,42 +62,41 @@
   </div>
 
   <div id="controlCenter" class="absolute bottom-0 w-screen mx-auto">
-    <div id="bottomBar" class="bg-white p-4 fring-1 ring-gray-900/5 mx-auto">
-      <div class="mx-auto max-w-md">
-        <div class="flex">
-          <div id="betLabel" class="bg-white text-center text-sm"></div>
-          <div><input id="betAmount" class="w-full h-8 px-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/></div>
+    <div id="bottomBar" class="p-2 mx-auto">
+      
+        <div class="flex w-screen justify-center pb-2" id="buttonRow1">
+          <div id="betLabel" class="text-center text-sm p-2"></div>
+          <div><input id="betAmount" class="w-full h-8 p-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/></div>
           <div><button id="betBtn" onclick="bet()"
-              class="w-full h-8 inset-y-0 px-4 text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>
+              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
           </div>
         </div>
   
-        <div class="flex">
+        <div class="flex w-screen justify-center gap-2" id="buttonRow2">
           <div><button type="button" id="checkBtn" onclick="check()"
-              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
+              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Check</button>
           </div>
           <div><button type="button" id="foldBtn" onclick="fold()"
-              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Fold</button>
+              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Fold</button>
           </div>
           <div><button type="button" id="callBtn" onclick="call()"
-              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
+              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Call</button>
           </div>
           <div><button type="button" id="allInBtn" onclick="allIn()"
-              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All
+              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">All
               In</button></div>
           <div><button type="button" id="muckBtnFalse" onclick="muckFalse()"
               class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Show
               cards</button></div>
           <div><button type="button" id="nextStreetBtn" onclick="nextStreet()"
-              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
+              class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Advance</button>
           </div>
           <div></div><button type="button" id="muckBtnTrue" onclick="muckTrue()"
             class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Hide
             cards</button>
         </div>
-      </div>
     </div>
-    <div id="self" class="w-screen bg-white p-4 ring-1 ring-gray-900/5 mx-auto">
+    <div id="self" class="w-screen p-2 mx-auto flex justify-center">
       <!--JS will populate a player inside here with appropriate styling-->
     </div>
   </div>
@@ -286,9 +285,9 @@
       let j = i % playersInfo.length;
       console.log("updating player at: ", j);
       if (playersInfo[j]["playerId"] == currentPlayerId) {
-        selfContainer.appendChild(renderPlayer(playersInfo[j]));
+        selfContainer.appendChild(renderPlayer(playersInfo[j], true));
       } else {
-        otherPlayers.push(renderPlayer(playersInfo[j]))
+        otherPlayers.push(renderPlayer(playersInfo[j], false))
       }
     }
     arrangePlayers(containerTop, containerLeft, containerRight, otherPlayers);
@@ -306,7 +305,8 @@
     var buttonLabel = document.getElementById("player" + playerId + "button");
     var smallBlindLabel = document.getElementById("player" + playerId + "smallBlind");
     var bigBlindLabel = document.getElementById("player" + playerId + "bigBlind");
-    var handLabel = document.getElementById("player" + playerId + "hand");
+    var card1Label = document.getElementById("player" + playerId + "card1");
+    var card2Label = document.getElementById("player" + playerId + "card2");
 
     if (playerBox) {
       if (playerInfo.handState == "FOLD" || playerInfo.gameState == "OUT") {
@@ -331,31 +331,34 @@
     if (buttonLabel) {
       if (playerInfo["button"]) {
         // Active look
-        buttonLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-gray-800 text-center text-white";
+        buttonLabel.className = "rounded-full w-4 h-4 text-xs font-bold bg-gray-800 text-center text-white";
       } else {
         // Inactive look
-        buttonLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
+        buttonLabel.className = "rounded-full w-4 h-4 text-xs bg-gray-100 text-center text-gray-300";
       }
     }
     if (smallBlindLabel) {
       if (playerInfo["smallBlind"]) {
-        smallBlindLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-blue-700 text-center text-white";
+        smallBlindLabel.className = "rounded-full w-4 h-4 text-xs font-bold bg-blue-700 text-center text-white";
       } else {
-        smallBlindLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
+        smallBlindLabel.className = "rounded-full w-4 h-4 text-xs bg-gray-100 text-center text-gray-300";
       }
     }
     if (bigBlindLabel) {
       if (playerInfo["bigBlind"]) {
-        bigBlindLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-yellow-500 text-center";
+        bigBlindLabel.className = "rounded-full w-4 h-4 text-xs font-bold bg-yellow-500 text-center";
       } else {
-        bigBlindLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
+        bigBlindLabel.className = "rounded-full w-4 h-4 text-xs bg-gray-100 text-center text-gray-300";
       }
     }
-    if (handLabel) {
-      var handString = ""
+    if (card1Label && card2Label) {
       if (playerInfo["hand"] && playerInfo["hand"].length > 1) {
-        handString = renderCard(playerInfo["hand"][0]) + " " + renderCard(playerInfo["hand"][1]);
-        handLabel.innerHTML = handString;
+        card1Label.innerHTML = renderCard(playerInfo["hand"][0]);
+        card1Label.classList.remove('bg-red-200');
+        card2Label.classList.add('bg-white');
+        card2Label.innerHTML = renderCard(playerInfo["hand"][1]);
+        card2Label.classList.remove('bg-red-200');
+        card2Label.classList.remove('bg-white');
       }
     }
   }
@@ -473,21 +476,19 @@
     if (table["activeIndex"] !== 'undefined' && table["activeIndex"] != null) {
       var activePlayer = playersInfo[table["activeIndex"]];
       for (let i = 0; i < playersInfo.length; i++) {
-        var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
+        var playerBox = document.getElementById("player" + playersInfo[i]["playerId"] + "box");
         let playerFirstName = document.getElementById("player" + playersInfo[i]["playerId"] + 'lastname');
         let playerLastName = document.getElementById("player" + playersInfo[i]["playerId"] + 'firstname');
         if (playerBox) {
           playerBox.classList.remove("ring");
           playerBox.classList.remove("ring-offset-4")
           playerBox.classList.remove("ring-cyan-500");
-          playerBox.classList.remove("ring-offset-green-700");
           playerFirstName.classList.remove("text-cyan-500");
           playerLastName.classList.remove("text-cyan-500");
           if (playersInfo[i]["playerId"] == activePlayer.playerId) {
             playerBox.classList.add("ring");
             playerBox.classList.add("ring-offset-4");
             playerBox.classList.add("ring-cyan-500");
-            playerBox.classList.add("ring-offset-green-700");
             playerFirstName.classList.add("text-cyan-500");
             playerLastName.classList.add("text-cyan-500");
           }
@@ -587,80 +588,77 @@
     }
   }
 
-  function renderPlayer(player) {
-    // <div class="relative m-2 flex-col bg-green-100 p-2 text-center">
-    //   <div class="">
-    //     <svg class="mx-auto h-6 w-6 flex-none fill-sky-100 stroke-sky-500 stroke-2" stroke-linecap="round"
-    //       stroke-linejoin="round">
-    //       <circle cx="12" cy="12" r="11" />
-    //       <path d="m8 13 2.165 2.165a1 1 0 0 0 1.521-.126L16 9" fill="none" />
-    //     </svg>
-    //   </div>
-    //   <div class="-mb-2 text-sm text-gray-400">Name</div>
-    //   <div class="">Pot</div>
-    //   <div class="absolute -bottom-2 -right-2 text-xs">Bet</div>
-    // </div>
-    // <div class="relative m-2 bg-green-100 p-2">Text</div>
+  function renderPlayer(player, displayCards) {
     let playerDiv = document.createElement('div');
-    let playerLastAction = document.createElement('div');
-    let playerActive = document.createElement('div');
-    let playerHand = document.createElement('p');
-    let playerInPot = document.createElement('div');
-    let playerFirstName = document.createElement('div');
-    let playerLastName = document.createElement('div');
+    let playerHand = document.createElement('div');
+    let playerCard1 = document.createElement('div');
+    let playerCard1Text = document.createElement('p');
+    let playerCard2 = document.createElement('div');
+    let playerCard2Text = document.createElement('p');
+    let playerBox = document.createElement('div');
+    let playerFace = document.createElement('div');
+    let playerName = document.createElement('div');
+    let playerChips = document.createElement('p');
     let playerPosition = document.createElement('div');
     let playerButton = document.createElement('div');
     let playerSmallBlind = document.createElement('div');
     let playerBigBlind = document.createElement('div');
-    let playerChips = document.createElement('p');
+    
+    let playerInPot = document.createElement('div');
+    let playerFirstName = document.createElement('div');
+    let playerLastName = document.createElement('div');
 
     playerDiv.id = 'player' + player.playerId;
-    playerDiv.className = 'player-box p-2 w-28 h-28 mx-auto bg-white rounded-full text-center relative z-0';
-    playerLastAction.id = 'player' + player.playerId + 'lastAction';
-    playerLastAction.class = "rounded-full";
+    playerDiv.className = 'player-box flex flex-columns mx-auto w-min relative';
+    playerBox.id = 'player' + player.playerId + 'box';
     playerHand.id = 'player' + player.playerId + 'hand';
-    playerHand.className = 'relative w-full flex h-6 justify-center';
+    playerHand.className = 'flex mr-4';
+    playerCard1.id = 'player' + player.playerId + 'card1';
+    playerCard2.id = 'player' + player.playerId + 'card2';
+    playerCard1.className = 'w-20 inset-0 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md z-0';
+    playerCard2.className = 'w-20 inset-0 -ml-4 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md z-10';
+    playerBox.className = 'inset-0 rounded-md bg-gray-200 bg-[url(/img/grid.svg)] bg-center p-2 shadow-md'
     playerInPot.id = 'player' + player.playerId + 'inPot';
-    playerInPot.className = 'playerinPot absolute -right-4 -top-4 h-12 w-12 bg-green-900 border-green-700 border-4 rounded-full text-white text-semibold pt-2 text-center';
+    playerInPot.className = 'playerinPot absolute -right-2 -top-2 h-6 w-6 bg-green-900 border-green-700 border-2 rounded-full text-white text-center';
     playerFirstName.id = 'player' + player.playerId + 'firstname';
-    playerFirstName.className = 'text-lg relative font-semibold -top-1 text-center';
+    playerFirstName.className = 'relative text-sm font-semibold -top-1 text-center';
     playerLastName.id = 'player' + player.playerId + 'lastname';
-    playerLastName.className = 'text-xs uppercase relative -top-3 text-center';
+    playerLastName.className = 'text-xs uppercase relative -top-2 text-center';
     playerChips.id = 'player' + player.playerId + 'chips';
-    playerChips.className = 'mx-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white relative -top-2';
+    playerChips.className = 'mx-2 text-lg text-center font-semibold rounded-full bg-slate-600 border-slate-900 text-white relative -top-2 px-2';
     playerPosition.id = 'player' + player.playerId + 'position';
-    playerPosition.className = 'flex gap-1 absolute left-0 justify-center w-full';
+    playerPosition.className = 'flex gap-1 justify-center';
     playerButton.id = 'player' + player.playerId + 'button';
-    playerButton.className = 'rounded-full w-1 h-1 text-center font-bold ring-2 ring-inset';
+    playerButton.className = 'rounded-full w-1 h-1 text-center font-bold ring-2 ring-inset text-sm';
     playerButton.innerHTML = "D";
     playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
-    playerSmallBlind.className = 'rounded-full font-bold ring-2 ring-inset';
+    playerSmallBlind.className = 'rounded-full font-bold ring-2 ring-inset text-sm';
     playerSmallBlind.innerHTML = "SB";
     playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
-    playerBigBlind.className = ' rounded-full font-bold ring-2 ring-inset';
+    playerBigBlind.className = 'rounded-full font-bold ring-2 ring-inset text-xs';
     playerBigBlind.innerHTML = "BB";
 
+    playerCard1.appendChild(playerCard1Text);
+    playerCard2.appendChild(playerCard2Text);
+    if (displayCards){
+      playerHand.appendChild(playerCard1);
+      playerHand.appendChild(playerCard2);
+      playerDiv.appendChild(playerHand);
+    }
 
-    // '<div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">'
-    //     <div id="player1name" class="text-xl font-medium"></div>
-    //     <p id="player1chips" class="text-slate-500"></p>
-    //     <p id="player1hand" class="text-slate-500"></p>
-    //     <div id="player1button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-    //     <div id="player1smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-    //     <div id="player1bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-    // </div>'
-
-    playerDiv.appendChild(playerLastAction);
-    playerDiv.appendChild(playerActive);
-    playerDiv.appendChild(playerInPot);
-    playerDiv.appendChild(playerHand);
-    playerDiv.appendChild(playerFirstName);
-    playerDiv.appendChild(playerLastName);
-    playerDiv.appendChild(playerChips);
+    playerBox.appendChild(playerInPot);
+    playerBox.appendChild(playerFace);
+    playerBox.appendChild(playerFirstName);
+    playerBox.appendChild(playerLastName);
+    playerBox.appendChild(playerChips);
     playerPosition.appendChild(playerButton);
     playerPosition.appendChild(playerSmallBlind);
     playerPosition.appendChild(playerBigBlind);
-    playerDiv.appendChild(playerPosition);
+    playerBox.appendChild(playerPosition);
+    playerDiv.appendChild(playerBox);
+    
     return playerDiv;
   }
+
+  
 </script>
