@@ -6,8 +6,9 @@
   "scripts": {
     "test": "./node_modules/@hapi/lab/bin/lab -v",
     "start:dev": "./node_modules/nodemon/bin/nodemon.js index.js",
-    "start": "node index.js",
-    "tailwind": "tailwindcss build -i ./public/css/input.css -o ./public/css/styles.css"
+    "tailwind": "tailwindcss build -i ./public/css/input.css -o ./public/css/styles.css",
+    "nodemon": "./node_modules/nodemon/bin/nodemon.js index.js",
+    "start": "npm run tailwind && npm run nodemon"
   },
   "author": "Jeff Mason",
   "license": "ISC",

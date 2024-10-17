@@ -1,5 +1,5 @@
-<div class="w-screen h-full relative bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-0">
-<!-- For felt background: add bg-green-700 bg-[url('/img/noisy-texture.png')] bg-repeat z-1 --->
+  <img src="/img/beams.jpg" alt="" class="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2"
+    width="1308" />
   <div id="gameEnd" class="w-screen h-full absolute bg-gray-900 z-50 flex flex-col justify-center hidden">
     <p id="winnerName" class="glowing text-white text-center font-extrabold logo-1 text-4xl">
     </p>
@@ -9,607 +9,653 @@
     <p id="chips" class="glowing text-white text-center font-extrabold logo-1 text-2xl">
     </p>
     <div class="text-center text-white">
-      <button type="button" id="newGameBtn" onclick="startGame()" class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Play again!</button>
+      <button type="button" id="newGameBtn" onclick="startGame()"
+        class="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Play
+        again!</button>
     </div>
   </div>
-
-  <div id="errorsContainer" class="absolute top-0 right-0 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
+  <div id="errorsContainer"
+    class="absolute top-0 right-0 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
   </div>
 
-  <div id="playersContainerTop" class="h-28 w-full absolute top-0 flex justify-center p-2 gap-8">
-  </div>
-  <div id="playersContainerLeft" class="w-28 h-full pb-36 pt-28 absolute left-0 flex flex-col justify-center px-2 gap-8">
-  </div>
-  <div id="playersContainerRight" class="w-28 h-full pb-36 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8">
+  <div id="playersContainerTop"
+    class="relative flex bg-white px-2 py-2 shadow-xl ring-1 ring-gray-900/5 sm:rounded-lg sm:px-10 bg-red-100">
   </div>
 
-  <div id="table-holder" class="absolute w-full h-full flex flex-col justify-center align-middle pb-32 pt-8">
-    <div id="table" class="mx-auto z-20">
-      <div class="flex flex-col justify-center align-middle">
-        <div id="potHolder" class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
+  <div id="playersContainerLeft"
+    class="w-28 h-full pb-36 pt-28 absolute left-0 flex flex-col justify-center px-2 gap-8 bg-green-100">
+  </div>
+
+  <div id="playersContainerRight"
+    class="w-28 h-full pb-36 pt-28 absolute right-0 flex flex-col justify-center px-2 gap-8 bg-green-100">
+  </div>
+
+    <div id="table-holder" class="w-full h-full flex flex-col justify-center align-middle">
+      <div id="table" class="mx-auto z-20">
+        <div class="flex flex-col justify-center align-middle">
+          <div id="potHolder"
+            class="mx-auto px-2 my-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
+          </div>
+          <div id="commonCards"
+      class="relative flex bg-white p-4 shadow-xl ring-1 ring-gray-900/5 mx-auto rounded-lg">
+          </div>
+          <div id="lastAction" class="text-sm text-white italic text-center">
+          </div>
+          <div id="nextUp" class="text-sm text-white italic text-center">
+          </div>
         </div>
-        <div id="commonCards" class="w-52 h-16 flex items-center justify-center gap-4 border border-white rounded-lg mx-auto">
-        </div>
-        <div id="lastAction" class="text-sm text-white italic text-center">
-        </div>
-        <div id="nextUp" class="text-sm text-white italic text-center">
+        <div id="results" class="w-60 text-center mx-auto">
         </div>
       </div>
-      <div id="results" class="w-60 text-center mx-auto">
-      </div>
-    </div>
-  </div>
-  
 
-  <div class="flex w-screen justify-center absolute mb-28 bottom-0">
-    <div id="self" class="mx-auto z-10">
-      <!--JS will populate a player inside here with appropriate styling-->
-    </div>
-  </div>
-  
- 
-  <div id="bottomBar"class="w-full absolute left-0 bottom-0 z-30">
-    <div id="betLabel" class="bg-white text-center text-sm"></div>
-    <div id="actions" class="bg-white border-t">
-      <div class="flex justify-center items-end text-center divide-x border-t">
-        <div class="w-3/12">
-          <button type="button" id="nextStreetBtn" onclick="nextStreet()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
-          <button type="button" id="startGameBtn" onclick="startGame()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start Game</button>
-          <button type="button" id="muckBtnTrue" onclick="muckTrue()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Hide cards</button>
-          <!-- can only call or check on a given turn, not both. So we put both in the same div-->
-          <button type="button" id="checkBtn" onclick="check()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
-          <button type="button" id="callBtn" onclick="call()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button>
-        </div>
-        <div class="w-3/12">
-          <div class="text-gray-700 w-full h-16 text-center">
-              <input id="betAmount" class="w-full h-8 px-4 text-center text-base placeholder-gray-400 focus:shadow-outline" type="number" placeholder="Amount"/>
-              <button id="betBtn" onclick="bet()" class="w-full h-8 inset-y-0 px-4 text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button>          </div>
-        </div>
-        <div class="w-3/12">
-          <button type="button" id="allInBtn" onclick="allIn()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All In</button>
-        </div>
-        <div class="w-3/12">
-          <button type="button" id="muckBtnFalse" onclick="muckFalse()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Show cards</button>
-          <button type="button" id="foldBtn" onclick="fold()" class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Fold</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
     
+    
+    <div id="lastAction" class="text-sm text-white italic text-center">
+    </div>
+    <div id="nextUp" class="text-sm text-white italic text-center">
+    </div>
+  </div>
+
+  <div id="bottomBar"
+    class="absolute w-screen bg-white p-4 fring-1 ring-gray-900/5 bottom-40 mx-auto z-20">
+    <div class="mx-auto max-w-md">
+      <div class="flex">
+        <div id="betLabel">Bet Label</div>
+        <div id="betInput">Bet Input</div>
+        <div>No.</div>
+        <div><input type="range" min="1" max="100" value="50" class="slider" id="betAmount"></div>
+        <div><button id="betBtn" onclick="bet()"
+          class="w-full h-8 inset-y-0 px-4 text-white bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700">Bet</button></div>
+      </div>
+
+      <div class="flex">
+        <div><button type="button" id="checkBtn" onclick="check()"
+          class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Check</button>
+        </div>
+        <div><button type="button" id="foldBtn" onclick="fold()"
+          class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Fold</button>
+        </div>
+        <div><button type="button" id="callBtn" onclick="call()"
+          class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Call</button></div>
+        <div>Pot</div>
+        <div><button type="button" id="allInBtn" onclick="allIn()"
+          class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-inditext-indigo-600 focus:ring-offset-2">All
+          In</button></div>
+          <div><button type="button" id="muckBtnFalse" onclick="muckFalse()"
+            class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Show
+            cards</button></div>
+            <div><button type="button" id="nextStreetBtn" onclick="nextStreet()"
+              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Advance</button>
+            <button type="button" id="startGameBtn" onclick="startGame()"
+              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">Start
+              Game</button>
+            <button type="button" id="muckBtnTrue" onclick="muckTrue()"
+              class="w-full h-16 px-4 py-1 text-sm text-indigo-600 font-semibold hover:text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hidden">Hide
+              cards</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="self"
+    class="absolute w-screen bg-white p-4 ring-1 ring-gray-900/5 bottom-0 mx-auto">
+    <!--JS will populate a player inside here with appropriate styling-->
+  </div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/menus.js"></script>
 <script src="/js/socket.js"></script>
 <script src="/js/pyro.js"></script>
 <script>
-    // Eventually convert this to react probably. But iterating with pure JS is easy.
-    function updateActions(actionsOpts, player){
-      let currentPlayerId;
-      var callBtn = document.getElementById("callBtn");
-      var checkBtn = document.getElementById("checkBtn");
-      var foldBtn = document.getElementById("foldBtn");
-      var betLabel = document.getElementById("betLabel");
-      var betInput = document.getElementById("betAmount");
-      var betBtn = document.getElementById("betBtn");
-      var allInBtn = document.getElementById("allInBtn");
-      var muckBtnTrue = document.getElementById("muckBtnTrue");
-      var muckBtnFalse = document.getElementById("muckBtnFalse");
-      let nextUpDiv = document.getElementById('nextUp');
-      if (typeof player !== 'undefined'){
-        currentPlayerId = player.playerId
-        nextUpDiv.innerHTML = player.firstName + " " + player.lastName + " is up.";
-      } else {
-        nextUpDiv.innerHTML = "";
-      }
-      console.log("actions are: ", actionsOpts, " for playerId: ", currentPlayerId);
-      if (actionsOpts && actionsOpts.call){
-        callBtn.classList.remove("hidden");
-        callBtn.innerHTML = "Call: " + actionsOpts.call;
-        nextUpDiv.innerHTML =  nextUpDiv.innerHTML + " " + actionsOpts.call + " to call.";
-      } else {
-        callBtn.classList.remove("hidden");
-        callBtn.classList.add("hidden");
-      }
-      if (actionsOpts && actionsOpts.muck){
-        muckBtnTrue.classList.remove("hidden");
-        muckBtnFalse.classList.remove("hidden");
-      } else {
-        muckBtnTrue.classList.remove("hidden");
-        muckBtnFalse.classList.remove("hidden");
-        muckBtnTrue.classList.add("hidden");
-        muckBtnFalse.classList.add("hidden");
-      }
-      if (actionsOpts && actionsOpts.fold){
-        foldBtn.classList.remove("hidden");
-      } else {
-        foldBtn.classList.remove("hidden");
-        foldBtn.classList.add("hidden");
-      }
-      if (actionsOpts && actionsOpts.check){
-        checkBtn.classList.remove("hidden");
-      } else {
-        checkBtn.classList.remove("hidden");
-        checkBtn.classList.add("hidden");
-      }
-      if (actionsOpts && actionsOpts.allIn){
-        allInBtn.classList.remove("invisible");
-        allInBtn.innerHTML = "All in: " + actionsOpts.allIn;
-      } else {
-        allInBtn.classList.remove("invisible");
-        allInBtn.classList.add("invisible");
-      }
-      if (actionsOpts && actionsOpts.bet && actionsOpts.bet.length > 1){
-        betBtn.classList.remove("invisible");
-        betLabel.classList.remove("invisible");
-        betInput.classList.remove("invisible");
-        betInput.min = actionsOpts.bet[0];
-        betInput.max = actionsOpts.bet[1];
-        betLabel.innerHTML = "To raise, bet: " + actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
-      } else {
-        betBtn.classList.remove("invisible");
-        betBtn.classList.add("invisible");
-        betInput.classList.remove("invisible");
-        betInput.classList.add("invisible")
-        betLabel.classList.remove("invisible");
-        betLabel.classList.add("invisible");
-      }
+  // Eventually convert this to react probably. But iterating with pure JS is easy.
+  function updateActions(actionsOpts, player) {
+    let currentPlayerId;
+    var callBtn = document.getElementById("callBtn");
+    var checkBtn = document.getElementById("checkBtn");
+    var foldBtn = document.getElementById("foldBtn");
+    var betLabel = document.getElementById("betLabel");
+    var betInput = document.getElementById("betAmount");
+    var betBtn = document.getElementById("betBtn");
+    var allInBtn = document.getElementById("allInBtn");
+    var muckBtnTrue = document.getElementById("muckBtnTrue");
+    var muckBtnFalse = document.getElementById("muckBtnFalse");
+    let nextUpDiv = document.getElementById('nextUp');
+    if (typeof player !== 'undefined') {
+      currentPlayerId = player.playerId
+      nextUpDiv.innerHTML = player.firstName + " " + player.lastName + " is up.";
+    } else {
+      nextUpDiv.innerHTML = "";
     }
-    function toggleAdvanceButton(status){
-      let advanceButton = document.getElementById('nextStreetBtn');
-      if (status == "auto-advance"){
-        advanceButton.classList.remove('hidden');
-      } else {
-        advanceButton.classList.remove('hidden');
-        advanceButton.classList.add('hidden');
-      }
+    console.log("actions are: ", actionsOpts, " for playerId: ", currentPlayerId);
+    if (actionsOpts && actionsOpts.call) {
+      callBtn.classList.remove("hidden");
+      callBtn.innerHTML = "Call: " + actionsOpts.call;
+      nextUpDiv.innerHTML = nextUpDiv.innerHTML + " " + actionsOpts.call + " to call.";
+    } else {
+      callBtn.classList.remove("hidden");
+      callBtn.classList.add("hidden");
     }
+    if (actionsOpts && actionsOpts.muck) {
+      muckBtnTrue.classList.remove("hidden");
+      muckBtnFalse.classList.remove("hidden");
+    } else {
+      muckBtnTrue.classList.remove("hidden");
+      muckBtnFalse.classList.remove("hidden");
+      muckBtnTrue.classList.add("hidden");
+      muckBtnFalse.classList.add("hidden");
+    }
+    if (actionsOpts && actionsOpts.fold) {
+      foldBtn.classList.remove("hidden");
+    } else {
+      foldBtn.classList.remove("hidden");
+      foldBtn.classList.add("hidden");
+    }
+    if (actionsOpts && actionsOpts.check) {
+      checkBtn.classList.remove("hidden");
+    } else {
+      checkBtn.classList.remove("hidden");
+      checkBtn.classList.add("hidden");
+    }
+    if (actionsOpts && actionsOpts.allIn) {
+      allInBtn.classList.remove("invisible");
+      allInBtn.innerHTML = "All in: " + actionsOpts.allIn;
+    } else {
+      allInBtn.classList.remove("invisible");
+      allInBtn.classList.add("invisible");
+    }
+    if (actionsOpts && actionsOpts.bet && actionsOpts.bet.length > 1) {
+      betBtn.classList.remove("invisible");
+      betLabel.classList.remove("invisible");
+      betInput.classList.remove("invisible");
+      betInput.min = actionsOpts.bet[0];
+      betInput.max = actionsOpts.bet[1];
+      betLabel.innerHTML = "To raise, bet: " + actionsOpts.bet[0] + " to " + actionsOpts.bet[1];
+    } else {
+      betBtn.classList.remove("invisible");
+      betBtn.classList.add("invisible");
+      betInput.classList.remove("invisible");
+      betInput.classList.add("invisible")
+      betLabel.classList.remove("invisible");
+      betLabel.classList.add("invisible");
+    }
+  }
+  function toggleAdvanceButton(status) {
+    let advanceButton = document.getElementById('nextStreetBtn');
+    if (status == "auto-advance") {
+      advanceButton.classList.remove('hidden');
+    } else {
+      advanceButton.classList.remove('hidden');
+      advanceButton.classList.add('hidden');
+    }
+  }
 
-    function getLeader(players){
-      let leader = players[0];
-      players.forEach(p => {
-        if (p.chips > leader.chips){
-          leader = p;
+  function getLeader(players) {
+    let leader = players[0];
+    players.forEach(p => {
+      if (p.chips > leader.chips) {
+        leader = p;
+      }
+    })
+    return leader;
+  }
+
+  function renderGameStatus(status, players) {
+    let winningScreen = document.getElementById('gameEnd');
+    let startGameBtn = document.getElementById('startGameBtn');
+    winningScreen.classList.remove("hidden");
+    winningScreen.classList.add("hidden");
+    if (typeof (status) != 'undefined') {
+      if (status == 'complete') {
+        let winner = getLeader(players);
+        winningScreen.classList.remove("hidden");
+        let winnerName = document.getElementById('winnerName');
+        let chips = document.getElementById('chips');
+        winnerName.innerHTML = winner.name;
+        chips.innerHTML = winner.chips + " chips!";
+        for (let i = 0; i < 10; i++) {
+          setTimeout(createFirework, fw_launch_rate * i);
         }
-      })
-      return leader;
+      } else if (status == 'unstarted') {
+        // Show start button if game is unstarted
+        startGameBtn.classList.remove("hidden");
+      } else {
+        // status is some thing else
+        startGameBtn.classList.remove("hidden");
+        startGameBtn.classList.add("hidden");
+      }
     }
+  }
 
-    function renderGameStatus(status, players){
-      let winningScreen = document.getElementById('gameEnd');
-      let startGameBtn = document.getElementById('startGameBtn');
-      winningScreen.classList.remove("hidden");
-      winningScreen.classList.add("hidden");
-      if (typeof(status) != 'undefined'){
-        if (status == 'complete'){
-          let winner = getLeader(players);
-          winningScreen.classList.remove("hidden");
-          let winnerName = document.getElementById('winnerName');
-          let chips = document.getElementById('chips');
-          winnerName.innerHTML = winner.name;
-          chips.innerHTML = winner.chips +  " chips!";
-          for (let i=0; i < 10; i++){
-            setTimeout(createFirework, fw_launch_rate * i);
+  function updateResults(results) {
+    // results is an array of winners for each pot
+    var resultsDiv = document.getElementById("results");
+    let tableDiv = document.getElementById('table');
+    if (results.length > 0) {
+      table.classList.add("bg-gray-300");
+      table.classList.add("shadow-xl");
+      table.classList.add("rounded");
+      let dealButton = document.createElement('button');
+      let resultText = document.createElement('div');
+      resultText.className = "font-semibold text-gray-800 p-2 m-2"
+      dealButton.id = "nextHandBtn";
+      dealButton.className = "m-2 px-4 py-1 text-sm font-semibold rounded-full border border-purple-200 text-white bg-purple-600 border-transparent outline-none ring-2 ring-purple-600 ring-offset-2";
+      dealButton.type = "button";
+      dealButton.onclick = nextHand;
+      dealButton.innerHTML = "Deal";
+      let resultString = "";
+      results.forEach(function (potResult) {
+        potResult.forEach(function (winner) {
+          resultString = resultString + "Winner: " + winner.winner_name + "!<br>" + winner.amount + ' chips<br>' + 'Hand: ' + winner.winning_hand;
+        })
+      })
+      resultText.innerHTML = resultString;
+      resultsDiv.appendChild(resultText);
+      resultsDiv.appendChild(dealButton);
+    } else {
+      resultsDiv.innerHTML = "";
+      table.classList.remove("bg-gray-300");
+      table.classList.remove("shadow-xl");
+      table.classList.remove("rounded");
+    }
+  }
+
+  function updateLastAction(lastActionString) {
+    let lastActionDiv = document.getElementById('lastAction');
+    if (lastActionDiv) {
+      lastActionDiv.innerHTML = lastActionString;
+    }
+  }
+
+  function updateAllPlayers(playersInfo, currentPlayerId) {
+    let containerTop = document.getElementById('playersContainerTop');
+    let containerLeft = document.getElementById('playersContainerLeft');
+    let containerRight = document.getElementById('playersContainerRight');
+    containerTop.innerHTML = "";
+    containerLeft.innerHTML = "";
+    containerRight.innerHTML = "";
+    let selfContainer = document.getElementById('self');
+    selfContainer.innerHTML = "";
+    // cycle through each player, starting at self.
+    let startArrayPosition = playersInfo.map(function (o) { return o.playerId; }).indexOf(currentPlayerId);
+    let otherPlayers = [];
+    for (var i = startArrayPosition; i < playersInfo.length + startArrayPosition; i++) {
+      let j = i % playersInfo.length;
+      console.log("updating player at: ", j);
+      if (playersInfo[j]["playerId"] == currentPlayerId) {
+        selfContainer.appendChild(renderPlayer(playersInfo[j]));
+      } else {
+        otherPlayers.push(renderPlayer(playersInfo[j]))
+      }
+    }
+    arrangePlayers(containerTop, containerLeft, containerRight, otherPlayers);
+    for (var i = 0; i < playersInfo.length; i++) {
+      updatePlayer(playersInfo[i]);
+    }
+  }
+
+  function updatePlayer(playerInfo) {
+    let playerId = playerInfo["playerId"];
+    var playerBox = document.getElementById("player" + playerId);
+    var chipLabel = document.getElementById("player" + playerId + "chips");
+    var firstNameLabel = document.getElementById("player" + playerId + "firstname");
+    var lastNameLabel = document.getElementById("player" + playerId + "lastname");
+    var buttonLabel = document.getElementById("player" + playerId + "button");
+    var smallBlindLabel = document.getElementById("player" + playerId + "smallBlind");
+    var bigBlindLabel = document.getElementById("player" + playerId + "bigBlind");
+    var handLabel = document.getElementById("player" + playerId + "hand");
+
+    if (playerBox) {
+      if (playerInfo.handState == "FOLD" || playerInfo.gameState == "OUT") {
+        playerBox.classList.remove('bg-white');
+        playerBox.classList.remove('shadow-lg');
+        playerBox.classList.add('bg-slate-300');
+      } else {
+        playerBox.classList.remove('bg-slate-300');
+        playerBox.classList.add('shadow-lg');
+        playerBox.classList.add('bg-white');
+      }
+    }
+    if (chipLabel) {
+      chipLabel.innerHTML = playerInfo["chips"];
+    }
+    if (firstNameLabel) {
+      firstNameLabel.innerHTML = playerInfo["firstName"];
+    }
+    if (lastNameLabel) {
+      lastNameLabel.innerHTML = playerInfo["lastName"];
+    }
+    if (buttonLabel) {
+      if (playerInfo["button"]) {
+        // Active look
+        buttonLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-gray-800 text-center text-white";
+      } else {
+        // Inactive look
+        buttonLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
+      }
+    }
+    if (smallBlindLabel) {
+      if (playerInfo["smallBlind"]) {
+        smallBlindLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-blue-700 text-center text-white";
+      } else {
+        smallBlindLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
+      }
+    }
+    if (bigBlindLabel) {
+      if (playerInfo["bigBlind"]) {
+        bigBlindLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-yellow-500 text-center";
+      } else {
+        bigBlindLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
+      }
+    }
+    if (handLabel) {
+      var handString = ""
+      if (playerInfo["hand"] && playerInfo["hand"].length > 1) {
+        handString = renderCard(playerInfo["hand"][0]) + " " + renderCard(playerInfo["hand"][1]);
+        handLabel.innerHTML = handString;
+      }
+    }
+  }
+
+  function arrangePlayers(containerTop, containerLeft, containerRight, otherPlayersArray) {
+
+    let playersCount = otherPlayersArray.length;
+
+    switch (playersCount) {
+      case 1:
+        // put at top middle of screen
+        containerTop.appendChild(otherPlayersArray[0]);
+        break;
+      case 2:
+        // put at upper left and upper right
+        containerTop.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[1]);
+        break;
+      case 3:
+        // put at mid left, upper middle, and mid right
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[1]);
+        containerRight.appendChild(otherPlayersArray[2]);
+        break;
+      case 4:
+        // put at mid left, two across top and mid right
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[1]);
+        containerTop.appendChild(otherPlayersArray[2]);
+        containerRight.appendChild(otherPlayersArray[3]);
+        break;
+      case 5:
+        // put at mid left, three across top and mid right
+        containerLeft.appendChild(otherPlayersArray[1]);
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[2]);
+        containerRight.appendChild(otherPlayersArray[3]);
+        containerRight.appendChild(otherPlayersArray[4]);
+        break;
+      case 6:
+        // put at two left, two across top and two right
+        containerLeft.appendChild(otherPlayersArray[1]);
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[2]);
+        containerTop.appendChild(otherPlayersArray[3]);
+        containerRight.appendChild(otherPlayersArray[4]);
+        containerRight.appendChild(otherPlayersArray[5]);
+        break;
+      case 7:
+        // put at two left, three across top and two right
+        containerLeft.appendChild(otherPlayersArray[1]);
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[2]);
+        containerTop.appendChild(otherPlayersArray[3]);
+        containerTop.appendChild(otherPlayersArray[4]);
+        containerRight.appendChild(otherPlayersArray[5]);
+        containerRight.appendChild(otherPlayersArray[6]);
+        break;
+      case 8:
+        // put at three left, two across top and three right
+        containerLeft.appendChild(otherPlayersArray[2]);
+        containerLeft.appendChild(otherPlayersArray[1]);
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[3]);
+        containerTop.appendChild(otherPlayersArray[4]);
+        containerRight.appendChild(otherPlayersArray[5]);
+        containerRight.appendChild(otherPlayersArray[6]);
+        containerRight.appendChild(otherPlayersArray[7]);
+        break;
+      case 9:
+        // put at three left, three across top and three right
+        containerLeft.appendChild(otherPlayersArray[2]);
+        containerLeft.appendChild(otherPlayersArray[1]);
+        containerLeft.appendChild(otherPlayersArray[0]);
+        containerTop.appendChild(otherPlayersArray[3]);
+        containerTop.appendChild(otherPlayersArray[4]);
+        containerTop.appendChild(otherPlayersArray[5]);
+        containerRight.appendChild(otherPlayersArray[6]);
+        containerRight.appendChild(otherPlayersArray[7]);
+        containerRight.appendChild(otherPlayersArray[8]);
+        break;
+    }
+  }
+
+  function updateTable(table) {
+    if (table) {
+      // table can and will have multiple pots
+      showPots(table["pots"]);
+      showCommonCards(table["commonCards"]);
+      updatePlayerContributions(table["pots"]);
+    }
+  }
+
+  function showPots(potsObject) {
+    if (potsObject) {
+      let potHolder = document.getElementById('potHolder');
+      let keys = Object.keys(potsObject);
+      potHolder.innerHTML = "";
+      keys.forEach(function (key, index) {
+        let pot = potsObject[key];
+        let keys2 = Object.keys(pot.playerAmounts);
+        let potDiv = document.createElement('div');
+        potDiv.class = 'pot'
+        potDiv.id = 'pot' + index;
+        let total = 0;
+        keys2.forEach(function (key2) {
+          total = total + pot.playerAmounts[key2].amount;
+        })
+        potDiv.innerHTML = "Pot: " + total;
+        potHolder.appendChild(potDiv);
+      })
+    }
+  }
+  function activatePlayer(playersInfo, table) {
+    if (table["activeIndex"] !== 'undefined' && table["activeIndex"] != null) {
+      var activePlayer = playersInfo[table["activeIndex"]];
+      for (let i = 0; i < playersInfo.length; i++) {
+        var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
+        let playerFirstName = document.getElementById("player" + playersInfo[i]["playerId"] + 'lastname');
+        let playerLastName = document.getElementById("player" + playersInfo[i]["playerId"] + 'firstname');
+        if (playerBox) {
+          playerBox.classList.remove("ring");
+          playerBox.classList.remove("ring-offset-4")
+          playerBox.classList.remove("ring-cyan-500");
+          playerBox.classList.remove("ring-offset-green-700");
+          playerFirstName.classList.remove("text-cyan-500");
+          playerLastName.classList.remove("text-cyan-500");
+          if (playersInfo[i]["playerId"] == activePlayer.playerId) {
+            playerBox.classList.add("ring");
+            playerBox.classList.add("ring-offset-4");
+            playerBox.classList.add("ring-cyan-500");
+            playerBox.classList.add("ring-offset-green-700");
+            playerFirstName.classList.add("text-cyan-500");
+            playerLastName.classList.add("text-cyan-500");
           }
-        } else if (status == 'unstarted'){
-          // Show start button if game is unstarted
-          startGameBtn.classList.remove("hidden");
-        } else {
-          // status is some thing else
-          startGameBtn.classList.remove("hidden");
-          startGameBtn.classList.add("hidden");
         }
       }
     }
+  }
 
-    function updateResults(results){
-      // results is an array of winners for each pot
-      var resultsDiv = document.getElementById("results");
-      let tableDiv = document.getElementById('table');
-      if (results.length > 0){
-        table.classList.add("bg-gray-300");
-        table.classList.add("shadow-xl");
-        table.classList.add("rounded");
-        let dealButton = document.createElement('button');
-        let resultText = document.createElement('div');
-        resultText.className = "font-semibold text-gray-800 p-2 m-2"
-        dealButton.id = "nextHandBtn";
-        dealButton.className = "m-2 px-4 py-1 text-sm font-semibold rounded-full border border-purple-200 text-white bg-purple-600 border-transparent outline-none ring-2 ring-purple-600 ring-offset-2";
-        dealButton.type = "button";
-        dealButton.onclick = nextHand;
-        dealButton.innerHTML = "Deal";
-        let resultString = "";
-        results.forEach(function(potResult){
-          potResult.forEach(function(winner){
-            resultString = resultString + "Winner: " + winner.winner_name + "!<br>" + winner.amount + ' chips<br>' + 'Hand: ' + winner.winning_hand;
-          })
-        })
-        resultText.innerHTML = resultString;
-        resultsDiv.appendChild(resultText);
-        resultsDiv.appendChild(dealButton);
+  function showCommonCards(cardArray) {
+    // <div class="mx-auto max-w-md">
+    //     <div
+    //       class="inset-0 -ml-4 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md">
+    //       <div><strong>5</strong></div>
+    //       <div>
+    //         <svg class="mx-auto h-6 w-6 flex-none fill-sky-100 stroke-sky-500 stroke-2" stroke-linecap="round"
+    //           stroke-linejoin="round">
+    //           <circle cx="12" cy="12" r="11" />
+    //           <path d="m8 13 2.165 2.165a1 1 0 0 0 1.521-.126L16 9" fill="none" />
+    //         </svg>
+    //       </div>
+    //     </div>
+    //   </div>
+    let cardDiv = document.getElementById("commonCards");
+    cardDiv.innerHTML = ""; // clear list first
+    for (let i = 0; i < 5; i++) {
+      let newCard = document.createElement('div');
+      newCard.classList = "inset-0 -ml-4 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md";
+      if (i < cardArray.length) {
+        newCard.innerHTML = renderCard(cardArray[i], true);
+        newCard.classList.remove("bg-red-200");
+        newCard.classList.add("bg-white");
       } else {
-        resultsDiv.innerHTML = "";
-        table.classList.remove("bg-gray-300");
-        table.classList.remove("shadow-xl");
-        table.classList.remove("rounded");
+        newCard.innerHTML = "";
+        newCard.classList.remove("bg-white");
+        newCard.classList.add("bg-red-200");
       }
+      cardDiv.appendChild(newCard);
     }
+  }
 
-    function updateLastAction(lastActionString){
-      let lastActionDiv = document.getElementById('lastAction');
-      if (lastActionDiv){
-        lastActionDiv.innerHTML = lastActionString;
-      }
-    }
-
-    function updateAllPlayers(playersInfo, currentPlayerId){
-      let containerTop = document.getElementById('playersContainerTop');
-      let containerLeft = document.getElementById('playersContainerLeft');
-      let containerRight = document.getElementById('playersContainerRight');
-      containerTop.innerHTML = "";
-      containerLeft.innerHTML = "";
-      containerRight.innerHTML = "";
-      let selfContainer = document.getElementById('self');
-      selfContainer.innerHTML = "";
-      // cycle through each player, starting at self.
-      let startArrayPosition = playersInfo.map(function(o) { return o.playerId; }).indexOf(currentPlayerId);
-      let otherPlayers = [];
-      for (var i = startArrayPosition; i < playersInfo.length + startArrayPosition; i++) {
-        let j = i % playersInfo.length;
-        console.log("updating player at: ", j);
-        if (playersInfo[j]["playerId"] == currentPlayerId){
-          selfContainer.appendChild(renderPlayer(playersInfo[j]));
-        } else {
-          otherPlayers.push(renderPlayer(playersInfo[j]))
+  function updatePlayerContributions(pots) {
+    let elsArray = document.getElementsByClassName('playerinPot');
+    [].forEach.call(elsArray, function (div) {
+      let playerId = parseInt(div.id.split("player")[1].split("inPot")[0]);
+      div.innerHTML = "";
+      pots.forEach(pot => {
+        let pA = pot.playerAmounts[playerId];
+        if (pA && pA.amount) {
+          if (div.innerHTML == "") {
+            div.innerHTML = pA.amount;
+          } else {
+            div.innerHTML = div.innerHTML + ', ' + pA.amount;
+          }
         }
-      }
-      arrangePlayers(containerTop,containerLeft,containerRight, otherPlayers);
-      for (var i = 0; i < playersInfo.length; i++) {
-        updatePlayer(playersInfo[i]);
-      }
-    }
-
-    function updatePlayer(playerInfo) {
-            let playerId = playerInfo["playerId"];
-            var playerBox = document.getElementById("player" + playerId);
-            var chipLabel = document.getElementById("player" + playerId + "chips");
-            var firstNameLabel = document.getElementById("player" + playerId + "firstname");
-            var lastNameLabel = document.getElementById("player" + playerId + "lastname");
-            var buttonLabel = document.getElementById("player" + playerId + "button");
-            var smallBlindLabel = document.getElementById("player" + playerId + "smallBlind");
-            var bigBlindLabel = document.getElementById("player" + playerId + "bigBlind");
-            var handLabel = document.getElementById("player" + playerId + "hand"); 
-
-            if (playerBox){
-              if (playerInfo.handState == "FOLD" || playerInfo.gameState == "OUT"){
-                playerBox.classList.remove('bg-white');
-                playerBox.classList.remove('shadow-lg');
-                playerBox.classList.add('bg-slate-300');
-              } else {
-                playerBox.classList.remove('bg-slate-300');
-                playerBox.classList.add('shadow-lg');
-                playerBox.classList.add('bg-white');
-              }
-            }
-            if (chipLabel){
-                chipLabel.innerHTML = playerInfo["chips"];
-            }
-            if (firstNameLabel){
-                firstNameLabel.innerHTML = playerInfo["firstName"];
-            }
-            if (lastNameLabel){
-                lastNameLabel.innerHTML = playerInfo["lastName"];
-            }
-            if (buttonLabel){
-              if (playerInfo["button"]){
-                // Active look
-                buttonLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-gray-800 text-center text-white";
-              } else {
-                // Inactive look
-                buttonLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
-              }  
-            }
-            if (smallBlindLabel){
-              if (playerInfo["smallBlind"]){
-                smallBlindLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-blue-700 text-center text-white";
-              } else {
-                smallBlindLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
-              }
-            }
-            if (bigBlindLabel){
-              if (playerInfo["bigBlind"]){
-                bigBlindLabel.className = "rounded-full w-5 h-5 text-sm font-bold bg-yellow-500 text-center";
-              } else {
-                bigBlindLabel.className = "rounded-full w-5 h-5 text-sm bg-gray-100 text-center text-gray-300";
-              }
-            }
-            if (handLabel){
-              var handString = ""
-              if (playerInfo["hand"] && playerInfo["hand"].length > 1){
-                handString = renderCard(playerInfo["hand"][0]) + " " + renderCard(playerInfo["hand"][1]);
-                handLabel.innerHTML = handString;
-              }
-            }
-    }
-
-    function arrangePlayers(containerTop, containerLeft, containerRight, otherPlayersArray){
-      
-      let playersCount = otherPlayersArray.length;
-
-      switch (playersCount){
-        case 1:
-          // put at top middle of screen
-          containerTop.appendChild(otherPlayersArray[0]);
-          break;
-        case 2:
-          // put at upper left and upper right
-          containerTop.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[1]);
-          break;
-        case 3:
-          // put at mid left, upper middle, and mid right
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[1]);
-          containerRight.appendChild(otherPlayersArray[2]);
-          break;
-        case 4:
-          // put at mid left, two across top and mid right
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[1]);
-          containerTop.appendChild(otherPlayersArray[2]);
-          containerRight.appendChild(otherPlayersArray[3]);
-          break;
-        case 5:
-          // put at mid left, three across top and mid right
-          containerLeft.appendChild(otherPlayersArray[1]);
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[2]);
-          containerRight.appendChild(otherPlayersArray[3]);
-          containerRight.appendChild(otherPlayersArray[4]);
-          break;
-        case 6:
-          // put at two left, two across top and two right
-          containerLeft.appendChild(otherPlayersArray[1]);
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[2]);
-          containerTop.appendChild(otherPlayersArray[3]);
-          containerRight.appendChild(otherPlayersArray[4]);
-          containerRight.appendChild(otherPlayersArray[5]);
-          break;
-        case 7:
-          // put at two left, three across top and two right
-          containerLeft.appendChild(otherPlayersArray[1]);
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[2]);
-          containerTop.appendChild(otherPlayersArray[3]);
-          containerTop.appendChild(otherPlayersArray[4]);
-          containerRight.appendChild(otherPlayersArray[5]);
-          containerRight.appendChild(otherPlayersArray[6]);
-          break;
-        case 8:
-          // put at three left, two across top and three right
-          containerLeft.appendChild(otherPlayersArray[2]);
-          containerLeft.appendChild(otherPlayersArray[1]);
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[3]);
-          containerTop.appendChild(otherPlayersArray[4]);
-          containerRight.appendChild(otherPlayersArray[5]);
-          containerRight.appendChild(otherPlayersArray[6]);
-          containerRight.appendChild(otherPlayersArray[7]);
-          break;
-        case 9:
-          // put at three left, three across top and three right
-          containerLeft.appendChild(otherPlayersArray[2]);
-          containerLeft.appendChild(otherPlayersArray[1]);
-          containerLeft.appendChild(otherPlayersArray[0]);
-          containerTop.appendChild(otherPlayersArray[3]);
-          containerTop.appendChild(otherPlayersArray[4]);
-          containerTop.appendChild(otherPlayersArray[5]);
-          containerRight.appendChild(otherPlayersArray[6]);
-          containerRight.appendChild(otherPlayersArray[7]);
-          containerRight.appendChild(otherPlayersArray[8]);
-          break;
-      }
-    }
-
-    function updateTable(table){
-      if (table){
-        // table can and will have multiple pots
-        showPots(table["pots"]);
-        showCommonCards(table["commonCards"]);
-        updatePlayerContributions(table["pots"]);
-      }
-    } 
-
-    function showPots(potsObject){
-      if (potsObject){
-        let potHolder = document.getElementById('potHolder');
-        let keys = Object.keys(potsObject);
-        potHolder.innerHTML = "";
-        keys.forEach(function(key, index){
-          let pot = potsObject[key];
-          let keys2 = Object.keys(pot.playerAmounts);
-          let potDiv = document.createElement('div');
-          potDiv.class = 'pot'
-          potDiv.id = 'pot' + index;
-          let total = 0;
-          keys2.forEach(function(key2){
-            total = total + pot.playerAmounts[key2].amount;
-          })
-          potDiv.innerHTML = "Pot: " + total;
-          potHolder.appendChild(potDiv);
-        })
-      }
-    }
-    function activatePlayer(playersInfo, table){
-      if (table["activeIndex"] !== 'undefined' && table["activeIndex"] != null){
-        var activePlayer = playersInfo[table["activeIndex"]];
-        for (let i = 0; i < playersInfo.length; i++) {
-            var playerBox = document.getElementById("player" + playersInfo[i]["playerId"]);
-            let playerFirstName = document.getElementById("player" + playersInfo[i]["playerId"] + 'lastname');
-            let playerLastName = document.getElementById("player" + playersInfo[i]["playerId"] + 'firstname');
-            if (playerBox){
-                playerBox.classList.remove("ring");
-                playerBox.classList.remove("ring-offset-4")
-                playerBox.classList.remove("ring-cyan-500");
-                playerBox.classList.remove("ring-offset-green-700");
-                playerFirstName.classList.remove("text-cyan-500");
-                playerLastName.classList.remove("text-cyan-500");
-                if (playersInfo[i]["playerId"] == activePlayer.playerId) {
-                  playerBox.classList.add("ring");
-                  playerBox.classList.add("ring-offset-4");
-                  playerBox.classList.add("ring-cyan-500");
-                  playerBox.classList.add("ring-offset-green-700");
-                  playerFirstName.classList.add("text-cyan-500");
-                  playerLastName.classList.add("text-cyan-500");
-                }
-            } 
-        }
-      }
-    }
-    
-    function showCommonCards(cardArray){
-        let cardDiv = document.getElementById("commonCards"); 
-        cardDiv.innerHTML = ""; // clear list first
-        for (let i = 0; i < 5; i++) {
-            let newCard = document.createElement('div');
-            newCard.classList = "border border-white-600 rounded-small p-2 h-14 w-8 text-center m-4";
-            if (i < cardArray.length){
-              newCard.innerHTML = renderCard(cardArray[i], true);
-              newCard.classList.remove("bg-red-500");
-              newCard.classList.add("bg-white");
-              newCard.classList.add("shadow");
-            } else {
-              newCard.innerHTML = "";
-              newCard.classList.remove("bg-white");
-              newCard.classList.add("bg-red-500");
-              newCard.classList.add("checkered");
-             
-              newCard.classList.remove("shadow")
-            }
-            cardDiv.appendChild(newCard);
-        }
-    }
-
-    function updatePlayerContributions(pots){
-      let elsArray = document.getElementsByClassName('playerinPot');
-      [].forEach.call(elsArray, function (div) {
-        let playerId = parseInt(div.id.split("player")[1].split("inPot")[0]);
-        div.innerHTML = "";
-        pots.forEach(pot => {
-            let pA = pot.playerAmounts[playerId];
-            if (pA && pA.amount){
-              if (div.innerHTML == ""){
-                div.innerHTML = pA.amount;
-              } else {
-                div.innerHTML = div.innerHTML + ', ' + pA.amount;
-              }
-            }
-        })
       })
+    })
+  }
+
+  function renderCard(cardString, addBreak = false) {
+    var num = cardString.charAt(0);
+    var suit = cardString.charAt(1);
+    if (num == "T") {
+      num = "10";
     }
-
-    function renderCard(cardString, addBreak = false){
-      var num = cardString.charAt(0);
-      var suit = cardString.charAt(1);
-      if (num == "T"){
-        num = "10";
-      }
-      if (addBreak){
-        return (num + "</br>" + htmlSuit(suit))
-      } else {
-        return (num + htmlSuit(suit))
-      }
-    } 
-
-    function htmlSuit(suitString){
-      switch (suitString) {
-        case 'c':
-          return "♣";
-        case 'd':
-          return "🔸";
-        case 'h':
-          return "🧡";
-        case 's':
-          return "♠";
-        default:
-          console.log(`Sorry, no suit match for  ${suitString}.`);
-          return suitString;
-      }
+    if (addBreak) {
+      return (num + "</br>" + htmlSuit(suit))
+    } else {
+      return (num + htmlSuit(suit))
     }
+  }
 
-    function renderErrors(errorsArray){
-      let errorDiv = document.getElementById('errorsContainer');
-      if (errorsArray.length > 0){
-        errorDiv.classList.remove("hidden");
-        errorDiv.innerHTML = JSON.stringify(errorsArray);
-      } else {
-        errorDiv.innerHTML = "";
-        errorDiv.classList.remove("hidden");
-        errorDiv.classList.add("hidden");
-      }
+  function htmlSuit(suitString) {
+    switch (suitString) {
+      case 'c':
+        return "♣";
+      case 'd':
+        return "🔸";
+      case 'h':
+        return "🧡";
+      case 's':
+        return "♠";
+      default:
+        console.log(`Sorry, no suit match for  ${suitString}.`);
+        return suitString;
     }
+  }
 
-    function renderPlayer(player){
-      let playerDiv = document.createElement('div');
-      let playerLastAction = document.createElement('div');
-      let playerActive = document.createElement('div');
-      let playerHand = document.createElement('p');
-      let playerInPot = document.createElement('div');
-      let playerFirstName = document.createElement('div');
-      let playerLastName = document.createElement('div');
-      let playerPosition = document.createElement('div');
-      let playerButton = document.createElement('div');
-      let playerSmallBlind = document.createElement('div');
-      let playerBigBlind = document.createElement('div');
-      let playerChips = document.createElement('p');
-  
-      playerDiv.id = 'player' + player.playerId;
-      playerDiv.className = 'player-box p-2 w-28 h-28 mx-auto bg-white rounded-full text-center relative z-0';
-      playerLastAction.id = 'player' + player.playerId + 'lastAction';
-      playerLastAction.class = "rounded-full";
-      playerHand.id = 'player' + player.playerId + 'hand';
-      playerHand.className = 'relative w-full flex h-6 justify-center';
-      playerInPot.id = 'player' + player.playerId + 'inPot';
-      playerInPot.className = 'playerinPot absolute -right-4 -top-4 h-12 w-12 bg-green-900 border-green-700 border-4 rounded-full text-white text-semibold pt-2 text-center';
-      playerFirstName.id = 'player' + player.playerId + 'firstname';
-      playerFirstName.className = 'text-lg relative font-semibold -top-1 text-center';
-      playerLastName.id = 'player' + player.playerId + 'lastname';
-      playerLastName.className = 'text-xs uppercase relative -top-3 text-center';
-      playerChips.id = 'player' + player.playerId + 'chips';
-      playerChips.className = 'mx-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white relative -top-2';
-      playerPosition.id = 'player' + player.playerId + 'position';
-      playerPosition.className = 'flex gap-1 absolute left-0 justify-center w-full';
-      playerButton.id = 'player' + player.playerId + 'button';
-      playerButton.className = 'rounded-full w-1 h-1 text-center font-bold ring-2 ring-inset';
-      playerButton.innerHTML = "D";
-      playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
-      playerSmallBlind.className = 'rounded-full font-bold ring-2 ring-inset';
-      playerSmallBlind.innerHTML = "SB";
-      playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
-      playerBigBlind.className = ' rounded-full font-bold ring-2 ring-inset';
-      playerBigBlind.innerHTML = "BB";
-
-
-      // '<div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">'
-      //     <div id="player1name" class="text-xl font-medium"></div>
-      //     <p id="player1chips" class="text-slate-500"></p>
-      //     <p id="player1hand" class="text-slate-500"></p>
-      //     <div id="player1button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      //     <div id="player1smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      //     <div id="player1bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
-      // </div>'
-      
-      playerDiv.appendChild(playerLastAction);
-      playerDiv.appendChild(playerActive);
-      playerDiv.appendChild(playerInPot);
-      playerDiv.appendChild(playerHand);
-      playerDiv.appendChild(playerFirstName);
-      playerDiv.appendChild(playerLastName);
-      playerDiv.appendChild(playerChips);
-      playerPosition.appendChild(playerButton);
-      playerPosition.appendChild(playerSmallBlind);
-      playerPosition.appendChild(playerBigBlind);
-      playerDiv.appendChild(playerPosition);
-      return playerDiv;
+  function renderErrors(errorsArray) {
+    let errorDiv = document.getElementById('errorsContainer');
+    if (errorsArray.length > 0) {
+      errorDiv.classList.remove("hidden");
+      errorDiv.innerHTML = JSON.stringify(errorsArray);
+    } else {
+      errorDiv.innerHTML = "";
+      errorDiv.classList.remove("hidden");
+      errorDiv.classList.add("hidden");
     }
+  }
+
+  function renderPlayer(player) {
+    // <div class="relative m-2 flex-col bg-green-100 p-2 text-center">
+    //   <div class="">
+    //     <svg class="mx-auto h-6 w-6 flex-none fill-sky-100 stroke-sky-500 stroke-2" stroke-linecap="round"
+    //       stroke-linejoin="round">
+    //       <circle cx="12" cy="12" r="11" />
+    //       <path d="m8 13 2.165 2.165a1 1 0 0 0 1.521-.126L16 9" fill="none" />
+    //     </svg>
+    //   </div>
+    //   <div class="-mb-2 text-sm text-gray-400">Name</div>
+    //   <div class="">Pot</div>
+    //   <div class="absolute -bottom-2 -right-2 text-xs">Bet</div>
+    // </div>
+    // <div class="relative m-2 bg-green-100 p-2">Text</div>
+    let playerDiv = document.createElement('div');
+    let playerLastAction = document.createElement('div');
+    let playerActive = document.createElement('div');
+    let playerHand = document.createElement('p');
+    let playerInPot = document.createElement('div');
+    let playerFirstName = document.createElement('div');
+    let playerLastName = document.createElement('div');
+    let playerPosition = document.createElement('div');
+    let playerButton = document.createElement('div');
+    let playerSmallBlind = document.createElement('div');
+    let playerBigBlind = document.createElement('div');
+    let playerChips = document.createElement('p');
+
+    playerDiv.id = 'player' + player.playerId;
+    playerDiv.className = 'player-box p-2 w-28 h-28 mx-auto bg-white rounded-full text-center relative z-0';
+    playerLastAction.id = 'player' + player.playerId + 'lastAction';
+    playerLastAction.class = "rounded-full";
+    playerHand.id = 'player' + player.playerId + 'hand';
+    playerHand.className = 'relative w-full flex h-6 justify-center';
+    playerInPot.id = 'player' + player.playerId + 'inPot';
+    playerInPot.className = 'playerinPot absolute -right-4 -top-4 h-12 w-12 bg-green-900 border-green-700 border-4 rounded-full text-white text-semibold pt-2 text-center';
+    playerFirstName.id = 'player' + player.playerId + 'firstname';
+    playerFirstName.className = 'text-lg relative font-semibold -top-1 text-center';
+    playerLastName.id = 'player' + player.playerId + 'lastname';
+    playerLastName.className = 'text-xs uppercase relative -top-3 text-center';
+    playerChips.id = 'player' + player.playerId + 'chips';
+    playerChips.className = 'mx-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white relative -top-2';
+    playerPosition.id = 'player' + player.playerId + 'position';
+    playerPosition.className = 'flex gap-1 absolute left-0 justify-center w-full';
+    playerButton.id = 'player' + player.playerId + 'button';
+    playerButton.className = 'rounded-full w-1 h-1 text-center font-bold ring-2 ring-inset';
+    playerButton.innerHTML = "D";
+    playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
+    playerSmallBlind.className = 'rounded-full font-bold ring-2 ring-inset';
+    playerSmallBlind.innerHTML = "SB";
+    playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
+    playerBigBlind.className = ' rounded-full font-bold ring-2 ring-inset';
+    playerBigBlind.innerHTML = "BB";
+
+
+    // '<div id="player1" class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg items-center">'
+    //     <div id="player1name" class="text-xl font-medium"></div>
+    //     <p id="player1chips" class="text-slate-500"></p>
+    //     <p id="player1hand" class="text-slate-500"></p>
+    //     <div id="player1button" class="bg-white rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+    //     <div id="player1smallBlind" class="bg-blue rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+    //     <div id="player1bigBlind" class="bg-yellow rounded-xl ring-2 ring-pink-300 ring-inset"></div>
+    // </div>'
+
+    playerDiv.appendChild(playerLastAction);
+    playerDiv.appendChild(playerActive);
+    playerDiv.appendChild(playerInPot);
+    playerDiv.appendChild(playerHand);
+    playerDiv.appendChild(playerFirstName);
+    playerDiv.appendChild(playerLastName);
+    playerDiv.appendChild(playerChips);
+    playerPosition.appendChild(playerButton);
+    playerPosition.appendChild(playerSmallBlind);
+    playerPosition.appendChild(playerBigBlind);
+    playerDiv.appendChild(playerPosition);
+    return playerDiv;
+  }
 </script>
