@@ -515,7 +515,7 @@
     cardDiv.innerHTML = ""; // clear list first
     for (let i = 0; i < 5; i++) {
       let newCard = document.createElement('div');
-      newCard.classList = "inset-0 -ml-4 w-10 h-16 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-4 shadow-md";
+      newCard.classList = "text-center -ml-2 w-10 h-16 rounded-md border-4 border-white bg-red-200 bg-[url(/img/grid.svg)] bg-center p-2 shadow-md";
       if (i < cardArray.length) {
         newCard.innerHTML = renderCard(cardArray[i], true);
         newCard.classList.remove("bg-red-200");

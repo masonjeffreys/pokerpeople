@@ -22,22 +22,22 @@
       <label class="block text-gray-700 text-sm font-bold mb-2" for="firstName">
         First Name
       </label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="firstName" id="firstName" type="text" placeholder="first name" value="{{prevDetails.firstName}}">
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="firstName" id="firstName" type="text" placeholder="first name" value="{{user.firstName}}">
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="lastName">
         Last Name
       </label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="lastName" id="lastName" type="text" placeholder="last name" value="{{prevDetails.lastName}}">
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="lastName" id="lastName" type="text" placeholder="last name" value="{{user.lastName}}">
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="gameId">
         Table Code
       </label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="gameCode" id="gameCode" type="text" placeholder="abc" value="{{prevDetails.lastGameCode}}">
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="gameCode" id="gameCode" type="text" placeholder="abc" value="{{user.lastGameCode}}">
     </div>
     <div class="mb-4">
-      <button class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" name="joinGame">
+      <button class="w-full bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded" type="submit" name="joinGame">
         Join (or create) a table
       </button>
     </div>

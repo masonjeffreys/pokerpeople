@@ -9,7 +9,7 @@ exports.validate = (req, session) => {
     );
 
     // either have a user from DB or not
-    if (!user && (session.prevDetails == null || session.prevDetails == {})) {
+    if (!user) {
         // return false will be 'unauthenticated'
         console.log('not valid user');
         return { valid: false };
@@ -25,11 +25,11 @@ exports.validate = (req, session) => {
     
     return { valid: true,
         credentials: {
-            prevDetails:{
-                firstName: session.prevDetails.firstName,
-                lastName: session.prevDetails.lastName,
-                lastGameCode: session.prevDetails.lastGameCode
-            },
+            // prevDetails:{
+            //     firstName: session.prevDetails.firstName,
+            //     lastName: session.prevDetails.lastName,
+            //     lastGameCode: session.prevDetails.lastGameCode
+            // },
             user: {
                 id: user.id,
                 firstName: user.firstName,
@@ -54,7 +54,6 @@ exports.fillFormHomePage = (req, h) => {
     let prevDetails = {}
     
     if (req.auth.credentials && req.auth.credentials.prevDetails){
-        console.log("we hva")
         prevDetails = req.auth.credentials.prevDetails
     }
     

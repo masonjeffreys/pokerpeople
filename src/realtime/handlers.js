@@ -6,7 +6,7 @@ function getGame(){
     return Repo.getGame(module.parent.socket.handshake.query.gameCode, module.parent.server.app.games);
 }
 
-function getPlayer(game){
+function getPlayer(game, checkForCorrectPlayer = true){
     let idToAuth = module.parent.userId;
     let player;
 
@@ -17,7 +17,7 @@ function getPlayer(game){
         player = game.players.find(p => p.id == parseInt(idToAuth));
         if (game.testMode){
             player = game.players.find(p => p.id == desiredPlayerId);
-        } else {
+        } else if (checkForCorrectPlayer) {
             if (player.id == desiredPlayerId){
                 // Good!
             } else {
@@ -61,7 +61,7 @@ exports.startGame = () => {
 exports.toggleTestMode = () => {
     // Only called after players have sat at table.
     let game = getGame();
-    let player = getPlayer(game);
+    let player = getPlayer(game, false);
     if (game["testMode"]){
         game["testMode"] = false;
     } else {

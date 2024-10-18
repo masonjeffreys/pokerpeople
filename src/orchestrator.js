@@ -12,13 +12,12 @@ const Utils = require('./utils');
 const Solver = require('pokersolver').Hand;
 
 function startGame(game){
-    console.log("game starting now");
-
     // Check for at least two players?
     if (game.players.length < 2){
-        throw "Less than two players. Tough to play!"
+        console.log("Less than two players. Tough to play!")
+        return;
     }
-
+    console.log("game starting now");
     // Game state should advance to in-progress (from 'unstarted', 'in-progress', 'hand-complete', 'complete')
     // Maybe also 'muck-check' and 'auto-advance'
     game.status = 'in-progress';
