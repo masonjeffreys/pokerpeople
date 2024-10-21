@@ -67,11 +67,24 @@ describe('will track minRaise correctly',()=>{
     let game = newTestGame(Date.now());
     it('will start with correct data', () => {
         Orchestrator.startGame(game);
-        expect(game.table.minRaise).to.equal(10);
+        expect(game.table.minRaise).to.equal(10); // small blind is 5, big blind is 10, so first min raise is 10 on top of the big blind
         expect(Utils.playerMaxBet(game.table, game.players)).to.equal(10);
         Orchestrator.actionBet(game, getPlayer(game), 10 + 11 ); // UnderGun player bets 10 (call) + 11 (1 above min raise);
         expect(Utils.playerMaxBet(game.table, game.players)).to.equal(21);
         expect(game.table.minRaise).to.equal(11);
+    })
+})
+
+describe('will allow all-in even if less than min raise',()=>{
+    let game = newTestGame(Date.now());
+    it('will start with correct data', () => {
+        Orchestrator.startGame(game);
+        expect(game.table.minRaise).to.equal(10); // small blind is 5, big blind is 10, so first min raise is 10 on top of the big blind
+        expect(Utils.playerMaxBet(game.table, game.players)).to.equal(10);
+        Orchestrator.actionBet(game, getPlayer(game), 70); // UnderGun player bets 10 (call) + 11 (1 above min raise);
+        expect(Utils.playerMaxBet(game.table, game.players)).to.equal(70);
+        expect(game.table.minRaise).to.equal(60);
+        Orchestrator.actionAllIn(game, getPlayer(game)); // all in should be allowed even if doesn't meet min raise
     })
 })
 
@@ -84,8 +97,9 @@ describe('can handle a win',()=>{
     it('in a standard game', () => {
         Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls
         Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
-        Orchestrator.actionBet(game, getPlayer(game), 30); // Small blind bets 30 (5 call, 25 raise).
-        Orchestrator.actionBet(game, getPlayer(game), 50); // Big blind raises another 25
+        Orchestrator.actionBet(game, getPlayer(game), 30); // Small blind bets 30 (5 call up to bigblind of 10, 25 raise). Total 35.
+        expect(game.table.minRaise).to.equal(25);
+        Orchestrator.actionBet(game, getPlayer(game), 50); // Big blind in for 10, 25 to call + raises another 25.
         Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls.
         expect(game.table.street).to.equal('preflop');
         Orchestrator.actionCall(game, getPlayer(game)); // Small blind calls. Street ends.

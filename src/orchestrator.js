@@ -491,6 +491,7 @@ function getPlayerIdsLeft(game){
 function advanceStreet(game){
     // Set table to next street
     game.table.street = nextStreet(game.table.street);
+    game.table.minRaise = game.table.bigBlind;
     console.log("New street is: ", game.table.street);
     // Players have not acted in this new street
     game.players.forEach(function(player){
