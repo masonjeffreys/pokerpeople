@@ -229,7 +229,7 @@
     var resultsDiv = document.getElementById("results");
     let tableDiv = document.getElementById('table');
     if (results.length > 0) {
-      table.classList.add("bg-gray-300");
+      table.classList.add("p-2");
       table.classList.add("shadow-xl");
       table.classList.add("rounded");
       let dealButton = document.createElement('button');
@@ -243,7 +243,7 @@
       let resultString = "";
       results.forEach(function (potResult) {
         potResult.forEach(function (winner) {
-          resultString = resultString + "Winner: " + winner.winner_name + "!<br>" + winner.amount + ' chips<br>' + 'Hand: ' + winner.winning_hand;
+          resultString = resultString + "Winner: " + winner.winner_name + "!<br>" + winner.amount + ' chips<br>' + 'Hand: ' + winner.winning_hand + '<br>';
         })
       })
       resultText.innerHTML = resultString;
@@ -251,7 +251,7 @@
       resultsDiv.appendChild(dealButton);
     } else {
       resultsDiv.innerHTML = "";
-      table.classList.remove("bg-gray-300");
+      table.classList.remove("p-2");
       table.classList.remove("shadow-xl");
       table.classList.remove("rounded");
     }
@@ -475,12 +475,14 @@
         let playerFirstName = document.getElementById("player" + playersInfo[i]["playerId"] + 'lastname');
         let playerLastName = document.getElementById("player" + playersInfo[i]["playerId"] + 'firstname');
         if (playerBox) {
+          playerBox.classList.remove("blink");
           playerBox.classList.remove("ring");
           playerBox.classList.remove("ring-offset-4")
           playerBox.classList.remove("ring-cyan-500");
           playerFirstName.classList.remove("text-cyan-500");
           playerLastName.classList.remove("text-cyan-500");
           if (playersInfo[i]["playerId"] == activePlayer.playerId) {
+            playerBox.classList.add("blink");
             playerBox.classList.add("ring");
             playerBox.classList.add("ring-offset-4");
             playerBox.classList.add("ring-cyan-500");
