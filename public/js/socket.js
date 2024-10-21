@@ -47,6 +47,11 @@ function startGame(){
   socket.emit('start game');
 }
 
+function newGame(){
+  console.log("client requesting game reset");
+  socket.emit('new game');
+}
+
 function muckTrue(){
   socket.emit('muck', {muck: true});
 }

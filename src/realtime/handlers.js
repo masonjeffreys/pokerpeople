@@ -58,6 +58,17 @@ exports.startGame = () => {
     emitPrivateStateToEachPlayer(game);
 }
 
+exports.newGame = () => {
+    // Only called after a previous game is complete
+    console.log("new game");
+    let game = getGame();
+    let player = getPlayer(game);
+    Orchestrator.startGame(game);
+    console.log(game);
+    game.lastAction = player.prettyName() + " started New Game. Begin!";
+    emitPrivateStateToEachPlayer(game);
+}
+
 exports.toggleTestMode = () => {
     // Only called after players have sat at table.
     let game = getGame();

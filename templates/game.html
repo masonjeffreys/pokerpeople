@@ -10,7 +10,7 @@
     <p id="chips" class="glowing text-white text-center font-extrabold logo-1 text-2xl">
     </p>
     <div class="text-center text-white">
-      <button type="button" id="newGameBtn" onclick="startGame()"
+      <button type="button" id="newGameBtn" onclick="newGame()"
         class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Play
         again!</button>
     </div>
@@ -204,15 +204,17 @@
     winningScreen.classList.add("hidden");
     if (typeof (status) != 'undefined') {
       if (status == 'complete') {
+
         let winner = getLeader(players);
         winningScreen.classList.remove("hidden");
         let winnerName = document.getElementById('winnerName');
         let chips = document.getElementById('chips');
-        winnerName.innerHTML = winner.name;
+        winnerName.innerHTML = winner.firstName + ' ' + winner.lastName;
         chips.innerHTML = winner.chips + " chips!";
-        for (let i = 0; i < 10; i++) {
-          setTimeout(createFirework, fw_launch_rate * i);
-        }
+        // setting the fireworks seems to breack the code
+        // for (let i = 0; i < 10; i++) {
+        //   setTimeout(createFirework, fw_launch_rate * i);
+        // }
       } else if (status == 'unstarted') {
         // Show start button if game is unstarted
         startGameBtn.classList.remove("hidden");

@@ -167,6 +167,28 @@ describe('handles min bets correctly',()=>{
     })
 })
 
+describe('handles a bet larger than other players can match',()=>{
+    let game = newTestGame(Date.now());
+    // Remove chips from SmallBlind as if they have not been playing well
+    game.players[1].chips = 40;
+    // Remove chips from bigBlind
+    game.players[2].chips = 50;
+    // Remove chips from Under the gun player3 so they cannot make a full raise.
+    game.players[3].chips = 18;
+    Orchestrator.startGame(game);
+    // Player 3 calls
+    Orchestrator.actionCall(game, getPlayer(game));
+    // Dealer bets more than anyone can call.
+    Orchestrator.actionBet(game, getPlayer(game), 90)
+    it('will start side pots', () => {
+        expect(game.table.pots).to.equal({
+            id: 0,
+            playerAmounts: { '25': {amount:90}, '26': {amount:5}, '27': {amount:10}, '28': {amount:10} },
+            highBet: 90
+          });
+    })
+})
+
 describe('handles everyone going all in',()=>{
     let game = newTestGame(Date.now());
     Orchestrator.startGame(game);

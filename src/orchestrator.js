@@ -23,6 +23,7 @@ function startGame(game){
     game.status = 'in-progress';
     game.players.forEach(player => {
         player.gameState = "ACTIVE";
+        player.chips = game.table.startingChips; // good for resetting new games
     })
     setupHand(game);
 }
@@ -271,16 +272,6 @@ function isSomeoneAllIn(game){
     return anyoneAlreadyAllIn;
 }
 
-function maxCallableBet(game, playerToExclude){
-    let max = 0;
-    game.players.forEach(player => {
-        if (player.id != playerToExclude.id){
-            max = Math.max(max, player.chips + Utils.playerCurrentBet(game.table, player));
-        }
-    })
-    return max;
-}
-
 function  actionBet(game, player, amount){
     /// **** THIS IS NOT AN ALL IN BET -> That is handled in another function ****
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
@@ -302,8 +293,6 @@ function  actionBet(game, player, amount){
     else if (amount < callAmount + game.table.minRaise ){
         // bet wasn't large enough
         throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
-    } else if (amount > maxCallableBet(game,player)){
-        throw new Error("Bet is too big, no one can match it.");
     } else if (amount > player.chips){
         player.error = "You only have ", player.chips, " left."
     }
