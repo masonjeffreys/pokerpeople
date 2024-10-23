@@ -261,6 +261,7 @@ function equalizeFundsAndCreateSidePot(game) {
         }
     })
     if (allActed == false){
+        console.log("All players haven't acted. Willl not calc sidepots");
         return;
     }
 
@@ -420,6 +421,9 @@ function actionBet(game, player, amount) {
 function actionCall(game, player) {
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
+    if (game.table.pots.length > 1) {
+        equalizeFundsAndCreateSidePot(game)
+    }
     applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
     advanceGame(game);
     return;
@@ -441,6 +445,7 @@ function actionFold(game, player) {
     // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
     if (game.table.pots.length > 1) {
         maybeReturnExtraMoney(game);
+        equalizeFundsAndCreateSidePot(game)
     }
     advanceGame(game);
     return;
