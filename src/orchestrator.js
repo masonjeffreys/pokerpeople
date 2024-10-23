@@ -11,9 +11,9 @@ const Utils = require('./utils');
 // https://github.com/goldfire/pokersolver
 const Solver = require('pokersolver').Hand;
 
-function startGame(game){
+function startGame(game) {
     // Check for at least two players?
-    if (game.players.length < 2){
+    if (game.players.length < 2) {
         console.log("Less than two players. Tough to play!")
         return;
     }
@@ -28,16 +28,16 @@ function startGame(game){
     setupHand(game);
 }
 
-function nextStreet(currentStreet){
+function nextStreet(currentStreet) {
     return STREETS[STREETS.indexOf(currentStreet) + 1] || STREETS[0]
 }
 
-function addPlayerToGame(game, player){
+function addPlayerToGame(game, player) {
     // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
     let alreadyExists = game.players.find(
         (p) => (p.id === parseInt(player.id))
     );
-    if (alreadyExists){
+    if (alreadyExists) {
         console.log("player is already in the game");
         return game.players;
     } else {
@@ -55,11 +55,46 @@ function addPlayerToGame(game, player){
     }
 }
 
-function nextHand(game){
+function nextHand(game) {
     setupHand(game);
 }
 
-function setupHand(game){
+bets = [{ 'jeff': 20 }, { 'andrew': 15 }]
+function calcSidePots(bets) {
+    var prevPotValue = 0;
+    var result = []
+    // Sort the bets
+    var ascBets = bets.sort(function (a, b) { return Object.values(a)[0] - Object.values(b)[0] });
+
+    for (let i = 0; i < ascBets.length; i++) {
+        var playerBet = ascBets[i]; // {'jeff':30}
+        var potList = [];
+        var potValue = Object.values(playerBet)[0] - prevPotValue;
+        console.log(prevPotValue)
+        prevPotValue = potValue;
+
+        // cycle through each player and subtract this amount if the player has that amount and add him to the pot
+        for (let j = 0; j < ascBets.length; j++) {
+            playerName = Object.keys(ascBets[j])[0];// name of player
+            val = Object.values(playerBet)[0]; // value of bet
+            console.log(playerName);
+
+            if (Object.values(ascBets[j])[0] >= val) {
+                Object.values(ascBets[j])[0] = Object.values(ascBets[j])[0] - playerBet.val;
+                potList.push(playerName);
+            }
+
+        }
+        console.log("pot list");
+        console.log(potList);
+        o = {}
+        o[potValue] = potList
+        result.push(o);
+    }
+    return result;
+}
+
+function setupHand(game) {
     // EVERY new hand:
     // Reset 'acted in Street' prop that indicates whether player has acted in the current street
     // Clear player hand
@@ -69,8 +104,8 @@ function setupHand(game){
     // Make small and big blind bets
     // Shuffle deck
     // Deal 2 cards to each active player
-    
-    game.players.forEach(function(player){
+
+    game.players.forEach(function (player) {
         player.actedInStreet = false;
         player.clearHand();
         player.button = false;
@@ -84,14 +119,14 @@ function setupHand(game){
     // Not sure whether to set button on player or table or both?
     // Depends how people are allowed to join/leave the game?
     game.players[game.table.dealerPosition].button = true;
-    
+
     game.table.resetPots();
     game.table.clearCommonCards();
     // Reset results
     game.lastAction = "Dealt new hand.";
     game.results = [];
     game.freeAdvance = false;
-    
+
     // Set the min bet (or min raise on top of a bet)
     // for the betting round to be equal to the big blind
     game.table.minRaise = game.table.bigBlind;
@@ -105,7 +140,7 @@ function setupHand(game){
     Utils.dealOne(game.players, game.deck, game.table.dealerPosition + 1);
 }
 
-function makeBlindBets(game){
+function makeBlindBets(game) {
     // Get Indices for various players
     let smallBlindIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
     game.players[smallBlindIndex].smallBlind = true;
@@ -124,7 +159,37 @@ function makeBlindBets(game){
     console.log("*** after blinds, active index is ", game.table.activeIndex);
 }
 
-function applyBet(game, playerIndex, amount){
+function applyBet(game, playerIndex, amount) {
+    // cover two scenarios
+    // 1. standard bet, one pot
+    // 2. bet over top of all in
+    // only hit this function if player is not going all in.
+    // Assume bet amount is valid per the game state before this function is called.
+    // If someone is all in already, may need side pots
+    let anyoneAlreadyAllIn = isSomeoneAllIn(game);
+    // call amount is sum of amounts needed to call each pot
+    let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]);
+    let callAmounts = Utils.getCallAmounts(game.table, game.players, game.players[playerIndex]);
+
+    let raiseAmount = amount - callAmount;
+    if (raiseAmount > game.table.minRaise) {
+        console.log("New min raise: ", raiseAmount);
+        game.table.minRaise = raiseAmount;
+    }
+
+    game.table.addBet(game.players[playerIndex].id, amount, game.table.pots.length - 1);
+    game.players[playerIndex].makeBet(amount);
+
+    // if (anyoneAlreadyAllIn){
+    //     // might have side pots
+    //     console.log("someone all in");
+    //     equalizeFundsAndCreateSidePot(game);
+    //     console.log("pots are");
+    //     console.log(game.table.pots);
+    // }
+}
+
+function applyBetOld(game, playerIndex, amount) {
     // Assume bet amount is valid per the game state before this function is called.
 
     // Player makes bet
@@ -134,29 +199,29 @@ function applyBet(game, playerIndex, amount){
     let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]); // single call amount
     console.log("Call amounts by pot are: ", callAmounts);
     console.log("Placing bet of: ", amount);
-    
+
     let raiseAmount = amount - callAmount;
-    if (raiseAmount > game.table.minRaise){
+    if (raiseAmount > game.table.minRaise) {
         console.log("New min raise: ", raiseAmount);
-        game.table.minRaise = raiseAmount; 
+        game.table.minRaise = raiseAmount;
     }
 
     let amountRemaining = amount;
-    callAmounts.forEach(function(ca,index){
-        if (index == game.table.pots.length - 1 && amountRemaining > 0){
+    callAmounts.forEach(function (ca, index) {
+        if (index == game.table.pots.length - 1 && amountRemaining > 0) {
             // last Pot. Drop all money here
             console.log("option 1");
             game.table.addBet(game.players[playerIndex].id, amountRemaining, index);
             amountRemaining = 0;
-        } else if (ca > 0 && amountRemaining >= ca){
+        } else if (ca > 0 && amountRemaining >= ca) {
             console.log("option 2");
             // Need to call the pot and can make the call
             game.table.addBet(game.players[playerIndex].id, ca, index);
             amountRemaining = amountRemaining - ca;
-        } else if (ca == 0){
+        } else if (ca == 0) {
             // if call amount is 0, don't add anything. (except if it's the last pot which will be caught by option 1)
             console.log("option 3");
-        } else if (amountRemaining > 0){
+        } else if (amountRemaining > 0) {
             console.log("option 4");
             // not the last pot, but can't cover the call. Drop all money here
             // also triggered if call amount is 0
@@ -173,7 +238,7 @@ function applyBet(game, playerIndex, amount){
     game.players[playerIndex].makeBet(amount);
 }
 
-function equalizeFundsAndCreateSidePot(game, allInTotal){
+function equalizeFundsAndCreateSidePot(game) {
     // Example: amount to call in main pot was $10 and side pot was $20. Last player can only add $15 by going all-in.
     // $15 is the allInTotal in this case
     // before this function, bet of $15 was placed at $10 in main pot, $5 in side pot
@@ -187,13 +252,11 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
 
     // Do we ever need to adjust more than the current pot and the new side pot? Yes -> The nth player may go all-in with only $1
     // goal is to put player amounts in correct pots
-    
-    let playerCurrentBets = {}; // object of playerCurrentBets
 
     let sortableList = [];
-    game.players.forEach(player=>{
-        playerCurrentBets[player.id] = {amount: Utils.playerCurrentBetInt(game.table, player)};
-        sortableList.push({id: player.id, amount: Utils.playerCurrentBetInt(game.table, player)})
+    game.players.forEach(player => {
+
+        sortableList.push({ id: player.id, amount: Utils.playerCurrentBetInt(game.table, player), status: player.handState })
     })
 
     // Sort in ascending order
@@ -201,52 +264,79 @@ function equalizeFundsAndCreateSidePot(game, allInTotal){
         return a.amount - b.amount;
     });
 
+    // [
+    //     { id: 4, amount: 10, status: 'FOLD' },
+    //     { id: 1, amount: 40, status: 'ALLIN' },
+    //     { id: 2, amount: 40, status: 'IN' },
+    //     { id: 3, amount: 80, status: 'IN' }
+    //   ]
+
     let newPots = [] // {id: 0, highBet: 10, playerAmounts: {1:{amount: 10}}}
 
-    sortableList.forEach(i => {
-        let pcb = playerCurrentBets[i.id];
-        // Go through objects like  2: {amount: 10}, 3: {amount: 10}, 8: {amount: 40}
-        // if pot already exists for this amount, contribute to that pot
-        let amountRemaining = pcb.amount;
-        newPots.forEach(pot => {
-            if (amountRemaining >= pot.highBet){
-                pot.playerAmounts[i.id] = {amount: pot.highBet}
-                amountRemaining = amountRemaining - pot.highBet;
-            }
-        })
-        if (amountRemaining > 0){
-            let playerId = i.id;
-            newPots.push({
-                id: newPots.length,
-                highBet: amountRemaining,
-                playerAmounts: {
-                    [playerId] : {amount: amountRemaining}
+    sortableList.forEach(p => {
+        console.log("status: ", p.id, p.status, p.amount);
+        if (p['status'] == "IN" || p['status'] == "ALLIN") {
+            // we have an active player. with an amount e.g. 40
+            playerAmounts = {}
+            potAmount = p.amount;
+            potTotal = 0;
+            sortableList.forEach(p2 => {
+                if (p2.amount == 0) {
+                    // do nothing
                 }
+                else if (p2.amount < potAmount) {
+                    // must be a folded player or another all in player
+                    potTotal = potTotal + p2.amount;
+                    playerAmounts[p2.id] = { amount: p2.amount }
+                    p2.amount = 0;
+                }
+                else if (p2.amount >= potAmount) {
+                    // add money to pot, take away from player, and add player in pot (if active)
+                    potTotal = potTotal + potAmount;
+                    p2.amount = p2.amount - potAmount;
+                    playerAmounts[p2.id] = { amount: potAmount }
+                    
+                }
+
             })
+            console.log("player amounts");
+            console.log(playerAmounts);
+
+            if (potTotal > 0) {
+                // create new pot
+                newPots.push({
+                    total: potTotal,
+                    id: newPots.length,
+                    highBet: potAmount,
+                    playerAmounts: playerAmounts
+                })
+            }
         }
+
     })
+
     game.table.pots = newPots;
 }
 
-function maybeReturnExtraMoney(game){
+function maybeReturnExtraMoney(game) {
     // A side pot has collapsed if there are 0 players who are not current with bet and still have chips and haven't folded.
     // That person gets all chips in the last pot
     let lastPot = game.table.pots[game.table.pots.length - 1];
     let lastPotBet = Utils.maxBetForPot(lastPot);
     let eligiblePlayerIds = [];
     game.players.forEach(p => {
-        if (p.handState != "FOLD"){
+        if (p.handState != "FOLD") {
             let playerBetInPot = Utils.playerBetForPot(lastPot, p);
-            if (playerBetInPot < lastPotBet && p.chips > 0){
+            if (playerBetInPot < lastPotBet && p.chips > 0) {
                 eligiblePlayerIds.push(p.id);
-            } else if (playerBetInPot == lastPotBet){
+            } else if (playerBetInPot == lastPotBet) {
                 // This would be the potential winner
                 eligiblePlayerIds.push(p.id);
             }
         }
     })
-   
-    if (eligiblePlayerIds.length == 1){
+
+    if (eligiblePlayerIds.length == 1) {
         // return bet and destroy pot
         let returnAmount = Utils.potTotal(lastPot);
         let player = game.players.find(p => p.id == eligiblePlayerIds[0]);
@@ -262,62 +352,61 @@ function maybeReturnExtraMoney(game){
     return;
 }
 
-function isSomeoneAllIn(game){
+function isSomeoneAllIn(game) {
     let anyoneAlreadyAllIn = false;
     game.players.forEach(player => {
-        if (player.handState == "ALLIN"){
+        if (player.handState == "ALLIN") {
             anyoneAlreadyAllIn = true;
         }
     })
     return anyoneAlreadyAllIn;
 }
 
-function  actionBet(game, player, amount){
+function actionBet(game, player, amount) {
+    console.log("Player ", player.id, " is betting ", amount);
     /// **** THIS IS NOT AN ALL IN BET -> That is handled in another function ****
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
     // this is essentially a raise action (range restricted to ensure this) but not an all-in
     // add logic here to not let the player 
-    if (amount == player.chips){
+    if (amount == player.chips) {
         // should move this to be handled by the 'all-in' action for more clarity.
         throw new Error("Player attempted to go all in, but the received action was 'bet' ");
     }
-    else if (amount == 0){
+    else if (amount == 0) {
         // should move this to be handled by the 'check' action for more clarity.
         throw new Error("Player attempted to check, but the received action was 'bet' ");
     }
-    else if (amount == callAmount){
+    else if (amount == callAmount) {
         // should move this to be handled by the 'call' action for more clarity.
         throw new Error("Player attempted to check, but the received action was 'bet' ");
     }
-    else if (amount < callAmount + game.table.minRaise ){
+    else if (amount < callAmount + game.table.minRaise) {
         // bet wasn't large enough
         throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
-    } else if (amount > player.chips){
+    } else if (amount > player.chips) {
         player.error = "You only have ", player.chips, " left."
     }
     else {
         // We now have a valid raise for sure!
         // If someone has already gone all-in on this pot already, we must:
-        // 1. apply the call amount to the current pot
-        // 2. create a new pot.
-        // 3. bet the rest of the money in the new pot
+        // 1. Check to see if bet exceeds all-in amount. If so, we raise
         // Record that player has acted in street (used for later determination of when the street is over)
-        player.actedInStreet = true;
-        if (anyoneAlreadyAllIn){
-            applyBet(game, game.table.activeIndex, callAmount);
-            game.table.addPot();
-            applyBet(game, game.table.activeIndex, amount - callAmount);
+        if (anyoneAlreadyAllIn) {
+            console.log("Raising with someone already all in");
+            applyBet(game, game.table.activeIndex, amount);
+            equalizeFundsAndCreateSidePot(game);
         } else {
-            // Standard raise. Will not create side pot until it is called.
+            // Standard bet
             applyBet(game, game.table.activeIndex, amount);
         }
+        player.actedInStreet = true;
         advanceGame(game);
     }
     return;
 }
 
-function actionCall(game, player){
+function actionCall(game, player) {
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
     applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
@@ -325,7 +414,7 @@ function actionCall(game, player){
     return;
 }
 
-function actionCheck(game, player){
+function actionCheck(game, player) {
     // Essentially no change. Just move to next position
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
@@ -333,20 +422,20 @@ function actionCheck(game, player){
     return;
 }
 
-function actionFold(game, player){
+function actionFold(game, player) {
     // Change player state and advance to next position
     player.handState = "FOLD"
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
     // If there are multiple pots, a fold could mean we have to give money back to a player and collapse a side pot
-    if (game.table.pots.length > 1){
+    if (game.table.pots.length > 1) {
         maybeReturnExtraMoney(game);
     }
     advanceGame(game);
     return;
 }
 
-function actionMuck(game, player, muck){
+function actionMuck(game, player, muck) {
     // Winnings have already been distributed?
     // this will display results only and then move to next hand
 
@@ -354,7 +443,7 @@ function actionMuck(game, player, muck){
     // if muck is true, we only want to show the winning player the result
     game.results = calculateWinners(game);
 
-    if (muck){
+    if (muck) {
         game.results[0][0].winning_hand = "hidden";
     }
 
@@ -364,38 +453,40 @@ function actionMuck(game, player, muck){
     game.table.activeIndex = null;
 }
 
-function actionAllIn(game, player){
+function actionAllIn(game, player) {
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     // call amount is sum of amounts needed to call each pot
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
-    
+
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
 
     // Player is all in. Any bet amount is legal here.
-    
+
     let amount = player.chips;
     player.handState = "ALLIN";
-    game.table.playerAllIn = player.playerId;
+    game.table.playerAllIn = player.id;
+    console.log("player is ", player.id);
     console.log("call amouont is ", callAmount, ", all-in pushed in ", amount);
 
     // Now decide if we need to immediately create a side pot or not
-    if (amount < callAmount){
+    if (amount < callAmount) {
+        // Player went all in but couldn't match the call amount so we
         // siphon some funds off of the current pot and start a side pot
         console.log("Equalizing funds for new side pot since amount bet was ", amount, " and call amount was ", callAmount);
         applyBet(game, game.table.activeIndex, amount);
         equalizeFundsAndCreateSidePot(game);
     } else {
-        // We have a raise.  Definitely have a side pot
-        if (anyoneAlreadyAllIn){
+        if (anyoneAlreadyAllIn) {
+            // We have a raise.  Definitely have a side pot
             console.log(" --- someones already all in");
             applyBet(game, game.table.activeIndex, callAmount);
-            if (amount - callAmount > 0 ){
+            if (amount - callAmount > 0) {
                 game.table.addPot();
             }
             applyBet(game, game.table.activeIndex, amount - callAmount);
         } else {
-            console.log(" --- no one all in");
+            console.log(" --- no one previously all in");
             // Standard all-in bet. Will not create side pot until it is called.
             applyBet(game, game.table.activeIndex, amount);
         }
@@ -403,29 +494,29 @@ function actionAllIn(game, player){
     advanceGame(game);
 }
 
-function advanceGame(game){
+function advanceGame(game) {
     // After a player takes some action, need to evaluate game state:
 
     // - hand could be over and we need to check for mucking (someone just folded)
     // - hand needs to continue but betting is over? -> cover this through normal flow
     // - street could be over
     // - OR we just need to advance to the next player
-    
-    if (winByFolding(game)){
+
+    if (winByFolding(game)) {
         game.status = 'muck-check';
         // set active index to player who needs to say whether to muck or not
         let activeId = getPlayerIdsLeft(game)[0];
-        game.players.forEach(function(player, index){
-            if (player.id == activeId){
+        game.players.forEach(function (player, index) {
+            if (player.id == activeId) {
                 game.table.activeIndex = index;
             }
         })
         console.log("Time to check muck check: ", game.status);
-    } else if (Utils.isBettingComplete(game.table, game.players)){
+    } else if (Utils.isBettingComplete(game.table, game.players)) {
         game.status = 'auto-advance';
         console.log("Betting complete");
         advanceStreet(game);
-    } else if (Utils.isStreetComplete(game.table, game.players)){
+    } else if (Utils.isStreetComplete(game.table, game.players)) {
         console.log("Completed street: ", game.table.street);
         advanceStreet(game);
     } else {
@@ -435,37 +526,37 @@ function advanceGame(game){
     }
 }
 
-function isGameComplete(game){
+function isGameComplete(game) {
     // Game is complete if game status is between-hands AND
     // only 1 player is active and still has chips
     let remainingPlayers = 0;
-    game.players.forEach(function(player){
-        if (player.gameState == 'ACTIVE'){
+    game.players.forEach(function (player) {
+        if (player.gameState == 'ACTIVE') {
             remainingPlayers = remainingPlayers + 1;
         }
     })
     return (remainingPlayers <= 1);
 }
 
-function winByFolding(game){
+function winByFolding(game) {
     // If there is only 1 pot, an outright win by folding
     // occurs if allPlayersHaveActed and only 1 hasn't folded.
 
     // If there are side pots:
     // Folding can only collapse the last pot, not provide an outright win 
-    if (game.table.pots.length == 1){
+    if (game.table.pots.length == 1) {
         return (getPlayerIdsLeft(game).length == 1);
     } else {
         return false;
     }
 }
 
-function getPlayerIdsLeft(game){
+function getPlayerIdsLeft(game) {
     let playersLeft = [];
-    game.players.forEach(function(player){
-        if (player.handState == "FOLD"){
+    game.players.forEach(function (player) {
+        if (player.handState == "FOLD") {
             console.log("Player ", player.id, " is folded.");
-        } else if (player.handState == "ALLIN"){
+        } else if (player.handState == "ALLIN") {
             console.log("Player ", player.id, " is all-in.");
             playersLeft.push(player.id);
         }
@@ -477,18 +568,18 @@ function getPlayerIdsLeft(game){
     return playersLeft;
 }
 
-function advanceStreet(game){
+function advanceStreet(game) {
     // Set table to next street
     game.table.street = nextStreet(game.table.street);
     game.table.minRaise = game.table.bigBlind;
     console.log("New street is: ", game.table.street);
     // Players have not acted in this new street
-    game.players.forEach(function(player){
+    game.players.forEach(function (player) {
         player.actedInStreet = false;
     })
     // Set starting player to 'left-of-dealer'
     game.table.activeIndex = Utils.nextValidPlayerIndex(game.players, game.table.dealerPosition);
-    if (typeof(game.table.activeIndex) == 'undefined'){
+    if (typeof (game.table.activeIndex) == 'undefined') {
         // no action needs to occur, just keep showing results
         console.log("can freely advance");
         game.freeAdvance = true;
@@ -498,12 +589,12 @@ function advanceStreet(game){
 
     let ret = null;
 
-    switch(game.table.street){
+    switch (game.table.street) {
         case 'flop':
             ret = game.deck.take();
             game.deck = ret.deck;
             game.table.addBurnedCard(ret.card);
-            for (let i = 0; i < 3; i++){
+            for (let i = 0; i < 3; i++) {
                 ret = game.deck.take();
                 game.deck = ret.deck;
                 game.table.addCommonCard(ret.card);
@@ -531,7 +622,7 @@ function advanceStreet(game){
             game.results = calculateWinners(game);
             distributeWinnings(game, game.results); // modifies the results array
             deactivatePlayersWithoutChips(game);
-            if (isGameComplete(game)){
+            if (isGameComplete(game)) {
                 game.status = 'complete';
             } else {
                 game.status = 'hand-complete';
@@ -543,12 +634,12 @@ function advanceStreet(game){
     }
 }
 
-function playerIdsInPot(pot, players){
+function playerIdsInPot(pot, players) {
     let playerIdsInPot = [];
-    players.forEach(function(player){
-        if (player.handState == "FOLD"){
+    players.forEach(function (player) {
+        if (player.handState == "FOLD") {
             // player folded so they definitely can't win
-        } else if (player.gameState == "ACTIVE" && Utils.playerInPot(pot, player)){
+        } else if (player.gameState == "ACTIVE" && Utils.playerInPot(pot, player)) {
             // player is still in (i.e. hasn't left the table)
             playerIdsInPot.push(player.id);
         } else {
@@ -559,17 +650,17 @@ function playerIdsInPot(pot, players){
     return playerIdsInPot;
 }
 
-function calculateWinners(game){
+function calculateWinners(game) {
     // cycle through pots since we may have to handle multiple pots
     // game.results is an array of arrays matching with pots
     let resultsArray = [];
-    game.table.pots.forEach(function(pot, index){
+    game.table.pots.forEach(function (pot, index) {
         resultsArray.push(calculatePotWinner(game.table, pot, index, game.players));
     })
     return resultsArray;
 }
 
-function calculatePotWinner(table, pot, potIndex, players){
+function calculatePotWinner(table, pot, potIndex, players) {
     // for a single pot, find winner (or multiple winners for a tie)
     // need to handle win by folding as well
 
@@ -588,11 +679,11 @@ function calculatePotWinner(table, pot, potIndex, players){
     let solutions = [];
 
     idsInPot.forEach(pId => {
-        let player = Utils.getByAttributeValue(players,"id", pId);
-        handsByPlayer.push({player: player, hand: player.hand.concat(table.commonCards)})
+        let player = Utils.getByAttributeValue(players, "id", pId);
+        handsByPlayer.push({ player: player, hand: player.hand.concat(table.commonCards) })
     })
 
-    handsByPlayer.forEach(function(h, i){
+    handsByPlayer.forEach(function (h, i) {
         let solution = Solver.solve(h.hand);
         solution.index = i;
         solutions.push(solution);
@@ -602,9 +693,9 @@ function calculatePotWinner(table, pot, potIndex, players){
     let winnersCount = winningHands.length;
     console.log("*** handsByPlayer are ", handsByPlayer);
     console.log("*** winningHands are ", winningHands);
-    winningHands.forEach(function(winningHand){
+    winningHands.forEach(function (winningHand) {
         let winningPlayer = handsByPlayer[winningHand.index].player
-        let winningAmount = potTotal/winnersCount;
+        let winningAmount = potTotal / winnersCount;
         resultsList.push({
             winner_id: winningPlayer.id,
             winner_name: winningPlayer.prettyName(),
@@ -620,20 +711,20 @@ function calculatePotWinner(table, pot, potIndex, players){
     return resultsList;
 }
 
-function deactivatePlayersWithoutChips(game){
+function deactivatePlayersWithoutChips(game) {
     game.players.forEach(player => {
-        if (player.chips == 0){
+        if (player.chips == 0) {
             player.gameState = "OUT";
         }
     })
 }
 
-function distributeWinnings(game, resultsArray){
+function distributeWinnings(game, resultsArray) {
     //
-    resultsArray.forEach(function(potResult){
-        potResult.forEach(function(result){
+    resultsArray.forEach(function (potResult) {
+        potResult.forEach(function (result) {
             let winningPlayer = game.players.find(p => p.id == result.winner_id);
-            if (winningPlayer){
+            if (winningPlayer) {
                 winningPlayer.wins(result.amount);
             } else {
                 console.log("winning player not found with id ", result.winner_id);
@@ -656,3 +747,4 @@ module.exports.actionAllIn = actionAllIn;
 module.exports.actionCheck = actionCheck;
 module.exports.actionMuck = actionMuck;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
+module.exports.calcSidePots = calcSidePots;
