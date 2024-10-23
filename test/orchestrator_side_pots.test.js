@@ -39,103 +39,88 @@ function newTestGame(gameCode){
 }
 
 
-// describe('handles side pot craziness',()=>{
-//     let game = newTestGame(Date.now());
-//     // Dealer and SB have 100 chips
-//     game.players[2].chips = 85; // BB has 15 less
-//     game.players[3].chips = 40; // Player3 (under gun) has short stack: 40.
-//     Orchestrator.startGame(game);
-//     Orchestrator.actionAllIn(game, getPlayer(game)); // Player 3 is all in. D, SB, BB haven't acted
+describe('handles side pot craziness',()=>{
+    let game = newTestGame(Date.now());
+    Orchestrator.startGame(game);
+    // Dealer and SB have 100 chips
+    game.players[2].chips = 75; // BB has 85 total (10 in pot)
+    game.players[3].chips = 40; // Player3 (under gun) has short stack: 40.
 
-//     it('will allow a call - no side pot', () => {
-//         Orchestrator.actionCall(game, getPlayer(game)); // Dealer calls - in for 40.
-//         // Total is 40 + 5 + 10 + 40
-//         expect(game.table.pots.length).to.equal(1);
-//         expect(Utils.potTotal(game.table.pots[0])).to.equal(95);
-//     })
+    it('will allow a call - no side pot', () => {
+        Orchestrator.actionAllIn(game, getPlayer(game)); // Player 3 is all in. D, SB, BB haven't acted
+        Orchestrator.actionCall(game, getPlayer(game)); // Dealer calls - in for 40.
+        // Total is 40 + 5 + 10 + 40
+        expect(game.table.pots.length).to.equal(1);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(95);
+    })
 
-//     it('will allow a bet and create a first side pot', () => {
-//         Orchestrator.actionAllIn(game, getPlayer(game)); // Small blind goes all in - 100 in.
-//         // This is a raise above previous all-in
-//         // So we have a side pot:
-//         // Pot1 is currently 40 + 40 + 10 + 40 = 130
-//         // Pot2 is (100-40) = 60
-//         expect(game.table.pots.length).to.equal(2);
-//         expect(Utils.potTotal(game.table.pots[0])).to.equal(130);
-//         expect(Utils.potTotal(game.table.pots[1])).to.equal(60);
-//     })
+    it('will allow a bet and not create a side pot', () => {
+        Orchestrator.actionAllIn(game, getPlayer(game)); // Small blind goes all in - 100 in.
+        // This is a raise above previous all-in, so we would have a side pot except that not all players have acted
+        // So we have a side pot:
+        // Pot1 is currently 40 + 100 + 10 + 40 = 190
+        expect(game.table.pots.length).to.equal(1);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(190);
+    })
 
-//     it('will allow another, lower, all in and retroactively create a second side pot', () => {
-//         // BigBlind only has 75 chips left (already has 10 in pot).
-//         // BigBlind goes all in. His first 30 calls the first pot.
-//         // Other 45 go against side pot (60) but can't call it fully, so...
-//         // We need to pull 15 from SmallBlind out of pot 2 and create pot 3.
-//         Orchestrator.actionAllIn(game, getPlayer(game));
-//         expect(game.table.pots.length).to.equal(3);
-//         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
-//         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
-//         expect(Utils.potTotal(game.table.pots[2])).to.equal(15);
-//         // That does not complete the street, cause BigBlind has reraised
-//         // Action should be to the dealer, the only person who can bet against BigBlind
-//         expect(game.table.street).to.equal('preflop');
-//         expect(game.table.activeIndex).to.equal(0);
-//     })
+    it('will allow another, lower, all in and retroactively create a second side pot', () => {
+        // BigBlind goes all in with 75 chips left (already has 10 in pot).
+        // 40 + 100 + 85 + 40 
+        Orchestrator.actionAllIn(game, getPlayer(game));
+        expect(game.table.pots.length).to.equal(3);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
+        expect(Utils.potTotal(game.table.pots[2])).to.equal(15);
+        // That does not complete the street, cause SmallBlind has reraised
+        // Action should be to the dealer, the only person who can bet against BigBlind
+        expect(game.table.street).to.equal('preflop');
+        expect(game.table.activeIndex).to.equal(0);
+    })
 
-//     it('will allow a fold on the last side pot and return money to the lead', () => {
-//         expect(game.players[1].chips).to.equal(0); // Small blind is all in
-//         Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
-//         // SmallBlind's 15 cannot be matched, so it should immediately be returned.
-//         // That completes the street - no additional action allowed
-//         expect(game.table.street).to.equal('flop');
-//         expect(game.players[1].chips).to.equal(15); // Small blind got chips back
-//         expect(game.table.pots.length).to.equal(2);
-//         expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
-//         expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
-//     })
+    it('will allow a fold on the last side pot and return money to the lead', () => {
+        expect(game.players[1].chips).to.equal(0); // Small blind is all in
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
+        // SmallBlind's 15 cannot be matched, so it should immediately be returned.
+        // That completes the street - no additional action allowed
+        expect(game.table.street).to.equal('flop');
+        expect(game.players[1].chips).to.equal(15); // Small blind got chips back
+        expect(game.table.pots.length).to.equal(2);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
+    })
 
-//     it('will allow a winner on both remaining pots', () => {
-//         // starting state is Dealer folded. BigBlind and Player 3 all in. Small Blind has 15 chips left that no one can match.
-//         // So no more action should be allowed. Proceed with checks for the rest of the game
-//         // Main pot is: 40 for every player (BigBlind, Player 3, and Small Blind can win it)
-//         // Side pot is: 45 for smallBlind and 45 for bigBlind (BigBlind and SmallBlind can win it)
+    it('will allow a winner on both remaining pots', () => {
+        // starting state is Dealer folded. BigBlind and Player 3 all in. Small Blind has 15 chips left that no one can match.
+        // So no more action should be allowed. Proceed with checks for the rest of the game
+        // Main pot is: 40 for every player (BigBlind, Player 3, and Small Blind can win it)
+        // Side pot is: 45 for smallBlind and 45 for bigBlind (BigBlind and SmallBlind can win it)
 
-//         console.log("******* Start test *******")
-//         expect(game.status).to.equal('auto-advance');
-//         Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen at this point.
-//         expect(game.table.street).to.equal('turn');
-//         Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen.
-//         expect(game.table.street).to.equal('river');
-//         /// Need to assign cards so we have a predictable result
+        console.log("******* Start test *******")
+        expect(game.status).to.equal('auto-advance');
+        Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen at this point.
+        expect(game.table.street).to.equal('turn');
+        Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen.
+        expect(game.table.street).to.equal('river');
+        /// Need to assign cards so we have a predictable result
 
-//         game.players[1].hand = ["Th","Td"]; // SmBlind has pocket 10s
-//         game.players[2].hand = ["Tc","Ts"]; // BgBLind has pocket 10s
-//         game.players[3].hand = ["Ah","Ad"]; // Player3 has best hand overall
-//         game.table.commonCards = ["2c","3s","5d","7h","7d"]; // Common cards don't help anyone
-//         Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen.
-//         expect(game.table.street).to.equal('showdown');
-//         expect(game.players[1].chips).to.equal(60); // SmBlind wins half of top pot: 45. Plus starting chips (15) = 60
-//         expect(game.players[2].chips).to.equal(45); // BgBlind wins half of top pot: 45. Plus remaining chips (0) = 45
-//         expect(game.players[3].chips).to.equal(160); // Player3 wins lower pot: 160. Plus remaining chips (0) = 160;
-//     })
-// })
-
-// describe('calculates side pots',()=>{
-//     it('will calculate them correctly', () => {
-//         expect(Orchestrator.calcSidePots([{'jeff': 15}, {'steve':10}, {'joe':25}, {'bill': 15}])).to.equal(
-//             [{40: ['jeff','steve','joe','bill']},
-//             {15: ['jeff', 'joe', 'bill']},
-//             {10: ['joe']}
-//             ]
-//         )   
-//     })
-// })
+        game.players[1].hand = ["Th","Td"]; // SmBlind has pocket 10s
+        game.players[2].hand = ["Tc","Ts"]; // BgBLind has pocket 10s
+        game.players[3].hand = ["Ah","Ad"]; // Player3 has best hand overall
+        game.table.commonCards = ["2c","3s","5d","7h","7d"]; // Common cards don't help anyone
+        Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen.
+        expect(game.table.street).to.equal('showdown');
+        expect(game.players[1].chips).to.equal(60); // SmBlind wins half of top pot: 45. Plus starting chips (15) = 60
+        expect(game.players[2].chips).to.equal(45); // BgBlind wins half of top pot: 45. Plus remaining chips (0) = 45
+        expect(game.players[3].chips).to.equal(160); // Player3 wins lower pot: 160. Plus remaining chips (0) = 160;
+    })
+})
 
 describe('handles side pot craziness without all in to start',()=>{
     let game = newTestGame(Date.now());
     Orchestrator.startGame(game);
     game.players[0].chips = 70; // Dealer has 30 less
-    game.players[1].chips = 100; // SB has 100 chips
-    game.players[2].chips = 85; // BB has 15 less
+    game.players[1].chips = 95; // SB has 100 chips (5 are in small blind)
+    game.players[2].chips = 75; // BB has 85 chips (10 are in big blind)
     game.players[3].chips = 40; // Player3 (under gun) has short stack: 40.
     Orchestrator.actionCall(game, getPlayer(game)); // Player 3 calls (adds 10 to pot)
     // 0 + 5 + 10 + 10
@@ -160,7 +145,6 @@ describe('handles side pot craziness without all in to start',()=>{
     })
 
     it('will allow an all in and create a side pot', () => {
-        console.log("***** new test ****");
         // Dealer only has 30 chips left (already has 40 in pot).
         // Dealer doesn't cover all 85 total chips, but small blind can, we need a dealer-BB side pot with 75 from each player
         // plus what is already in pot ()
@@ -178,51 +162,45 @@ describe('handles side pot craziness without all in to start',()=>{
         expect(game.table.activeIndex).to.equal(1);
     })
 
-    // it('will allow a call above the all in and recalc side pots', () => {
-    //     Orchestrator.actionCall(game, getPlayer(game)); // Small blind calls with 40 chips
-    //     // 70 + 80 + 80 + f10
-    //     expect(game.table.pots.length).to.equal(3);
-    //     expect(Utils.potTotal(game.table.pots[0])).to.equal(220); // D, BB, SB
-    //     expect(Utils.potTotal(game.table.pots[1])).to.equal(20); // BB, SB
-    //     // That does complete the street, next action with Dealer
-    //     expect(game.table.street).to.equal('flop');
-    //     expect(game.table.activeIndex).to.equal(0);
-    // })
+    it('will allow a call above the all in and recalc side pots', () => {
+        Orchestrator.actionCall(game, getPlayer(game)); // Small blind calls with 40 chips
+        // 70 + 80 + 80 + f10
+        expect(game.table.pots.length).to.equal(2);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(220); // D, BB, SB
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(20); // BB, SB
+        // That does complete the street, next action with Small Blind
+        expect(game.table.street).to.equal('flop');
+        expect(game.table.activeIndex).to.equal(1);
+    })
 
-    // it('will allow a fold on the last side pot and return money to the lead', () => {
-    //     expect(game.players[1].chips).to.equal(0); // Small blind is all in
-    //     Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
-    //     // SmallBlind's 15 cannot be matched, so it should immediately be returned.
-    //     // That completes the street - no additional action allowed
-    //     expect(game.table.street).to.equal('flop');
-    //     expect(game.players[1].chips).to.equal(15); // Small blind got chips back
-    //     expect(game.table.pots.length).to.equal(2);
-    //     expect(Utils.potTotal(game.table.pots[0])).to.equal(160);
-    //     expect(Utils.potTotal(game.table.pots[1])).to.equal(90);
-    // })
+    it('will allow a fold on the last side pot and return money to the lead', () => {
+        expect(game.players[2].chips).to.equal(5); // Big blind is currently in for 80
+        
+        Orchestrator.actionFold(game, getPlayer(game)); // Small blind folds (inexplicably)
+        // BigBlind's 80 cannot be matched, so 20 should be ready to be returned
+        // 70 + f80 + 80 + f10
+        expect(game.players[2].chips).to.equal(5 + 20); // Big blind got chips back
+        expect(game.table.pots.length).to.equal(1);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(220);
+        // This will end betting and advance to 'turn'
+    })
 
-    // it('will allow a winner on both remaining pots', () => {
-    //     // starting state is Dealer folded. BigBlind and Player 3 all in. Small Blind has 15 chips left that no one can match.
-    //     // So no more action should be allowed. Proceed with checks for the rest of the game
-    //     // Main pot is: 40 for every player (BigBlind, Player 3, and Small Blind can win it)
-    //     // Side pot is: 45 for smallBlind and 45 for bigBlind (BigBlind and SmallBlind can win it)
-
-    //     console.log("******* Start test *******")
-    //     expect(game.status).to.equal('auto-advance');
-    //     Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen at this point.
-    //     expect(game.table.street).to.equal('turn');
-    //     Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen.
-    //     expect(game.table.street).to.equal('river');
-    //     /// Need to assign cards so we have a predictable result
-
-    //     game.players[1].hand = ["Th","Td"]; // SmBlind has pocket 10s
-    //     game.players[2].hand = ["Tc","Ts"]; // BgBLind has pocket 10s
-    //     game.players[3].hand = ["Ah","Ad"]; // Player3 has best hand overall
-    //     game.table.commonCards = ["2c","3s","5d","7h","7d"]; // Common cards don't help anyone
-    //     Orchestrator.advanceGame(game); // SmBnd checks. No other play can happen.
-    //     expect(game.table.street).to.equal('showdown');
-    //     expect(game.players[1].chips).to.equal(60); // SmBlind wins half of top pot: 45. Plus starting chips (15) = 60
-    //     expect(game.players[2].chips).to.equal(45); // BgBlind wins half of top pot: 45. Plus remaining chips (0) = 45
-    //     expect(game.players[3].chips).to.equal(160); // Player3 wins lower pot: 160. Plus remaining chips (0) = 160;
-    // })
+    it('will allow a winner on both remaining pots', () => {
+        // starting state is Dealer all in. SmallBlind and Player 3 folded. BigBlind has chips that no one can match
+        // So no more action should be allowed. Proceed with checks for the rest of the game
+        // Main pot is 220 winnable by Dealer or BigBlind
+        console.log("******* Start test *******")
+        expect(game.status).to.equal('auto-advance');
+        expect(game.table.street).to.equal('turn');
+        Orchestrator.advanceGame(game); // BgBnd checks. No other play can happen.
+        expect(game.table.street).to.equal('river');
+        /// Need to assign cards so we have a predictable result
+        game.players[0].hand = ["Th","Td"]; // Dealer has pocket 10s
+        game.players[2].hand = ["Ah","Ad"]; // BgBlind has best hand overall
+        game.table.commonCards = ["2c","3s","5d","7h","7d"]; // Common cards don't help anyone
+        Orchestrator.advanceGame(game); // BgBnd checks. No other play can happen.
+        expect(game.table.street).to.equal('showdown');
+        expect(game.players[0].chips).to.equal(0); // Dealer loses everything
+        expect(game.players[2].chips).to.equal(245); // BgBlind wins 220 + 25 = 245
+    })
 })

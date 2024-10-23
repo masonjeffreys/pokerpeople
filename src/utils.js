@@ -92,8 +92,44 @@ function potTotal(pot){
     return total;
 }
 
-function isBettingComplete(table, players){ // boolean
-    return nextValidPlayerIndex(players, table.activeIndex) == null;
+function isBettingComplete(table, players){ 
+    console.log("is betting complete");// boolean
+    if (countValidPlayers(players) == 1 ){
+        console.log("player left is: ");
+        let player = players[nextValidPlayerIndex(players, table.activeIndex)];
+        console.log(player);
+        console.log(player.actedInStreet);
+        console.log(player.handState);
+        console.log(playerCurrentBetInt(table, player));
+        console.log(currentMaxBet(table, players));
+        if (playerCurrentBetInt(table, player) == currentMaxBet(table, players) || player.handState == "ALLIN"){
+            console.log("1 player left but he can't do anything");
+            // Handle special case where there is only one player left and he is current with bet or all in
+            return true
+        }
+    } else {
+        return nextValidPlayerIndex(players, table.activeIndex) == null;
+    }
+}
+
+function countValidPlayers(players){
+    let count = 0;
+    players.forEach(p => {
+        if (isValidPlayer(p)){
+            count = count + 1;
+        }
+    })
+    return count;
+}
+
+function currentMaxBet(table, players){
+    val = 0;
+    players.forEach(function(player){
+        if (playerCurrentBetInt(table, player) > val){
+            val = playerCurrentBetInt(table, player)
+        }
+    })
+    return val;
 }
 
 function isStreetComplete(table, players){
@@ -112,20 +148,13 @@ function isStreetComplete(table, players){
 
     // Player doesn't have to be current with bet if they are all in.
 
-    var currentMaxBet = 0;
-    players.forEach(function(player){
-        if (playerCurrentBetInt(table, player) > currentMaxBet){
-            currentMaxBet = playerCurrentBetInt(table, player)
-        }
-    })
-
-    console.log("currentMaxBet is ", currentMaxBet);
+    console.log("currentMaxBet is ", currentMaxBet(table, players));
     var streetComplete = true;
 
     players.forEach(function(player){
         if (player.gameState == "ACTIVE"){
             console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
-            if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
+            if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet(table, players)) {
                 console.log(player.id, " is current with bet.")
             } else if (player.handState == "FOLD") {
                 console.log(player.id, " has folded.")
@@ -291,15 +320,8 @@ function canRaise(players, playerOfInterest, table){
     // We will worry about the actual range later.
 
     // Player doesn't have to be current with bet if they are all in.
-    let currentMaxBet = 0;
 
-    players.forEach(function(player){
-        if (playerCurrentBetInt(table, player) > currentMaxBet){
-            currentMaxBet = playerCurrentBetInt(table, player)
-        }
-    })
-
-    if (playerCurrentBetInt(table, playerOfInterest) == currentMaxBet && playerOfInterest.actedInStreet == true){
+    if (playerCurrentBetInt(table, playerOfInterest) == currentMaxBet(table, players) && playerOfInterest.actedInStreet == true){
         // Player has acted and is already the bet leader. Can't raise yourself
         return false;
     } else {
@@ -307,7 +329,7 @@ function canRaise(players, playerOfInterest, table){
 
         players.forEach(function(player){
             console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
-            if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet) {
+            if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet(table, players)) {
                 console.log(player.id, " is current with bet.")
             } else if (player.handState == "FOLD") {
                 console.log(player.id, " has folded.")

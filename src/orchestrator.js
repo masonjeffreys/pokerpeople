@@ -180,13 +180,13 @@ function applyBet(game, playerIndex, amount) {
     game.table.addBet(game.players[playerIndex].id, amount, game.table.pots.length - 1);
     game.players[playerIndex].makeBet(amount);
 
-    // if (anyoneAlreadyAllIn){
-    //     // might have side pots
-    //     console.log("someone all in");
-    //     equalizeFundsAndCreateSidePot(game);
-    //     console.log("pots are");
-    //     console.log(game.table.pots);
-    // }
+    if (anyoneAlreadyAllIn){
+        // might have side pots
+        console.log("someone all in");
+        equalizeFundsAndCreateSidePot(game);
+        console.log("pots are");
+        console.log(game.table.pots);
+    }
 }
 
 function applyBetOld(game, playerIndex, amount) {
@@ -252,6 +252,17 @@ function equalizeFundsAndCreateSidePot(game) {
 
     // Do we ever need to adjust more than the current pot and the new side pot? Yes -> The nth player may go all-in with only $1
     // goal is to put player amounts in correct pots
+
+    // All players must have acted to calc side pots
+    allActed = true;
+    game.players.forEach(p => {
+        if (p.actedInStreet == false && p.handState != "FOLD"){
+            allActed = false;
+        }
+    })
+    if (allActed == false){
+        return;
+    }
 
     let sortableList = [];
     game.players.forEach(player => {
@@ -480,11 +491,8 @@ function actionAllIn(game, player) {
         if (anyoneAlreadyAllIn) {
             // We have a raise.  Definitely have a side pot
             console.log(" --- someones already all in");
-            applyBet(game, game.table.activeIndex, callAmount);
-            if (amount - callAmount > 0) {
-                game.table.addPot();
-            }
-            applyBet(game, game.table.activeIndex, amount - callAmount);
+            applyBet(game, game.table.activeIndex, amount);
+            equalizeFundsAndCreateSidePot(game);
         } else {
             console.log(" --- no one previously all in");
             // Standard all-in bet. Will not create side pot until it is called.
