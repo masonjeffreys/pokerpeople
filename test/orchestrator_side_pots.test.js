@@ -261,3 +261,17 @@ describe('handles side pot scenario 2',()=>{
         expect(Utils.potTotal(game.table.pots[0])).to.equal(90);
     })
 })
+
+describe('handles side pot scenario 3',()=>{
+    let game = newTestGame(Date.now());
+    Orchestrator.startGame(game);
+    // All players have 100 chips
+
+    it('will allow an all in', () => {
+        Orchestrator.actionCall(game, getPlayer(game)); // Player 3 Calls 10. D, SB, BB haven't acted
+        Orchestrator.actionBet(game, getPlayer(game), 100); // Dealer calls - in for 10.
+        // Total is 100 + 5 + 10 + 10
+        expect(game.table.pots.length).to.equal(1);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(125);
+    })
+})

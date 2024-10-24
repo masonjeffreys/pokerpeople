@@ -375,17 +375,14 @@ function isSomeoneAllIn(game) {
 }
 
 function actionBet(game, player, amount) {
+    // A bet is a first bet (when no one else has bet yet) or a raise, if there is another person who has bet.
     console.log("Player ", player.id, " is betting ", amount);
     /// **** THIS IS NOT AN ALL IN BET -> That is handled in another function ****
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
     // this is essentially a raise action (range restricted to ensure this) but not an all-in
     // add logic here to not let the player 
-    if (amount == player.chips) {
-        // should move this to be handled by the 'all-in' action for more clarity.
-        throw new Error("Player attempted to go all in, but the received action was 'bet' ");
-    }
-    else if (amount == 0) {
+    if (amount == 0) {
         // should move this to be handled by the 'check' action for more clarity.
         throw new Error("Player attempted to check, but the received action was 'bet' ");
     }
@@ -393,24 +390,24 @@ function actionBet(game, player, amount) {
         // should move this to be handled by the 'call' action for more clarity.
         throw new Error("Player attempted to check, but the received action was 'bet' ");
     }
+    else if (amount == player.chips){
+        // player going all in. Doesn't have to meet min raise.
+        actionAllIn(game, player);
+    }
     else if (amount < callAmount + game.table.minRaise) {
-        // bet wasn't large enough
+        // bet wasn't large enough. Shouldn't be allowed.
         throw new Error("Not a big enough raise. Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
     } else if (amount > player.chips) {
+        // bet was too large. Shouldn't be allowed.
         player.error = "You only have ", player.chips, " left."
     }
     else {
         // We now have a valid raise for sure!
-        // If someone has already gone all-in on this pot already, we must:
-        // 1. Check to see if bet exceeds all-in amount. If so, we raise
-        // Record that player has acted in street (used for later determination of when the street is over)
+        // If someone has already gone all-in on this pot already, we might have a side pot
+        applyBet(game, game.table.activeIndex, amount);
         if (anyoneAlreadyAllIn) {
             console.log("Raising with someone already all in");
-            applyBet(game, game.table.activeIndex, amount);
             equalizeFundsAndCreateSidePot(game);
-        } else {
-            // Standard bet
-            applyBet(game, game.table.activeIndex, amount);
         }
         player.actedInStreet = true;
         advanceGame(game);
@@ -478,7 +475,6 @@ function actionAllIn(game, player) {
     player.actedInStreet = true;
 
     // Player is all in. Any bet amount is legal here.
-
     let amount = player.chips;
     player.handState = "ALLIN";
     game.table.playerAllIn = player.id;
@@ -493,6 +489,7 @@ function actionAllIn(game, player) {
         applyBet(game, game.table.activeIndex, amount);
         equalizeFundsAndCreateSidePot(game);
     } else {
+        // All in meets call amount or raises
         if (anyoneAlreadyAllIn) {
             // We have a raise.  Definitely have a side pot
             console.log(" --- someones already all in");
