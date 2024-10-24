@@ -189,7 +189,7 @@ exports.fold = () => {
 
 exports.advance = () =>{
     let game = getGame();
-    let player = getPlayer(game);
+    let player = getPlayer(game, false);
     if (game.errors.length == 0){
         game.lastAction = player.prettyName() + " advanced game."
         Orchestrator.advanceGame(game);
