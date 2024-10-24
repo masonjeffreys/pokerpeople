@@ -357,10 +357,6 @@ function actionBet(game, player, amount) {
         // We now have a valid raise for sure!
         // If someone has already gone all-in on this pot already, we might have a side pot
         applyBet(game, game.table.activeIndex, amount);
-        if (anyoneAlreadyAllIn) {
-            console.log("Raising with someone already all in");
-            equalizeFundsAndCreateSidePot(game);
-        }
         player.actedInStreet = true;
         advanceGame(game);
     }
@@ -370,9 +366,6 @@ function actionBet(game, player, amount) {
 function actionCall(game, player) {
     // Record that player has acted in street (used for later determination of when the street is over)
     player.actedInStreet = true;
-    if (game.table.pots.length > 1) {
-        equalizeFundsAndCreateSidePot(game)
-    }
     applyBet(game, game.table.activeIndex, Utils.getCallAmount(game.table, game.players, player));
     advanceGame(game);
     return;
@@ -419,7 +412,6 @@ function actionMuck(game, player, muck) {
 }
 
 function actionAllIn(game, player) {
-    let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     // call amount is sum of amounts needed to call each pot
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
 
@@ -432,27 +424,8 @@ function actionAllIn(game, player) {
     game.table.playerAllIn = player.id;
     console.log("player is ", player.id);
     console.log("call amouont is ", callAmount, ", all-in pushed in ", amount);
-
-    // Now decide if we need to immediately create a side pot or not
-    if (amount < callAmount) {
-        // Player went all in but couldn't match the call amount so we
-        // siphon some funds off of the current pot and start a side pot
-        console.log("Equalizing funds for new side pot since amount bet was ", amount, " and call amount was ", callAmount);
-        applyBet(game, game.table.activeIndex, amount);
-        equalizeFundsAndCreateSidePot(game);
-    } else {
-        // All in meets call amount or raises
-        if (anyoneAlreadyAllIn) {
-            // We have a raise.  Definitely have a side pot
-            console.log(" --- someones already all in");
-            applyBet(game, game.table.activeIndex, amount);
-            equalizeFundsAndCreateSidePot(game);
-        } else {
-            console.log(" --- no one previously all in");
-            // Standard all-in bet. Will not create side pot until it is called.
-            applyBet(game, game.table.activeIndex, amount);
-        }
-    }
+    
+    applyBet(game, game.table.activeIndex, amount);
     advanceGame(game);
 }
 
