@@ -165,6 +165,11 @@
       betInput.value = actionsOpts.bet[0];
       console.log(betInput.value);
       betLabel.innerHTML = actionsOpts.bet[0];
+      betBtn.innerHTML = "Bet " + actionsOpts.bet[0];
+      betInput.oninput = function() {
+        betLabel.innerHTML = this.value;
+        betBtn.innerHTML = "Bet " + this.value;
+      }
     } else {
       betBtn.classList.remove("invisible");
       betBtn.classList.add("invisible");
@@ -172,18 +177,26 @@
       betInput.classList.add("invisible")
       betLabel.classList.remove("invisible");
       betLabel.classList.add("invisible");
-      betInput.oninput = function() {
-        betLabel.innerHTML = this.value;
-      }
+      
     }
   }
   function toggleAdvanceButton(status) {
     let advanceButton = document.getElementById('nextStreetBtn');
+    let checkButton = document.getElementById('checkBtn');
+    let foldButton = document.getElementById('foldBtn');
     if (status == "auto-advance") {
       advanceButton.classList.remove('hidden');
+      checkButton.classList.remove('hidden');
+      checkButton.classList.add('hidden');
+      foldButton.classList.remove('hidden');
+      foldButton.classList.add('hidden');
     } else {
       advanceButton.classList.remove('hidden');
       advanceButton.classList.add('hidden');
+      checkButton.classList.add('hidden');
+      checkButton.classList.remove('hidden');
+      foldButton.classList.add('hidden');
+      foldButton.classList.remove('hidden');
     }
   }
 

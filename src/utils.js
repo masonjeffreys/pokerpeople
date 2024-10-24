@@ -282,8 +282,13 @@ function getOptions(gameStatus, players, player, table){
 
             // Based on the range, set options.
             if (betRange != []){
-                actionOpts.bet = betRange;
-                if (actionOpts.bet[1] == player.chips){
+                if (betRange[0] == betRange[1] && betRange[1] == callAmount){
+                    // player can only call
+                } else {
+                    actionOpts.bet = betRange;
+                }
+                
+                if (betRange[1] == player.chips){
                     // if bet range max is equal to player chips, they can go all in.
                     actionOpts.allIn = player.chips;
                 }
@@ -326,8 +331,10 @@ function canRaise(players, playerOfInterest, table){
         return false;
     } else {
         var raiseAllowed = false;
-
         players.forEach(function(player){
+            let callAmounts = getCallAmounts(table, players, player);
+            let callAmount = callAmounts[callAmounts.length - 1];
+            let maxPossibleMatch = maxMatchByOtherPlayers(table, players, player);
             console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
             if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet(table, players)) {
                 console.log(player.id, " is current with bet.")
@@ -335,6 +342,8 @@ function canRaise(players, playerOfInterest, table){
                 console.log(player.id, " has folded.")
             } else if (player.handState == "ALLIN"){
                 console.log(player.id, " is all in.")
+            } else if (player.chips == callAmount) {
+                console.log(player.id, " can only call.")
             } else {
                 console.log("Betting round not done. Player ", player.id, " needs to act.")
                 raiseAllowed = true;

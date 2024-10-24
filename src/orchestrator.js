@@ -388,7 +388,7 @@ function actionBet(game, player, amount) {
     }
     else if (amount == callAmount) {
         // should move this to be handled by the 'call' action for more clarity.
-        throw new Error("Player attempted to check, but the received action was 'bet' ");
+        throw new Error("Player attempted to call, but the received action was 'bet' ");
     }
     else if (amount == player.chips){
         // player going all in. Doesn't have to meet min raise.
