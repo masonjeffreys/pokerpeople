@@ -189,55 +189,6 @@ function applyBet(game, playerIndex, amount) {
     }
 }
 
-function applyBetOld(game, playerIndex, amount) {
-    // Assume bet amount is valid per the game state before this function is called.
-
-    // Player makes bet
-    // Remove chips from player
-    // Add chips to correct pots on table
-    let callAmounts = Utils.getCallAmounts(game.table, game.players, game.players[playerIndex]); // array of callAmounts by Pot
-    let callAmount = Utils.getCallAmount(game.table, game.players, game.players[playerIndex]); // single call amount
-    console.log("Call amounts by pot are: ", callAmounts);
-    console.log("Placing bet of: ", amount);
-
-    let raiseAmount = amount - callAmount;
-    if (raiseAmount > game.table.minRaise) {
-        console.log("New min raise: ", raiseAmount);
-        game.table.minRaise = raiseAmount;
-    }
-
-    let amountRemaining = amount;
-    callAmounts.forEach(function (ca, index) {
-        if (index == game.table.pots.length - 1 && amountRemaining > 0) {
-            // last Pot. Drop all money here
-            console.log("option 1");
-            game.table.addBet(game.players[playerIndex].id, amountRemaining, index);
-            amountRemaining = 0;
-        } else if (ca > 0 && amountRemaining >= ca) {
-            console.log("option 2");
-            // Need to call the pot and can make the call
-            game.table.addBet(game.players[playerIndex].id, ca, index);
-            amountRemaining = amountRemaining - ca;
-        } else if (ca == 0) {
-            // if call amount is 0, don't add anything. (except if it's the last pot which will be caught by option 1)
-            console.log("option 3");
-        } else if (amountRemaining > 0) {
-            console.log("option 4");
-            // not the last pot, but can't cover the call. Drop all money here
-            // also triggered if call amount is 0
-            game.table.addBet(game.players[playerIndex].id, amountRemaining, index);
-            amountRemaining = 0;
-        } else if (amountRemaining == 0) {
-            console.log("option 5");
-            // no amountRemaining is so we Do nothing.
-        } else {
-            console.log("option 6");
-            throw new Error("Weird. Would not expect to hit this.")
-        }
-    })
-    game.players[playerIndex].makeBet(amount);
-}
-
 function equalizeFundsAndCreateSidePot(game) {
     // Example: amount to call in main pot was $10 and side pot was $20. Last player can only add $15 by going all-in.
     // $15 is the allInTotal in this case
@@ -375,14 +326,14 @@ function isSomeoneAllIn(game) {
 }
 
 function actionBet(game, player, amount) {
-    // A bet is a first bet (when no one else has bet yet) or a raise, if there is another person who has bet.
+    // A bet is a first bet (when no one else has bet yet, so a raise over 0) or a raise
+    // if there is another person who has bet.
+    // Could be an all-in bet.
     console.log("Player ", player.id, " is betting ", amount);
-    /// **** THIS IS NOT AN ALL IN BET -> That is handled in another function ****
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
-    let maxMatchByOtherPlayers = Utils.maxMatchByOtherPlayers(game.table, game.players, player);
-    // this is essentially a raise action (range restricted to ensure this) but not an all-in
-    // add logic here to not let the player 
+    let maxMatchByOthers = Utils.maxMatchByOthers(game.table, game.players, player);
+    
     if (amount == 0) {
         // should move this to be handled by the 'check' action for more clarity.
         throw new Error("Player attempted to check, but the received action was 'bet' ");
@@ -395,9 +346,9 @@ function actionBet(game, player, amount) {
         // player going all in. Doesn't have to meet min raise.
         actionAllIn(game, player);
     }
-    else if (amount < callAmount + game.table.minRaise && amount != (maxMatchByOtherPlayers + callAmount)) {
-        // bet wasn't large enough. Shouldn't be allowed.
-        throw new Error("Not a big enough raise and not " + (maxMatchByOtherPlayers + callAmount) + ". Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
+    else if (amount < callAmount + game.table.minRaise && amount != maxMatchByOthers) {
+        // bet wasn't large enough and is not pushing another player all in. Shouldn't be allowed.
+        throw new Error("Not a big enough raise and not " + maxMatchByOthers + ". Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
     } else if (amount > player.chips) {
         // bet was too large. Shouldn't be allowed.
         player.error = "You only have ", player.chips, " left."

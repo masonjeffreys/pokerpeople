@@ -250,7 +250,7 @@ function getOptions(gameStatus, players, player, table){
     } else {
         let callAmounts = getCallAmounts(table, players, player);
         let callAmount = callAmounts[callAmounts.length - 1];
-        let upperLimit = Math.min(maxMatchByOtherPlayers(table, players, player) + callAmount, player.chips);
+        let upperLimit = Math.min(maxMatchByOthers(table, players, player), player.chips);
         if (canFold(player)){
             // Is player allowed to fold?
             actionOpts.fold = true;
@@ -334,7 +334,6 @@ function canRaise(players, playerOfInterest, table){
         players.forEach(function(player){
             let callAmounts = getCallAmounts(table, players, player);
             let callAmount = callAmounts[callAmounts.length - 1];
-            let maxPossibleMatch = maxMatchByOtherPlayers(table, players, player);
             console.log("player ", player.id, " bet is ", playerCurrentBet(table, player));
             if (player.actedInStreet && playerCurrentBetInt(table, player) == currentMaxBet(table, players)) {
                 console.log(player.id, " is current with bet.")
@@ -353,25 +352,22 @@ function canRaise(players, playerOfInterest, table){
     }
 }
 
-function maxMatchByOtherPlayers(table, players, playerToExclude){
+function maxMatchByOthers(table, players, playerToExclude){
     // The point of this function is to not let a player bet more than someone else at the table can match.
     // Eg. the chip leader can't actually go all-in. They would only be able to put in as many chips
     // as the next biggest stack could match.
 
-    let maxPossibleMatch = 0;
+    let maxMatchByOthers = 0;
     // Cycle through each player other than the playerToExclude
-    // If player is still in, we need to theoretically make a 'call' and then see how many chips
-    // they have left to match a possible raise.
+    // If player is still in, we need to see how many chips they have left
     players.forEach(player => {
         if (player.id != playerToExclude.id && player.handState == "IN"){
-            let callAmount = getCallAmounts(table, players, player);
-            let possibleRaise = player.chips - callAmount;
-            if (possibleRaise > maxPossibleMatch){
-                maxPossibleMatch = possibleRaise;
+            if (player.chips > maxMatchByOthers){
+                maxMatchByOthers = player.chips;
             }
         }
     })
-    return maxPossibleMatch;
+    return maxMatchByOthers;
 }
 
 function getBetRange(players, playerOfInterest, table, callAmounts){
@@ -379,11 +375,11 @@ function getBetRange(players, playerOfInterest, table, callAmounts){
     // Need to determine what the possible bet range is, considering existing pots and player chips.
     // determine if another player can match or exceed this bet.
     let callAmount = callAmounts[callAmounts.length - 1];
-    let maxPossibleMatch = maxMatchByOtherPlayers(table, players, playerOfInterest);
-    console.log("Max raise by another player is: ", maxPossibleMatch);
+    let maxMatchByOthers = maxMatchByOthers(table, players, playerOfInterest);
+    console.log("Max match by another player is: ", maxMatchByOthers);
 
-    //set upper range to minimum of total chips or maxPossibleMatch
-    let upperLimit = Math.min(playerOfInterest.chips, maxPossibleMatch + callAmount);
+    //set upper range to minimum of total chips or maxMatchByOthers
+    let upperLimit = Math.min(playerOfInterest.chips, maxMatchByOthers);
 
     if (upperLimit > 0){
         // Player has chips and some bet can be matched. Proceed.
@@ -411,7 +407,7 @@ module.exports.getByAttributeValue = getByAttributeValue;
 module.exports.isBettingComplete = isBettingComplete;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.maxBetForPot = maxBetForPot;
-module.exports.maxMatchByOtherPlayers = maxMatchByOtherPlayers;
+module.exports.maxMatchByOthers = maxMatchByOthers;
 module.exports.nextValidPlayerIndex = nextValidPlayerIndex;
 module.exports.playerBetForPot = playerBetForPot;
 module.exports.playerCurrentBet = playerCurrentBet;
