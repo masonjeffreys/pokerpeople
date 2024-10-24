@@ -275,3 +275,81 @@ describe('handles side pot scenario 3',()=>{
         expect(Utils.potTotal(game.table.pots[0])).to.equal(125);
     })
 })
+
+describe('handles side pot scenario 4',()=>{
+    let game = newTestGame(Date.now());
+    Orchestrator.startGame(game);
+    game.players[1].chips = 30; // SB has 35 chips total (5 in pot)
+    game.players[2].chips = 75; // BB has 85 total (10 in pot)
+    game.players[3].chips = 60;
+
+    it('will allow an all in', () => {
+        Orchestrator.actionCall(game, getPlayer(game)); // Player 3 Calls 10. D, SB, BB haven't acted
+        // 0 5 10 10
+        Orchestrator.actionCall(game, getPlayer(game)); // Dealer calls - in for 10.
+        // Total is 10 + 5 + 10 + 10
+        Orchestrator.actionBet(game, getPlayer(game), 30); // SB goes all in
+        // 10 35 10 10
+        expect(game.table.pots.length).to.equal(1);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(65);
+    })
+
+    it('will allow an raise on an all in', () => {
+        Orchestrator.actionBet(game, getPlayer(game), 55); // BB Raises w/o going all in
+        // 10 35 65 10
+        Orchestrator.actionCall(game, getPlayer(game)); // Player 3 calls - in for 55.
+        // Total is 10 + 35 + 65 + 65
+        expect(game.table.pots.length).to.equal(3);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(40);
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(75);
+        expect(Utils.potTotal(game.table.pots[2])).to.equal(60);
+    })
+
+
+    it('will allow a fold and collapse pots', () => {
+        Orchestrator.actionFold(game, getPlayer(game)); //  Dealer folds
+        // Total is 10f + 35 + 65 + 65
+        expect(game.table.pots.length).to.equal(2);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(115);
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(60);
+    })
+})
+
+describe('handles side pot scenario 5',()=>{
+    let game = newTestGame(Date.now());
+    Orchestrator.startGame(game);
+    game.players[1].chips = 30; // SB has 35 chips total (5 in pot)
+    game.players[2].chips = 75; // BB has 85 total (10 in pot)
+    game.players[3].chips = 60;
+
+    it('will allow an all in', () => {
+        Orchestrator.actionCall(game, getPlayer(game)); // Player 3 Calls 10. D, SB, BB haven't acted
+        // 0 5 10 10
+        Orchestrator.actionCall(game, getPlayer(game)); // Dealer calls - in for 10.
+        // Total is 10 + 5 + 10 + 10
+        Orchestrator.actionBet(game, getPlayer(game), 30); // SB goes all in
+        // 10 35 10 10
+        expect(game.table.pots.length).to.equal(1);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(65);
+    })
+
+    it('will allow an second higher all in', () => {
+        Orchestrator.actionBet(game, getPlayer(game), 75); // BB Raises w/o going all in
+        // 10 35 85 10
+        Orchestrator.actionCall(game, getPlayer(game)); // Player 3 calls - in for 55.
+        // Total is 10 + 35 + 85 + 85
+        expect(game.table.pots.length).to.equal(3);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(40);
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(75);
+        expect(Utils.potTotal(game.table.pots[2])).to.equal(100);
+    })
+
+
+    it('will allow a fold and collapse pots', () => {
+        Orchestrator.actionFold(game, getPlayer(game)); //  Dealer folds
+        // Total is 10f + 35 + 85 + 85
+        expect(game.table.pots.length).to.equal(2);
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(115);
+        expect(Utils.potTotal(game.table.pots[1])).to.equal(100);
+    })
+})

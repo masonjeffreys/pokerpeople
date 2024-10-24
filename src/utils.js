@@ -411,6 +411,7 @@ module.exports.getByAttributeValue = getByAttributeValue;
 module.exports.isBettingComplete = isBettingComplete;
 module.exports.isStreetComplete = isStreetComplete;
 module.exports.maxBetForPot = maxBetForPot;
+module.exports.maxMatchByOtherPlayers = maxMatchByOtherPlayers;
 module.exports.nextValidPlayerIndex = nextValidPlayerIndex;
 module.exports.playerBetForPot = playerBetForPot;
 module.exports.playerCurrentBet = playerCurrentBet;
