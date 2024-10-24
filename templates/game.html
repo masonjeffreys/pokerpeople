@@ -61,17 +61,7 @@
     </div>
     <div id="bottomBar" class="p-2 mx-auto">
 
-      <div class="flex w-screen justify-center pb-2" id="buttonRow1">
-          <div id="betLabel" class="text-center text-sm p-2"></div>
-        <div>
-          <input type="range" min="1" max="100" class="h-10 p-4 text-center text-base placeholder-gray-400 focus:shadow-outline" id="betAmount">
-        </div>
-        <div><button id="betBtn" onclick="bet()"
-          class="ml-2 bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
-        </div>
-      </div>
-      
-      <div class="flex w-screen justify-center gap-2" id="buttonRow2">
+      <div class="flex w-screen justify-center gap-2" id="buttonRow1">
         <div><button type="button" id="foldBtn" onclick="fold()"
           class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Fold</button>
       </div>
@@ -93,6 +83,18 @@
           cards</button>
         </div>
       </div>
+
+      <div class="flex w-screen justify-center pb-2" id="buttonRow2">
+          <div id="betLabel" class="text-center text-sm p-2"></div>
+        <div>
+          <input type="range" min="1" max="100" class="h-10 p-4 text-center text-base placeholder-gray-400 focus:shadow-outline" id="betAmount">
+        </div>
+        <div><button id="betBtn" onclick="bet()"
+          class="ml-2 bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
+        </div>
+      </div>
+      
+      
     </div>
     <div id="self" class="w-screen p-2 mx-auto flex justify-center">
     </div>
