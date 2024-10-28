@@ -163,7 +163,7 @@ describe('handles min bets correctly',()=>{
 
     it('will reject bets below the min raise if they are not all-in bets', () => {
         // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
-        expect(function(){Orchestrator.actionBet(game, getPlayer(game), 11)}).to.throw('Not a big enough raise and not 100. Min raise is 10 over 10 to call.');
+        expect(function(){Orchestrator.actionBet(game, getPlayer(game), 11)}).to.throw('Not a big enough raise and not 90. Min raise is 10 over 10 to call.');
     })
 })
 

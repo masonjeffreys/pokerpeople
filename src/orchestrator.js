@@ -332,7 +332,7 @@ function actionBet(game, player, amount) {
     console.log("Player ", player.id, " is betting ", amount);
     let anyoneAlreadyAllIn = isSomeoneAllIn(game);
     let callAmount = Utils.getCallAmount(game.table, game.players, player);
-    let maxMatchByOthers = Utils.maxMatchByOthers(game.table, game.players, player);
+    let maxRaiseByOthers = Utils.maxRaiseByOthers(game.table, game.players, player);
     
     if (amount == 0) {
         // should move this to be handled by the 'check' action for more clarity.
@@ -346,9 +346,9 @@ function actionBet(game, player, amount) {
         // player going all in. Doesn't have to meet min raise.
         actionAllIn(game, player);
     }
-    else if (amount < callAmount + game.table.minRaise && amount != maxMatchByOthers) {
+    else if (amount < callAmount + game.table.minRaise && amount != maxRaiseByOthers) {
         // bet wasn't large enough and is not pushing another player all in. Shouldn't be allowed.
-        throw new Error("Not a big enough raise and not " + maxMatchByOthers + ". Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
+        throw new Error("Not a big enough raise and not " + maxRaiseByOthers + ". Min raise is " + game.table.minRaise + " over " + callAmount + " to call.");
     } else if (amount > player.chips) {
         // bet was too large. Shouldn't be allowed.
         player.error = "You only have ", player.chips, " left."
