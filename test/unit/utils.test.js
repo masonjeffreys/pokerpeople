@@ -8,11 +8,11 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // D
 
 
 // Require Deck object (Singleton)
-const Utils = require('../src/utils');
-const Deck = require('../src/deck');
-const Table = require('../src/table');
-const Repo = require('../src/repo');
-const Orchestrator = require('../src/orchestrator');
+const Utils = require('../../src/utils');
+const Deck = require('../../src/deck');
+const Table = require('../../src/table');
+const Repo = require('../../src/repo');
+const Orchestrator = require('../../src/orchestrator');
 
 const table = Table();
 const gameConfig = {

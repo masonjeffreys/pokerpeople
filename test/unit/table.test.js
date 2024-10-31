@@ -8,7 +8,7 @@ const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // D
 
 
 // Require Deck object (Singleton)
-const Table = require('../src/table');
+const Table = require('../../src/table');
 const table = Table();
 
 describe('Streets',()=>{

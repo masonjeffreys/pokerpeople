@@ -5,7 +5,7 @@
 const Code = require('@hapi/code'); // Load Lab (test runner that is produced by Hapi people)
 const Lab = require('@hapi/lab'); // Load Lab (test runner that is produced by Hapi people)
 
-const { init } = require('../server'); // If the app is required, this is required to start the server
+const { init } = require('../../server'); // If the app is required, this is required to start the server
 const { expect } = Code; // Use this instead of Assert
 const { afterEach, beforeEach, describe, it, beforeAll } = exports.lab = Lab.script(); // Defines several constants that are useful for test followup, and notation
 

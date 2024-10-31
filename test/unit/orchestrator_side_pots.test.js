@@ -6,10 +6,10 @@ const Lab = require('@hapi/lab'); // Load Lab (test runner that is produced by H
 const { expect } = Code; // Use this instead of Assert
 const { afterEach, beforeEach, describe, it } = exports.lab = Lab.script(); // Defines several constants that are useful for test followup, and notation
 
-const Table = require('../src/table');
-const Repo = require('../src/repo');
-const Orchestrator = require('../src/orchestrator');
-const Utils = require('../src/utils');
+const Table = require('../../src/table');
+const Repo = require('../../src/repo');
+const Orchestrator = require('../../src/orchestrator');
+const Utils = require('../../src/utils');
 
 const gameConfig = {
     startingChips: 100,
