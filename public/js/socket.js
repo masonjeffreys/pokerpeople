@@ -64,6 +64,10 @@ function startTestGame(){
   socket.emit('test mode');
 }
 
+function buyBackIn(){
+  socket.emit('buy back in');
+};
+
 function nextHand() {
   socket.emit('next hand');
 }

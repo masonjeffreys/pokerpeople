@@ -54,6 +54,7 @@ exports.plugin = {
             socket.on('bet', Handlers.bet);
             socket.on('advance', Handlers.advance);
             socket.on('muck', Handlers.muckChoice);
+            socket.on('buy back in', Handlers.buyBackIn);
 
             // Add chat functionality
             socket.on('newMessage', Handlers.newMessage);

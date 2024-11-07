@@ -69,6 +69,15 @@ exports.newGame = () => {
     emitPrivateStateToEachPlayer(game);
 }
 
+exports.buyBackIn = () => {
+    console.log("buying back in");
+    let game = getGame();
+    let player = getPlayer(game);
+    Orchestrator.buyBackIn(game, player);
+    game.lastAction = player.prettyName() + " bought in again.";
+    emitPrivateStateToEachPlayer(game);
+}
+
 exports.toggleTestMode = () => {
     // Only called after players have sat at table.
     let game = getGame();

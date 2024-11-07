@@ -140,6 +140,40 @@ describe('can handle a win',()=>{
 describe('can handle a win',()=>{
     let game = newTestGame(Date.now());
     Orchestrator.startGame(game);
+    // Modify game state so we can predict winner
+    game.players[1].hand = ['Ac','As']; // Small blind has pocket rockets
+    game.players[2].hand = ['Ah', '2d']; // Bigblind has 1 ace and a 2
+    game.players[2].chips = 40; //Big blind in for 10 already
+    it('when losing a player', () => {
+        Orchestrator.actionFold(game, getPlayer(game)); // Under the gun fold
+        Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds
+        // Heads up
+        Orchestrator.actionCheck(game, getPlayer(game)); // Small blind checks
+        Orchestrator.actionBet(game, getPlayer(game), 40); // Big blind all in
+        Orchestrator.actionCall(game, getPlayer(game)); // Small blind calls. // End of street
+        expect(game.table.street).to.equal('flop');
+        Orchestrator.actionCheck(game, getPlayer(game));
+        expect(game.table.street).to.equal('turn');
+        Orchestrator.actionCheck(game, getPlayer(game));
+        expect(game.table.street).to.equal('river');
+        // Set common cards to ensure winner
+        game.table.commonCards = ['Ad','3d','6c','8h','Kc'];
+        Orchestrator.actionCheck(game, getPlayer(game));
+        expect(game.table.street).to.equal('showdown');
+        expect(game.status).to.equal('hand-complete');
+        expect(game.results[0][0].winner_name).to.equal('Small Blind');
+        expect(game.results[0][0].winning_hand).to.equal("Three of a Kind, A's");
+        expect(game.results[0][0].amount).to.equal(100);
+        expect(game.players[1].chips).to.equal(150);
+        expect(game.players[2].chips).to.equal(0);
+        expect(game.players[1].gameState).to.equal('ACTIVE');
+        expect(game.players[2].gameState).to.equal('OUT');
+    })
+})
+
+describe('can handle a win',()=>{
+    let game = newTestGame(Date.now());
+    Orchestrator.startGame(game);
     it('by all but 1 player folding', () => {
         Orchestrator.actionCall(game, getPlayer(game)); // Under the gun calls
         Orchestrator.actionFold(game, getPlayer(game)); // Dealer folds

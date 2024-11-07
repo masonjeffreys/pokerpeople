@@ -32,6 +32,14 @@ function nextStreet(currentStreet) {
     return STREETS[STREETS.indexOf(currentStreet) + 1] || STREETS[0]
 }
 
+function buyBackIn(game, player){
+    if (player.chips <= 0 || player.gameState == "OUT"){
+        player.handState = "FOLD";
+        player.gameState = "IN";
+    }
+    player.chips = player.chips + game.table.startingChips;
+}
+
 function addPlayerToGame(game, player) {
     // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
     let alreadyExists = game.players.find(
@@ -688,5 +696,6 @@ module.exports.actionFold = actionFold;
 module.exports.actionAllIn = actionAllIn;
 module.exports.actionCheck = actionCheck;
 module.exports.actionMuck = actionMuck;
+module.exports.buyBackIn = buyBackIn;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
 module.exports.calcSidePots = calcSidePots;
