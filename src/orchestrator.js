@@ -47,6 +47,11 @@ function addPlayerToGame(game, player) {
         player.chips = game.table.startingChips;
         player.lastGameCode = game.gameCode;
 
+        if (game.status == 'in-progress'){
+            // Player should add as folded so that they join on the next round
+            player.handState = "FOLD"
+        }
+
         // should Player know their position? Or Table? Or Game?
         // Seat n players from position 0..n-1, add starting chips for each player
         let index = game.players.length - 1;
