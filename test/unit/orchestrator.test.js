@@ -56,7 +56,7 @@ describe('can get new game ready',()=>{
         expect(game.players[0].chips).to.equal(gameConfig["startingChips"]);
         expect(game.players[0].hand).to.equal([]);
     })
-    it('will start with correct data', () => {
+    it('will start in correct position', () => {
         Orchestrator.startGame(game);
         expect(game.table.dealerPosition).to.equal(0);
         expect(game.table.activeIndex).to.equal(3);
@@ -65,7 +65,7 @@ describe('can get new game ready',()=>{
 
 describe('will track minRaise correctly',()=>{
     let game = newTestGame(Date.now());
-    it('will start with correct data', () => {
+    it('after a raise', () => {
         Orchestrator.startGame(game);
         expect(game.table.minRaise).to.equal(10); // small blind is 5, big blind is 10, so first min raise is 10 on top of the big blind
         expect(Utils.playerMaxBet(game.table, game.players)).to.equal(10);
@@ -75,16 +75,28 @@ describe('will track minRaise correctly',()=>{
     })
 })
 
-describe('will allow all-in even if less than min raise',()=>{
+describe('handles min bets correctly',()=>{
     let game = newTestGame(Date.now());
-    it('will start with correct data', () => {
+    // Remove chips from SmallBlind as if they have not been playing well
+    game.players[1].chips = 40;
+    // Remove chips from player3 so they cannot make a full raise.
+    game.players[3].chips = 18;
+    Orchestrator.startGame(game);
+
+    it('will reject bets below the min raise if they are not all-in bets', () => {
+        // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
+        expect(function(){Orchestrator.actionBet(game, getPlayer(game), 11)}).to.throw('Not a big enough raise and not 90. Min raise is 10 over 10 to call.');
+    })
+})
+
+describe('will allow all-in',()=>{
+    let game = newTestGame(Date.now());
+    it('even if less than min raise', () => {
         Orchestrator.startGame(game);
-        expect(game.table.minRaise).to.equal(10); // small blind is 5, big blind is 10, so first min raise is 10 on top of the big blind
-        expect(Utils.playerMaxBet(game.table, game.players)).to.equal(10);
-        Orchestrator.actionBet(game, getPlayer(game), 70); // UnderGun player bets 10 (call) + 11 (1 above min raise);
-        expect(Utils.playerMaxBet(game.table, game.players)).to.equal(70);
+        Orchestrator.actionBet(game, getPlayer(game), 70); // UnderGun player bets 70;
         expect(game.table.minRaise).to.equal(60);
-        Orchestrator.actionAllIn(game, getPlayer(game)); // all in should be allowed even if doesn't meet min raise
+        Orchestrator.actionAllIn(game, getPlayer(game)); // all in by dealer should be allowed even if doesn't meet min raise
+        expect(game.table.minRaise).to.equal(60); // min raise should still be 60
     })
 })
 
@@ -153,33 +165,17 @@ describe('can handle a win',()=>{
     })
 })
 
-describe('handles min bets correctly',()=>{
-    let game = newTestGame(Date.now());
-    // Remove chips from SmallBlind as if they have not been playing well
-    game.players[1].chips = 40;
-    // Remove chips from player3 so they cannot make a full raise.
-    game.players[3].chips = 18;
-    Orchestrator.startGame(game);
-
-    it('will reject bets below the min raise if they are not all-in bets', () => {
-        // Player tries to bet 11. (BB is 10, so they can only call 10 or go all-in with 18).
-        expect(function(){Orchestrator.actionBet(game, getPlayer(game), 11)}).to.throw('Not a big enough raise and not 90. Min raise is 10 over 10 to call.');
-    })
-})
-
 describe('handles a bet larger than other players can match',()=>{
     let game = newTestGame(Date.now());
-    // Remove chips from SmallBlind as if they have not been playing well
-    game.players[1].chips = 40;
-    // Remove chips from bigBlind
-    game.players[2].chips = 50;
-    // Remove chips from Under the gun player3 so they cannot make a full raise.
-    game.players[3].chips = 18;
-    Orchestrator.startGame(game);
-    // Player 3 calls
-    Orchestrator.actionCall(game, getPlayer(game));
-    // Dealer bets more than anyone can call.
-    Orchestrator.actionBet(game, getPlayer(game), 90);
+    it('will allow everyone to go all in', () => {
+        game.players[1].chips = 40; // Remove chips from SmallBlind as if they have not been playing well
+        game.players[2].chips = 50; // Remove chips from bigBlind
+        game.players[3].chips = 18; // Remove chips from Under the gun player3 so they cannot make a full raise.
+        Orchestrator.startGame(game);
+        Orchestrator.actionCall(game, getPlayer(game)); // Player 3 calls
+        Orchestrator.actionBet(game, getPlayer(game), 90);  // Dealer bets more than anyone can call.
+        expect(Utils.potTotal(game.table.pots[0])).to.equal(115);
+    })
 })
 
 describe('handles everyone going all in',()=>{
