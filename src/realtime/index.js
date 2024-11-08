@@ -55,6 +55,8 @@ exports.plugin = {
             socket.on('advance', Handlers.advance);
             socket.on('muck', Handlers.muckChoice);
             socket.on('buy back in', Handlers.buyBackIn);
+            socket.on('increase starting chips', Handlers.increaseStartingChips);
+            socket.on('decrease starting chips', Handlers.decreaseStartingChips);
 
             // Add chat functionality
             socket.on('newMessage', Handlers.newMessage);

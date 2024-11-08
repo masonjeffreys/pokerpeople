@@ -60,6 +60,14 @@ function muckFalse(){
   socket.emit('muck', {muck: false});
 }
 
+function increaseStartingChips(){
+  socket.emit('increase starting chips');
+}
+
+function decreaseStartingChips(){
+  socket.emit('decrease starting chips');
+}
+
 function startTestGame(){
   socket.emit('test mode');
 }

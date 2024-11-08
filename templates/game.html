@@ -40,8 +40,27 @@
           </div>
           <div id="commonCards" class="relative flex p-2 mx-auto">
           </div>
-          <div id="startDiv" class="mx-auto"><button type="button" id="startGameBtn" onclick="startGame()"
+          <div id="startGameDiv" class="mx-auto border border-slate-600 rounded p-2 hidden">
+            <div class="text-center text-sm">Starting chips (blinds 2/1):</div>
+            <div id="startingChips" class="flex mx-auto py-2 justify-center align-middle">
+              <button class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded"
+              onclick="decreaseStartingChips()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 10L12 15L17 10" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+              </button>
+              <div id="startingChipsAmount" class="px-4 font-semibold">5</div>
+                <button class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded"
+                onclick="increaseStartingChips()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" transform="rotate(180)">
+                    <path d="M7 10L12 15L17 10" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="mx-auto flex justify-center align-middle">
+              <button type="button" id="startGameBtn" onclick="startGame()"
             class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Start Game</button>
+            </div>
           </div>
           <div id="lastAction" class="text-sm italic text-center pt-2">
           </div>
@@ -214,7 +233,8 @@
 
   function renderGameStatus(status, players) {
     let winningScreen = document.getElementById('gameEnd');
-    let startGameBtn = document.getElementById('startGameBtn');
+    let startGameDiv = document.getElementById('startGameDiv');
+    let bottomBar = document.getElementById('bottomBar');
     winningScreen.classList.remove("hidden");
     winningScreen.classList.add("hidden");
     if (typeof (status) != 'undefined') {
@@ -232,11 +252,14 @@
         // }
       } else if (status == 'unstarted') {
         // Show start button if game is unstarted
-        startGameBtn.classList.remove("hidden");
+        startGameDiv.classList.remove("hidden");
+        bottomBar.classList.remove("hidden");
+        bottomBar.classList.add("hidden");
       } else {
         // status is some thing else
-        startGameBtn.classList.remove("hidden");
-        startGameBtn.classList.add("hidden");
+        startGameDiv.classList.remove("hidden");
+        startGameDiv.classList.add("hidden");
+        bottomBar.classList.remove("hidden");
       }
     }
   }
@@ -456,8 +479,12 @@
   }
 
   function updateTable(table) {
+    console.log("table is");
+    console.log(table);
     if (table) {
       // table can and will have multiple pots
+      let startingChipsAmount = document.getElementById('startingChipsAmount');
+      startingChipsAmount.innerHTML = table.startingChips;
       showPots(table["pots"]);
       showCommonCards(table["commonCards"]);
       updatePlayerContributions(table["pots"]);

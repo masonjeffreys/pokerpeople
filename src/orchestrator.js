@@ -40,6 +40,11 @@ function buyBackIn(game, player){
     player.chips = player.chips + game.table.startingChips;
 }
 
+function setStartingChips(startingChips){
+    game.table.startingChips = startingChips;
+    console.log("insde fun");
+}
+
 function addPlayerToGame(game, player) {
     // Seems like we shouldn't need to add player to both table and game? Maybe fix this later.
     let alreadyExists = game.players.find(
@@ -72,7 +77,6 @@ function nextHand(game) {
     setupHand(game);
 }
 
-bets = [{ 'jeff': 20 }, { 'andrew': 15 }]
 function calcSidePots(bets) {
     var prevPotValue = 0;
     var result = []
@@ -697,5 +701,6 @@ module.exports.actionAllIn = actionAllIn;
 module.exports.actionCheck = actionCheck;
 module.exports.actionMuck = actionMuck;
 module.exports.buyBackIn = buyBackIn;
+module.exports.setStartingChips = setStartingChips;
 module.exports.nextStreet = nextStreet; // only exporting for Testing...I don't like this
 module.exports.calcSidePots = calcSidePots;

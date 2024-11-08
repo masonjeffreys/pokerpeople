@@ -117,6 +117,18 @@ exports.nextHand = () => {
     emitPrivateStateToEachPlayer(game);
 }
 
+exports.increaseStartingChips = () => {
+    let game = getGame();
+    game.table.startingChips = game.table.startingChips + 10;
+    emitPrivateStateToEachPlayer(game);
+}
+
+exports.decreaseStartingChips = () => {
+    let game = getGame();
+    game.table.startingChips = game.table.startingChips - 10;
+    emitPrivateStateToEachPlayer(game);
+}
+
 exports.bet = (msg) => {
     // Validate 'data-level' stuff in handlers
     // (like making sure we have an integer, the correct player, a game that exists, etc)

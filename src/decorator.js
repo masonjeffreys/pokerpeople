@@ -54,6 +54,7 @@ function privateState(game, player, showHandsForPlayers=[]){
             id: game.table.id,
             street: game.table.street,
             highBet: Utils.playerMaxBet(game.table, game.players),
+            startingChips: game.table.startingChips,
             minRaise: game.table.minRaise,
             commonCards: game.table.commonCards,
             pots: game.table.pots,
