@@ -1,7 +1,5 @@
-<div class="relative w-full justify-center overflow-hidden bg-gray-50 h-full">
-  <img src="/img/beams.jpg" alt="" class="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 b"
-    width="1308" />
-  <div id="gameEnd" class="w-screen h-screen absolute bg-gray-900 z-50 flex flex-col justify-center hidden">
+<div class="relative w-full justify-center overflow-hidden bg-gray-900 h-full">
+  <div id="gameEnd" class="w-screen h-screen absolute bg-gray-900 z-30 flex flex-col justify-center hidden">
     <p id="winnerName" class="glowing text-white text-center font-extrabold logo-1 text-4xl">
     </p>
     <p class="glowing text-white text-center font-extrabold text-2xl">
@@ -15,6 +13,46 @@
         again!</button>
     </div>
   </div>
+  <div id="startGameDiv" class="w-screen h-screen absolute bg-gray-900 z-20 py-10 flex flex-col justify-between hidden">
+    <div id="playerContainer" class="w-60 mx-auto text-white">
+      <div class="font-semibold">Players</div>
+      <div id="playerListDiv"></div>
+    </div>
+    <div class="w-60 mx-auto">
+    <div class="text-center text-sm text-white">Starting chips (blinds 2/1):</div>
+    <div id="startingChips" class="flex mx-auto py-2 justify-between align-middle">
+      <button class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded"
+      onclick="decreaseStartingChips()">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="7px" viewBox="0 0 12 7" version="1.1">
+        <defs/>
+        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+            <g id="down-arrow-5-svgrepo-com" transform="translate(6.000000, 3.500000) rotate(180.000000) translate(-6.000000, -3.500000) translate(1.000000, 1.000000)" stroke="#ffffff" stroke-width="1.5">
+                <polyline id="Shape" transform="translate(5.000000, 2.500000) rotate(180.000000) translate(-5.000000, -2.500000) " points="0 0 5 5 10 0"/>
+            </g>
+        </g>
+    </svg>
+      </button>
+      <div id="startingChipsAmount" class="px-4 font-semibold text-white">5</div>
+        <button class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded"
+        onclick="increaseStartingChips()">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="7px" viewBox="0 0 12 7" version="1.1">
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+              <g id="down-arrow-5-svgrepo-com" transform="translate(1.000000, 1.000000)" stroke="#ffffff" stroke-width="1.5">
+                  <polyline id="Shape" transform="translate(5.000000, 2.500000) rotate(180.000000) translate(-5.000000, -2.500000) " points="0 0 5 5 10 0"/>
+              </g>
+          </g>
+      </svg>
+        </button>
+    </div>
+    </div>
+    <div class="w-60 mx-auto">
+    <div class="mx-auto flex justify-center align-middle">
+      <button type="button" id="startGameBtn" onclick="startGame()"
+    class="bg-transparent hover:bg-indigo-600 text-white text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded w-full">Start Game</button>
+    </div>
+    </div>
+  </div>
+  
   <div id="errorsContainer"
     class="absolute top-0 right-0 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
   </div>
@@ -33,57 +71,19 @@
   <div id="controlCenter" class="absolute bottom-0 w-screen mx-auto">
     <div id="table-holder" class="w-full flex flex-col p-4">
 
-      <div id="table" class="mx-auto z-20">
+      <div id="table" class="mx-auto z-10 w-60">
         <div class="flex flex-col justify-center align-middle">
-          <div id="potHolder"
-            class="mx-auto px-2 text-lg font-semibold rounded-full bg-slate-600 border-slate-900 text-white">
-          </div>
           <div id="commonCards" class="relative flex p-2 mx-auto">
           </div>
-          <div id="startGameDiv" class="mx-auto border border-slate-600 rounded p-2 hidden">
-            <div class="text-center text-sm">Starting chips (blinds 2/1):</div>
-            <div id="startingChips" class="flex mx-auto py-2 justify-center align-middle">
-              <button class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded"
-              onclick="decreaseStartingChips()">
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="7px" viewBox="0 0 12 7" version="1.1">
-                <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-                <title>down-arrow-5-svgrepo-com</title>
-                <desc>Created with Sketch.</desc>
-                <defs/>
-                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-                    <g id="down-arrow-5-svgrepo-com" transform="translate(6.000000, 3.500000) rotate(180.000000) translate(-6.000000, -3.500000) translate(1.000000, 1.000000)" stroke="#4f46e5" stroke-width="1.5">
-                        <polyline id="Shape" transform="translate(5.000000, 2.500000) rotate(180.000000) translate(-5.000000, -2.500000) " points="0 0 5 5 10 0"/>
-                    </g>
-                </g>
-            </svg>
-              </button>
-              <div id="startingChipsAmount" class="px-4 font-semibold">5</div>
-                <button class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded"
-                onclick="increaseStartingChips()">
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="7px" viewBox="0 0 12 7" version="1.1">
-                  <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-                  <title>Slice 1</title>
-                  <desc>Created with Sketch.</desc>
-                  <defs/>
-                  <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-                      <g id="down-arrow-5-svgrepo-com" transform="translate(1.000000, 1.000000)" stroke="#4f46e5" stroke-width="1.5">
-                          <polyline id="Shape" transform="translate(5.000000, 2.500000) rotate(180.000000) translate(-5.000000, -2.500000) " points="0 0 5 5 10 0"/>
-                      </g>
-                  </g>
-              </svg>
-                </button>
-            </div>
-            <div class="mx-auto flex justify-center align-middle">
-              <button type="button" id="startGameBtn" onclick="startGame()"
-            class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Start Game</button>
-            </div>
+          <div id="potHolder"
+            class="px-10 font-semibold text-white text-right">
           </div>
-          <div id="lastAction" class="text-sm italic text-center pt-2">
+          <div id="lastAction" class="text-sm italic text-center pt-2 text-gray-300">
           </div>
-          <div id="nextUp" class="text-sm italic text-center">
+          <div id="nextUp" class="text-sm italic text-center text-gray-300">
           </div>
         </div>
-        <div id="results" class="w-60 text-center mx-auto">
+        <div id="results" class="text-center mx-auto">
         </div>
       </div>
 
@@ -98,23 +98,23 @@
 
       <div class="flex w-screen justify-center gap-2 pb-2" id="buttonRow1">
         <div><button type="button" id="foldBtn" onclick="fold()"
-          class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Fold</button>
+          class="bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Fold</button>
       </div>
         <div><button type="button" id="checkBtn" onclick="check()"
-            class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Check</button>
+            class="bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Check</button>
         </div>
         <div><button type="button" id="callBtn" onclick="call()"
-            class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Call</button>
+            class="bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Call</button>
         </div>
         
         <div><button type="button" id="muckBtnFalse" onclick="muckFalse()"
-            class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Show
+            class="bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Show
             cards</button></div>
         <div><button type="button" id="nextStreetBtn" onclick="nextStreet()"
-            class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Advance</button>
+            class="bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Advance</button>
         </div>
         <div><button type="button" id="muckBtnTrue" onclick="muckTrue()"
-          class="bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Hide
+          class="bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Hide
           cards</button>
         </div>
       </div>
@@ -125,7 +125,7 @@
           <input type="range" min="1" max="100" class="h-10 p-4 text-center text-base placeholder-gray-400 focus:shadow-outline" id="betAmount">
         </div>
         <div><button id="betBtn" onclick="bet()"
-          class="ml-2 bg-transparent hover:bg-indigo-600 text-indigo-600 font-semibold hover:text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
+          class="ml-2 bg-transparent hover:bg-indigo-600 text-white py-2 px-4 border border-indigo-600 hover:border-transparent rounded">Bet</button>
         </div>
       </div>
       
@@ -250,6 +250,7 @@
   function renderGameStatus(status, players) {
     let winningScreen = document.getElementById('gameEnd');
     let startGameDiv = document.getElementById('startGameDiv');
+    let playerListDiv = document.getElementById('playerListDiv');
     let bottomBar = document.getElementById('bottomBar');
     winningScreen.classList.remove("hidden");
     winningScreen.classList.add("hidden");
@@ -269,6 +270,10 @@
       } else if (status == 'unstarted') {
         // Show start button if game is unstarted
         startGameDiv.classList.remove("hidden");
+        playerListDiv.innerHTML = '';
+        players.forEach((p) => {
+          playerListDiv.innerHTML = playerListDiv.innerHTML + '<p>' + p.firstName + ' ' + p.lastName + '</p>';
+        })
         bottomBar.classList.remove("hidden");
         bottomBar.classList.add("hidden");
       } else {
@@ -382,24 +387,24 @@
     if (buttonLabel) {
       if (playerInfo["button"]) {
         // Active look
-        buttonLabel.className = "rounded-full w-4 h-4 text-xs font-bold bg-gray-800 text-center text-white";
+        buttonLabel.className = "rounded-full p-2 px-3 text-xs font-semibold bg-gray-500 text-center text-white";
       } else {
         // Inactive look
-        buttonLabel.className = "rounded-full w-4 h-4 text-xs bg-gray-100 text-center text-gray-300";
+        buttonLabel.className = "hidden";
       }
     }
     if (smallBlindLabel) {
       if (playerInfo["smallBlind"]) {
-        smallBlindLabel.className = "rounded-full w-4 h-4 text-xs font-bold bg-blue-700 text-center text-white";
+        smallBlindLabel.className = "rounded-full p-2 text-xs font-semibold bg-blue-700 text-center text-white";
       } else {
-        smallBlindLabel.className = "rounded-full w-4 h-4 text-xs bg-gray-100 text-center text-gray-300";
+        smallBlindLabel.className = "hidden";
       }
     }
     if (bigBlindLabel) {
       if (playerInfo["bigBlind"]) {
-        bigBlindLabel.className = "rounded-full w-4 h-4 text-xs font-bold bg-yellow-500 text-center";
+        bigBlindLabel.className = "rounded-full p-2 text-xs font-semibold bg-yellow-500 text-center";
       } else {
-        bigBlindLabel.className = "rounded-full w-4 h-4 text-xs bg-gray-100 text-center text-gray-300";
+        bigBlindLabel.className = "hidden";
       }
     }
     if (card1Label && card2Label) {
@@ -522,7 +527,7 @@
         keys2.forEach(function (key2) {
           total = total + pot.playerAmounts[key2].amount;
         })
-        potDiv.innerHTML = "Pot: " + total;
+        potDiv.innerHTML = total;
         potHolder.appendChild(potDiv);
       })
     }
@@ -538,16 +543,16 @@
           playerBox.classList.remove("blink");
           playerBox.classList.remove("ring");
           playerBox.classList.remove("ring-offset-4")
-          playerBox.classList.remove("ring-cyan-500");
-          playerFirstName.classList.remove("text-cyan-500");
-          playerLastName.classList.remove("text-cyan-500");
+          playerBox.classList.remove("ring-indigo-600");
+          playerFirstName.classList.remove("text-indigo-600");
+          playerLastName.classList.remove("text-indigo-600");
           if (playersInfo[i]["playerId"] == activePlayer.playerId) {
             playerBox.classList.add("blink");
             playerBox.classList.add("ring");
             playerBox.classList.add("ring-offset-4");
-            playerBox.classList.add("ring-cyan-500");
-            playerFirstName.classList.add("text-cyan-500");
-            playerLastName.classList.add("text-cyan-500");
+            playerBox.classList.add("ring-indigo-600");
+            playerFirstName.classList.add("text-indigo-600");
+            playerLastName.classList.add("text-indigo-600");
           }
         }
       }
@@ -666,21 +671,21 @@
     playerInPot.id = 'player' + player.playerId + 'inPot';
     playerInPot.className = 'playerinPot absolute -right-2 -top-2 h-6 w-6 bg-slate-600 border-slate-900 border-1 rounded-full text-white text-sm text-center';
     playerFirstName.id = 'player' + player.playerId + 'firstname';
-    playerFirstName.className = 'relative text-sm font-semibold -top-1 text-center';
+    playerFirstName.className = 'relative text-sm -top-1 text-center text-gray-300';
     playerLastName.id = 'player' + player.playerId + 'lastname';
-    playerLastName.className = 'text-xs uppercase relative -top-2 text-center';
+    playerLastName.className = 'text-xs relative -top-2 text-center text-gray-300';
     playerChips.id = 'player' + player.playerId + 'chips';
-    playerChips.className = 'mx-2 text-lg text-center font-semibold rounded-full bg-slate-600 border-slate-900 text-white relative -top-2 px-2';
+    playerChips.className = 'mx-2 text-lg text-center font-semibold text-white relative -top-2 px-2';
     playerPosition.id = 'player' + player.playerId + 'position';
     playerPosition.className = 'flex gap-1 justify-center';
     playerButton.id = 'player' + player.playerId + 'button';
-    playerButton.className = 'rounded-full w-1 h-1 text-center font-bold ring-2 ring-inset text-sm';
+    playerButton.className = 'rounded-full w-1 h-1 text-center font-semibold ring-2 ring-inset text-sm';
     playerButton.innerHTML = "D";
     playerSmallBlind.id = 'player' + player.playerId + 'smallBlind';
-    playerSmallBlind.className = 'rounded-full font-bold ring-2 ring-inset text-sm';
+    playerSmallBlind.className = 'rounded-full font-semibold ring-2 ring-inset text-sm';
     playerSmallBlind.innerHTML = "SB";
     playerBigBlind.id = 'player' + player.playerId + 'bigBlind';
-    playerBigBlind.className = 'rounded-full font-bold ring-2 ring-inset text-xs';
+    playerBigBlind.className = 'rounded-full font-semibold ring-2 ring-inset text-xs';
     playerBigBlind.innerHTML = "BB";
 
     playerCard1.appendChild(playerCard1Text);
